@@ -3,8 +3,8 @@
   copyright Paul Dreik (earlier Sundvall)
 
   see LICENSE for details.
-  $Revision: 767 $
-  $Id: rdfind.cc 767 2012-05-07 17:35:41Z pauls $
+  $Revision: 803 $
+  $Id: rdfind.cc 803 2013-01-26 04:22:16Z paul $
 
 
   version info:
@@ -12,6 +12,7 @@
 
 */
 
+#include "config.h"
 
 #include <iostream>//cout etc
 #include <vector>
@@ -105,8 +106,8 @@ void usage()
   cout<<endl;
   cout<<endl
       <<"rdfind is written by Paul Dreik 2006. License: GPL v2 or later (at your option)."<<endl;
-  cout<<"svn version of this file is $Revision: 767 $"<<endl;
-  cout<<"svn id of this file is $Id: rdfind.cc 767 2012-05-07 17:35:41Z pauls $"<<endl;
+  cout<<"svn version of this file is $Revision: 803 $"<<endl;
+  cout<<"svn id of this file is $Id: rdfind.cc 803 2013-01-26 04:22:16Z paul $"<<endl;
   cout<<"version is "<<VERSION<<endl;
   cout<<endl;
 }

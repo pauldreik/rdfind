@@ -4,10 +4,13 @@ functionality in rdfind.
 
 Author Paul Sundvall 2006
 see LICENSE for details.
-$Revision: 719 $
-$Id: Rdutil.cc 719 2011-07-24 12:17:18Z pauls $
+$Revision: 803 $
+$Id: Rdutil.cc 803 2013-01-26 04:22:16Z paul $
  */
+#include "config.h"
+
 #include "Rdutil.hh"
+#include <cassert>
 #include <fstream> //for file writing
 #include <ostream> //for output
 #include <string> //for easier passing of string arguments
@@ -217,18 +220,24 @@ int Rdutil::remove_if()
 //total size
 //opmode=0 just add everything
 //opmode=1 only elements with m_duptype=Fileinfo::DUPTYPE_FIRST_OCCURRENCE
-unsigned long long Rdutil::totalsizeinbytes(int opmode) 
+unsigned long long Rdutil::totalsizeinbytes(int opmode) const
 {
   //for some reason, for_each does not work. 
   Rdutil::adder_helper adder;
   std::vector<Fileinfo>::iterator it;
-  if(opmode==0)
-    for(it=m_list.begin();it!=m_list.end();++it)
-      adder(*it);	
-  else if(opmode==1)
-    for(it=m_list.begin();it!=m_list.end();++it)
-      if(it->getduptype()==Fileinfo::DUPTYPE_FIRST_OCCURRENCE)
+  if(opmode==0) {
+    for(it=m_list.begin();it!=m_list.end();++it) {
+      adder(*it);
+    }
+  } else if(opmode==1) {
+    for(it=m_list.begin();it!=m_list.end();++it) {
+      if(it->getduptype()==Fileinfo::DUPTYPE_FIRST_OCCURRENCE) {
 	adder(*it);
+      }
+    }
+  } else {
+    assert(!"bad input, mode should be 0 or 1");
+  }
   
   return adder.getsize();
 }

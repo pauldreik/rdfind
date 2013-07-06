@@ -7,7 +7,7 @@ at your option, a later version. See the note at the bottom of this file.
 It uses nettle, a cryptographic library by Niels Möller. The parts of
 nettle that are used are released into the public domain.
 
-Do you think rdfind is useful? Drop me a line at rdfind@paulsundvall.net
+Do you think rdfind is useful? Drop me a line at rdfind@pauldreik.se
 
 
 
@@ -30,5 +30,5 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 02111-1307  USA
 
 version info:
-$Revision: 666 $
-$Id: LICENSE 666 2010-04-26 10:36:50Z pauls $
+$Revision: 824 $
+$Id: LICENSE 824 2013-06-18 10:43:10Z paul $

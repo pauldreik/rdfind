@@ -1,13 +1,27 @@
+2013-06-18  Paul Dreik  <rdfind@pauldreik.se>
+	* release of 1.3.3
+	now builds on GNU/Hurd (see debian bug #711793) using the patch by
+	Pino Toscano. Thanks!
+	large file problem on 32 bit solved.
+2013-06-03  Paul Dreik <rdfind@pauldreik.se>
+	* applied patch for building on GNU/Hurd, by Pino Toscano
+2013-01-31  Paul Dreik  <rdfind@pauldreik.se>
+	* added testing. currently the only test is to verify that the
+	  large file problem is solved.
+2013-01-26  Paul Dreik  <rdfind@pauldreik.se>
+	* prerelease of 1.3.3
+	* working with large file problems on 32 bit ubuntu,
+	  with large files being ignored by rdfind due to lstat
+	  returning error. There are also printing problems
+	  reporting total file size on stdout when running which
+	  hopefully are solved now.
 2012-11-27  Paul Dreik  <rdfind@pauldreik.se>
 	* corrected typo in manpage example, which incorrectly used
 	-deletefiles instead of -deleteduplicates. Thanks KC for reporting
 	this!
 	* release of 1.3.2
-	
 2012-05-07  Paul Dreik  <rdfind@pauldreik.se>
-
 	* release of 1.3.1. No changes except the gcc 4.7 related changes.
-	
 2012-04-19  Paul Dreik  <rdfind@pauldreik.se>
 	* now compiles with gcc 4.7
 2011-07-24  Paul Dreik  <rdfind@pauldreik.se>
@@ -115,4 +129,4 @@
 
 2006-01-05  Paul Sundvall  <rdfind@paulsundvall.net>  
 	*started. first version.
-	CHANGELOG $Revision: 798 $
+	CHANGELOG $Revision: 824 $

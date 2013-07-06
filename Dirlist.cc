@@ -3,9 +3,10 @@ files for reading entries from a file structure.
 
 Author Paul Sundvall 2006
 see LICENSE for details.
-$Revision: 561 $
-$Id: Dirlist.cc 561 2009-01-21 16:34:00Z pauls $
+$Revision: 803 $
+$Id: Dirlist.cc 803 2013-01-26 04:22:16Z paul $
  */
+#include "config.h"
 #include "Dirlist.hh"
 #include <dirent.h>
 #include <sys/types.h>

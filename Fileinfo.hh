@@ -3,8 +3,8 @@ a class to hold information about a file.
 
 Author Paul Sundvall 2006
 see LICENSE for details.
-$Revision: 765 $
-$Id: Fileinfo.hh 765 2012-04-19 20:05:09Z pauls $
+$Revision: 822 $
+$Id: Fileinfo.hh 822 2013-06-03 09:25:13Z paul $
  */
 
 #ifndef Fileinfo_hh
@@ -67,9 +67,9 @@ public:
   //to store info about the file
   typedef off_t filesizetype; //defined in sys/types.h
   struct Fileinfostat {
-    filesizetype st_size;//size
-    unsigned long st_ino;//inode
-    unsigned long st_dev;//device
+    filesizetype stat_size;//size
+    unsigned long stat_ino;//inode
+    unsigned long stat_dev;//device
     bool is_file;
     bool is_directory;
     Fileinfostat();
@@ -142,16 +142,16 @@ public:
   static bool static_deleteflag(const Fileinfo &A){return A.deleteflag();}
 
   //returns the size
-  filesizetype size() const {return m_info.st_size;}
+  filesizetype size() const {return m_info.stat_size;}
 
   //returns true if A has size zero
   static bool isempty(const Fileinfo &A){return A.size()==0;}
 
   //returns the inode number
-  unsigned long inode() const {return m_info.st_ino;}
+  unsigned long inode() const {return m_info.stat_ino;}
 
   //returns the device
-  unsigned long device() const {return m_info.st_dev;}
+  unsigned long device() const {return m_info.stat_dev;}
 
   //gets the filename
   const std::string& name() const {return m_filename;}

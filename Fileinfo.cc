@@ -2,12 +2,12 @@
 a class to hold information about a file.
 
 cvs info:
-$Revision: 765 $
-$Id: Fileinfo.cc 765 2012-04-19 20:05:09Z pauls $
+$Revision: 822 $
+$Id: Fileinfo.cc 822 2013-06-03 09:25:13Z paul $
 Author Paul Sundvall 2006
 See LICENSE for details.
 */
-
+#include "config.h"
 #include "Fileinfo.hh"
 
 #include <fstream>//for file reading
@@ -110,18 +110,18 @@ bool Fileinfo::readfileinfo(){
   } while(res<0 && errno==EINTR);
   
   if (res<0){
-    m_info.st_size=0;
-    m_info.st_ino=0;
-    m_info.st_dev=0;
+    m_info.stat_size=0;
+    m_info.stat_ino=0;
+    m_info.stat_dev=0;
     std::cerr<<"readfileinfo.cc:Something went wrong when reading file info from \""<<
       m_filename<<"\" :"<<strerror(errno)<<std::endl;
     return false;	    
   }
 
   //only keep the relevant information
-  m_info.st_size=(Fileinfo::filesizetype) info.st_size;
-  m_info.st_ino= info.st_ino;
-  m_info.st_dev= info.st_dev;
+  m_info.stat_size=(Fileinfo::filesizetype) info.st_size;
+  m_info.stat_ino= info.st_ino;
+  m_info.stat_dev= info.st_dev;
 
   m_info.is_file=S_ISREG(info.st_mode)?true:false;
   m_info.is_directory=S_ISDIR(info.st_mode)?true:false;
@@ -149,9 +149,9 @@ const std::string Fileinfo::getduptypestring(const Fileinfo &A) {
 
 //constructor
 Fileinfo::Fileinfostat::Fileinfostat() {
-  st_size=99999;
-  st_ino =99999;
-  st_dev =99999;
+  stat_size=99999;
+  stat_ino =99999;
+  stat_dev =99999;
   is_file    =false;
   is_directory=false;
 }
