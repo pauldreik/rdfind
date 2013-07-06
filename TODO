@@ -1,0 +1,13 @@
+TODO for rdfind
+cvs version: $Revision: 55 $
+
+20060603
+What happens when items are being removed because of duplicate inode,
+is the correct precedence preservered? 
+20060315: it removes depending on priority and depth, as it should.
+
+20060603
+maybe a tip howto combine with find and xargs.
+
+20060603
+maxdepth should be given? 

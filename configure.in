@@ -1,0 +1,52 @@
+dnl configure.in for rdfind. Written By Paul Sundvall.
+dnl This file is cvs version $Revision: 92 $
+
+VERSION="1.2.2"
+AC_INIT(rdfind.cc,1.2.2)
+AM_CONFIG_HEADER(config.h)       
+
+AM_INIT_AUTOMAKE(rdfind,1.2.2)
+
+
+dnl find and test the C compiler
+AC_PROG_CC
+AC_PROG_CXX
+AC_LANG_CPLUSPLUS
+        
+AC_PROG_MAKE_SET
+               
+AC_HEADER_STDC
+
+dnl test for nettle
+AC_CHECK_HEADER(nettle/sha.h,,[AC_MSG_ERROR([
+ nettle header files missing. Please install nettle
+ first. If you have already done so and get this error message 
+ anyway, it may be installed somewhere else, maybe because you 
+ don't have root access. Pass CPPFLAGS=-I/your/path/to/nettle to configure
+ and try again. The path should be so that #include nettle/headerfile.h works.
+])]) 
+AC_CHECK_LIB(nettle,main,,[AC_MSG_ERROR([
+ Could not link to libnettle. Please install nettle
+ first. If you have already done so; please run ldconfig
+ as root or check whether the path libnettle was installed
+ to is in your LD_LIBRARY_PATH. If you have nettle 
+ somewhere else, maybe because you don't have root 
+ access, pass LDFLAGS=-L/your/path/to/nettle to configure
+ and try again.
+])])
+
+dnl test for some specific functions
+AC_CHECK_FUNC(stat,,AC_MSG_ERROR(oops! no start ?!?))
+AC_CHECK_FUNC(nanosleep,,AC_MSG_WARN(cant do nanosleep ?))
+
+AC_CHECK_LIB(stdc++, main,,AC_MSG_ERROR(rdfind requires libstdc++))          
+
+AC_CHECK_HEADERS(string,,AC_MSG_WARN(STL classes missing ?))
+AC_CHECK_HEADERS(vector,,AC_MSG_WARN(STL classes missing ?))
+AC_CHECK_HEADERS(time.h,,AC_MSG_WARN(nanosleep header time.h missing?))
+
+
+AC_SUBST(VERSION)
+
+dnl read Makefile.in and write Makefile
+AC_OUTPUT(Makefile)

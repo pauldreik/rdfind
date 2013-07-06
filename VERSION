@@ -1,0 +1,9 @@
+1.2.2
+
+Note that the version number exists at three places:
+here (file VERSION)
+configure.in
+rdfind.1 (the man page)
+
+$Revision: 92 $
+$Id: VERSION 92 2006-03-26 09:27:32Z pauls $

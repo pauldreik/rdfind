@@ -1,0 +1,33 @@
+This software is written by Paul Sundvall 2006
+
+It is distributed under GNU General Public Licence (GPL) version 2 or,
+at your option, a later version. See the note at the bottom of this file.
+
+It uses nettle, a cryptographic library by Niels Möller. The parts of
+nettle that are used are released into the public domain.
+
+Do you think rdfind is useful? Drop me a line at rdfind@paulsundvall.net
+
+
+
+rdfind -  a redundant file finder.
+Copyright (C) 2006 Paul Sundvall
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+02111-1307  USA
+
+version info:
+$Revision: 66 $
+$Id: LICENSE 66 2006-03-19 17:33:33Z pauls $

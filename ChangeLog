@@ -1,0 +1,60 @@
+CHANGELOG $Revision: 91 $
+
+20060321 1.2.1+
+	sleep introduced, to reduce load.
+	examples in the manual introduced.
+	new formatting on usage() to not get line breaks.
+	new structure in configure.in, to get error messages from nettle quicker.
+	symlinks now work better, as they are made absolute.
+20060319 1.2.1
+	Changed to auto-tools.
+	
+20060302 1.2.0
+	Moved nettleclass to rdfind, to ease up installation.
+	finalized configure.in so that autoconf works.
+
+20060302 1.1.2  
+	spelling error (and a test of version numbers...)
+
+20060302 1.1.1
+	added VERSION as #define.
+	added flags --version etc
+	added install for make install.
+
+20060228
+	now possible to specify also files as input arguments.
+	added possibility to use sha1 checksum.
+	changed ints to enums on default args to make it compile even on
+	gcc 4.03 prerelease
+	
+
+20060225
+	moved into cvs. changed from RSA md5 to nettle.
+
+20060117
+	replacing name "Bulk" with "Fileinfo"
+	INSTALL COPYRIGHT etc created.
+	calling this one 1.0.1
+
+20060116
+	release version 1.0.0
+
+20060113
+	hard links
+
+20060112
+	using memcmp for comparison on byte.
+	dont read file if it already has been read and m_nbytes is longer
+	than the file itself.
+	
+
+20060111
+	parsing of input args before starting to add files added nice
+	output of size in Gb etc. fixed bug on char comparison.
+
+20060110 
+	wrote man page.
+
+
+20060105 
+	started. first version.

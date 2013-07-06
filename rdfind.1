@@ -1,0 +1,119 @@
+.\" View this file with
+.\" groff -man -Tascii rdfind.1 |less
+.\"
+.\" Author Paul Sundvall 2006
+.\" see LICENSE for details.
+.\" $Revision: 92 $
+.\" $Id: rdfind.1 92 2006-03-26 09:27:32Z pauls $
+.TH rdfind 1.2.2 "March 2006" rdfind
+.SH NAME
+rdfind \- finds duplicate files
+.SH SYNOPSIS
+.B rdfind [ options ] 
+.I directory1 | file1
+.B [
+.I directory2 |file2
+.B ] ...
+.SH DESCRIPTION
+.B rdfind
+finds duplicate files across and/or within several directories. It calculates
+checksum only if necessary.
+rdfind runs in O(Nlog(N)) time.
+
+If duplicates are found, the duplicate first encountered on the command line
+is considered the original. If duplicates exist within the
+same directory found during processing a specific input argument, 
+the file with lowest depth is considered to be the original.
+Depth is calculated relative to the input argument, not relative to /.
+If identical files are found in the same directory and during processing a
+specific input argument, precedence is undefined.
+To include files or directories that have names starting with -, use 
+rdfind ./- to not confuse them with options.
+.SH OPTIONS
+Searching etc:
+.IP "-ignoreempty true|false"
+Ignore empty files. (default)
+.IP "-followsymlinks true|false"
+Follow symlinks. Default is false.
+.IP "-removeidentinode true|false"
+removes items found which have identical inode and device ID. Default
+is true
+.IP "-checksum md5|sha1"
+what type of checksum to be used: md5 or sha1. Default is md5.
+.PP
+Actions:
+.IP "-makesymlinks true|false"
+Replace duplicate files with symbolic links
+.IP "-makehardlinks true|false"
+Replace duplicate files with symbolic links
+.IP "-makeresultsfile true|false"
+Make a results file results.txt (default) in the current directory.
+.IP "-deleteduplicates true|false"
+Delete (unlink) files.
+.PP
+General:
+.IP "-sleep Xms"
+sleeps X milliseconds between reading each file, to reduce
+load. Default is 0 (no sleep). Note that only a few values are
+supported at present: 0,1-5,10,25,50,100 milliseconds. 
+.IP "-n -dryrun"
+displays what should have been done, dont actually delete or link anything.
+.IP "-h, -help, --help"
+displays brief help message.
+.IP "-v, -version, --version"
+displays version number.
+.SH EXAMPLES
+.TP
+Search for duplicate files in home directory and a backup directory:
+.B rdfind ~ /mnt/backup
+.TP
+Delete duplicate in a backup directory:
+.B rdfind -deletefiles true /mnt/backup
+.TP
+Search for duplicate files in directories called foo:
+.B find . -type d -name foo -print0 |xargs -0 rdfind
+.SH FILES
+.I results.txt
+The results file results.txt will contain one row per duplicate file
+found, along with a header row explainging the columns.
+A text describes why the file is considered a duplicate:
+
+DUPTYPE_UNKNOWN some internal error
+
+DUPTYPE_FIRST_OCCURENCE the file that is considered to be the original.
+
+DUPTYPE_WITHIN_SAME_TREE files in the same tree (found when processing
+the directory in the same input argument as the original)
+
+DUPTYPE_OUTSIDE_TREE the file is found during processing another input
+argument than the original. 
+.RS
+The default output file with a description of the duplicate found.
+.SH ENVIRONMENT
+.SH DIAGNOSTICS
+.SH EXIT VALUES
+0 on success, nonzero otherwise.
+.SH BUGS/FEATURES
+When specifying the same directory twice, it keeps the first
+encountered as the most important (original), and the rest as
+duplicates. This might not be what you want.
+The symlink creates absolute links. 
+There are lots of enhancements left to do. Please contribute!
+.SH SECURITY CONSIDERATIONS
+Avoid manipulating the directories while rdfind is reading.
+rdfind is quite britle in that case. Especially, when deleting
+or making links, rdfind can be subject to a symlink attack.
+Use with care!
+.SH AUTHOR
+Paul Sundvall 2006, reachable at rdfind@paulsundvall.net
+Rdfind can be found at http://rdfind.paulsundvall.net/
+
+Do you find rdfind useful? Drop me a line!
+.SH VERSION
+1.2.2 (release date 20060326)
+.SH COPYRIGHT
+This program is distributed under GPL.
+.SH "SEE ALSO"
+.BR md5sum (1),
+.BR find (1),
+.BR symlinks(2)

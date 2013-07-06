@@ -1,0 +1,35 @@
+INSTALL for rdfind. By Paul Sundvall.
+cvs version: $Revision: 55 $
+
+To install rdfind:
+rdfind needs the library nettle by Niels Möller. 
+
+If you alread have nettle installed properly and on a standard place, 
+the installation goes quite smooth. Proceed to section 2 below.
+
+1)
+If you have nettle installed somewhere else (non-standard place, maybe
+because you do not have root access), you have to supply the
+paths to configure, for instance:
+./configure CPPFLAGS=-I../nettle/  LDFLAGS=-L../nettle/nettle 
+
+If you do not have nettle installed, you may install it either the
+standard way (going to http://www.lysator.liu.se/~nisse/nettle/,
+downloading and installing after instructions found there), or 
+with the small helper scripts in directory nettle provided with this
+package. See the INSTALL file in that directory.
+
+2)
+compile rdfind with 
+./configure (or ./configure CPPFLAGS=-I./nettle/  LDFLAGS=-L./nettle/nettle)
+make
+make install (optionally)
+
+3)
+rdfind should now work properly. Try man rdfind to check that the installation
+was succesful.
+
+Author Paul Sundvall 2006
+see LICENSE for details.
+$Revision: 55 $
+$Id: INSTALL 55 2006-03-15 19:04:57Z pauls $
