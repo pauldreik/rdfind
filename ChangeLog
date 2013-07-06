@@ -1,3 +1,8 @@
+2013-06-19  Paul Dreik  <rdfind@pauldreik.se>
+	* release of 1.3.4
+	workaround for unit test for filesize which did not run on Hurd
+	because of insufficient large file support. See the discussion on
+	debian bug #711793. no other changes.
 2013-06-18  Paul Dreik  <rdfind@pauldreik.se>
 	* release of 1.3.3
 	now builds on GNU/Hurd (see debian bug #711793) using the patch by
@@ -129,4 +134,4 @@
 
 2006-01-05  Paul Sundvall  <rdfind@paulsundvall.net>  
 	*started. first version.
-	CHANGELOG $Revision: 824 $
+	CHANGELOG $Revision: 825 $

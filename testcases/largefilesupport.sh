@@ -29,14 +29,21 @@ trap cleanup 0
 cd $datadir
 
 #create a large file, sparse.
-filesize=$((2147483647+1)) #size, in bytes. This is a problematic value.
+filesizem1=2147483647 #size, in bytes. This is no problem.
+filesize=$(($filesizem1+1)) #size, in bytes. This is a problematic value.
+
+#below, dd is used and the file is later appended to, to avoid problems
+#on Hurd which currently (20130619) can not take $filesize as argument to
+#dd without complaining and erroring out.
 
 #make two files, which differ at the first byte to make
 #rdfind return fast after comparing the initial part.
 echo "a">sparse-file1
 echo "b">sparse-file2
-dd if=/dev/null of=sparse-file1 bs=1 seek=$filesize count=1
-dd if=/dev/null of=sparse-file2 bs=1 seek=$filesize count=1
+dd if=/dev/null of=sparse-file1 bs=1 seek=$filesizem1 count=1
+dd if=/dev/null of=sparse-file2 bs=1 seek=$filesizem1 count=1
+head -c1 /dev/zero >>sparse-file1
+head -c1 /dev/zero >>sparse-file2
 #let the filesystem settle
 sync
 
