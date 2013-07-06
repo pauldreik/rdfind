@@ -1,3 +1,5 @@
+1.3.1
+now builds with gcc 4.7
 1.3.0
 Spelling of OCCURRENCE is now correct. This might affect user scripts
 parsing the output file (results.txt). 
@@ -5,4 +7,4 @@ parsing the output file (results.txt).
 fixed bug with failure to read files given directly on command line
 added debug support in configure script
 1.2.3
-$Revision: 721 $
+$Revision: 766 $

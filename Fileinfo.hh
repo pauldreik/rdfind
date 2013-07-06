@@ -3,17 +3,20 @@ a class to hold information about a file.
 
 Author Paul Sundvall 2006
 see LICENSE for details.
-$Revision: 719 $
-$Id: Fileinfo.hh 719 2011-07-24 12:17:18Z pauls $
+$Revision: 765 $
+$Id: Fileinfo.hh 765 2012-04-19 20:05:09Z pauls $
  */
 
 #ifndef Fileinfo_hh
 #define Fileinfo_hh
 
 
-
+//c++ headers
 #include <iostream> //for cout etc.
 #include <cstring>
+
+//os specific headers
+#include <sys/types.h> //for off_t and others.
 
 using std::cout;
 using std::endl;
@@ -62,7 +65,7 @@ public:
   };
 
   //to store info about the file
-  typedef off_t filesizetype;
+  typedef off_t filesizetype; //defined in sys/types.h
   struct Fileinfostat {
     filesizetype st_size;//size
     unsigned long st_ino;//inode

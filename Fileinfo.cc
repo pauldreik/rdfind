@@ -2,8 +2,8 @@
 a class to hold information about a file.
 
 cvs info:
-$Revision: 719 $
-$Id: Fileinfo.cc 719 2011-07-24 12:17:18Z pauls $
+$Revision: 765 $
+$Id: Fileinfo.cc 765 2012-04-19 20:05:09Z pauls $
 Author Paul Sundvall 2006
 See LICENSE for details.
 */
@@ -14,6 +14,7 @@ See LICENSE for details.
 #include <iostream>//for cout etc
 #include <sys/stat.h>//for file info
 #include <errno.h>//for errno
+#include <unistd.h>//for unlink etc.
 
 #include "Checksum.hh" //checksum calculation
 
