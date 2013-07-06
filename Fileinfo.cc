@@ -1,12 +1,3 @@
-/*
-a class to hold information about a file.
-
-cvs info:
-$Revision: 822 $
-$Id: Fileinfo.cc 822 2013-06-03 09:25:13Z paul $
-Author Paul Sundvall 2006
-See LICENSE for details.
-*/
 #include "config.h"
 #include "Fileinfo.hh"
 

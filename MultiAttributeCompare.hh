@@ -1,11 +1,3 @@
-/*
-some useful templates to sort a list on multiple attributes.
-
-Author Paul Sundvall 2006
-see LICENSE for details.
-$Revision: 28 $
-$Id: MultiAttributeCompare.hh 28 2006-02-25 14:24:52Z pauls $
- */
 #ifndef MultiAttributeCompare_hh
 #define MultiAttributeCompare_hh
 
@@ -140,15 +132,6 @@ public:
     
     
     const bool debug=false;
-
-
-    //some fault checking. if there are derefernce problems
-    //we will hopefully detect them here.
-    if(A.m_magicnumber!=771114)
-      cerr<<"öpp öpp öpp A"<<endl;  
-
-    if(B.m_magicnumber!=771114)
-      cerr<<"öpp öpp öpp B"<<endl;
 
     if(m_nfcns==0) {
       //the user must use "addattrib" first.

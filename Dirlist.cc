@@ -1,11 +1,3 @@
-/*
-files for reading entries from a file structure.
-
-Author Paul Sundvall 2006
-see LICENSE for details.
-$Revision: 803 $
-$Id: Dirlist.cc 803 2013-01-26 04:22:16Z paul $
- */
 #include "config.h"
 #include "Dirlist.hh"
 #include <dirent.h>

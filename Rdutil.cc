@@ -1,12 +1,3 @@
-/*
-this file contains functions and templates that implement most of the
-functionality in rdfind.
-
-Author Paul Sundvall 2006
-see LICENSE for details.
-$Revision: 803 $
-$Id: Rdutil.cc 803 2013-01-26 04:22:16Z paul $
- */
 #include "config.h"
 
 #include "Rdutil.hh"
