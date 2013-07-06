@@ -1,0 +1,22 @@
+This package was debianized by Paul Sundvall <rdfind@paulsundvall.net> on
+Wed, 14 Jan 2009 09:53:17 +0100.
+
+It was downloaded from http://rdfind.paulsundvall.net/
+
+Upstream Author(s):
+
+    Paul Sundvall <rdfind@paulsundvall.net>
+
+Copyright:
+
+    Copyright (C) 2006 Paul Sundvall
+
+License:
+
+    GPL v2
+
+The Debian packaging is (C) 2009, Paul Sundvall <rdfind@paulsundvall.net> and
+is licensed under the GPL, see `/usr/share/common-licenses/GPL'.
+
+# Please also look if there are files or directories which have a
+# different copyright/license attached and list them here.

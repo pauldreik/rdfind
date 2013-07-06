@@ -3,9 +3,9 @@
 .\"
 .\" Author Paul Sundvall 2006
 .\" see LICENSE for details.
-.\" $Revision: 546 $
-.\" $Id: rdfind.1 546 2009-01-13 18:05:11Z pauls $
-.TH rdfind 1.2.2+ "March 2006" rdfind
+.\" $Revision: 548 $
+.\" $Id: rdfind.1 548 2009-01-13 18:11:44Z pauls $
+.TH rdfind 1.2.3 "January 2009" rdfind
 .SH NAME
 rdfind \- finds duplicate files
 .SH SYNOPSIS
@@ -18,7 +18,7 @@ rdfind \- finds duplicate files
 .B rdfind
 finds duplicate files across and/or within several directories. It calculates
 checksum only if necessary.
-rdfind runs in O(Nlog(N)) time.
+rdfind runs in O(Nlog(N)) time with N being the number of files. 
 
 If two (or more) equal files are found, the program decides which of
 them is the original and the rest are considered duplicates. This
@@ -142,7 +142,7 @@ Niels Möller, Carl Payne and Salvatore Ansani. Thanks also to you
 who tested the program and sent me feedback.
 .SH VERSION
 1.2.3 (release date 20090113)
-svn id: $Id: rdfind.1 546 2009-01-13 18:05:11Z pauls $
+svn id: $Id: rdfind.1 548 2009-01-13 18:11:44Z pauls $
 .SH COPYRIGHT
 This program is distributed under GPLv2.
 .SH "SEE ALSO"

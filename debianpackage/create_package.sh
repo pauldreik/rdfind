@@ -1,20 +1,20 @@
 #!/bin/bash
-#this file is version $Revision: 527 $
+#this file is version $Revision: 549 $
 
 #follow http://www.debian.org/doc/maint-guide/ch-start.en.html
 
 
-#$Date: 2008-09-01 08:11:43 +0200 (mån, 01 sep 2008) $
-#$Rev: 527 $
+#$Date: 2009-01-14 09:44:55 +0100 (ons, 14 jan 2009) $
+#$Rev: 549 $
 #$Author: pauls $
-#$Id: create_package.sh 527 2008-09-01 06:11:43Z pauls $
+#$Id: create_package.sh 549 2009-01-14 08:44:55Z pauls $
 
 
 #let the build directory be some junk
 
 builddir=$HOME/tmp/debianize_rdfind
 sourcedir=$HOME/code/eget/all/rdfind
-sourcename=rdfind-1.2.2+
+sourcename=rdfind-1.2.3
 targz=.tar.gz
 if [ -d $builddir ]; then
 #echo "dont dare to rm..."
