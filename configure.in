@@ -1,11 +1,11 @@
 dnl configure.in for rdfind. Written By Paul Sundvall.
-dnl This file is cvs version $Revision: 546 $
+dnl This file is cvs version $Revision: 567 $
 
-VERSION="1.2.3"
-AC_INIT(rdfind.cc,1.2.3)
+VERSION="1.2.4"
+AC_INIT(rdfind.cc,1.2.4)
 AM_CONFIG_HEADER(config.h)       
 
-AM_INIT_AUTOMAKE(rdfind,1.2.3)
+AM_INIT_AUTOMAKE(rdfind,1.2.4)
 
 
 dnl find and test the C compiler
@@ -16,6 +16,22 @@ AC_LANG_CPLUSPLUS
 AC_PROG_MAKE_SET
                
 AC_HEADER_STDC
+
+dnl see if we should run a debug build with lots of output
+showdebugmessages=no
+AC_ARG_ENABLE(debug,
+ 	AC_HELP_STRING(
+ 	    [--enable-debug],
+ 	    [enable debug printouts in program (default=no)]
+ 	),
+   	showdebugmessages="$enableval"
+)
+AC_MSG_RESULT($showdebugmessages)
+if test x"$showdebugmessages" = x"yes"; then
+	AC_DEFINE([RDFIND_DEBUG],[1],[Enable debug printouts in program])
+dnl	CXXFLAGS="$CXXFLAGS -g -Wall -Werror"
+fi	
+
 
 dnl test for nettle
 AC_CHECK_HEADER(nettle/sha.h,,[AC_MSG_ERROR([

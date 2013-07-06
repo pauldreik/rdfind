@@ -3,8 +3,8 @@ files for reading entries from a file structure.
 
 Author Paul Sundvall 2006
 see LICENSE for details.
-$Revision: 91 $
-$Id: Dirlist.cc 91 2006-03-26 09:12:16Z pauls $
+$Revision: 561 $
+$Id: Dirlist.cc 561 2009-01-21 16:34:00Z pauls $
  */
 #include "Dirlist.hh"
 #include <dirent.h>
@@ -15,12 +15,15 @@ $Id: Dirlist.cc 91 2006-03-26 09:12:16Z pauls $
 #include <iostream>
 #include <errno.h>//for errno
 
-
+#include "RdfindDebug.hh" //debug macros
 
 int Dirlist::walk(const std::string &dir,const int recursionlevel)
 {
   using namespace std;
   struct stat info;
+  
+  RDDEBUG("Now in walk with dir="<<dir.c_str()<<" and recursionlevel="
+	  <<recursionlevel<<std::endl);
 
   if(recursionlevel<m_maxdepth) 
     {
@@ -29,6 +32,7 @@ int Dirlist::walk(const std::string &dir,const int recursionlevel)
       dirp = opendir(dir.c_str());
       if(dirp) {
 	//we opened the directory. let us read the content.
+	RDDEBUG("opened directory"<<std::endl);
 	struct dirent* dp=NULL;
 	while(0!=(dp = readdir( dirp ))){ 
 	  if(0!=strcmp(".",dp->d_name)) {
@@ -87,6 +91,7 @@ int Dirlist::walk(const std::string &dir,const int recursionlevel)
 	return 2;//its a directory
       } else {
 	//failed to open directory (dirp==NULL)
+	RDDEBUG("failed to open directory"<<std::endl);
 	//this can be due to rights, or some other error.
 	handlepossiblefile(dir,recursionlevel);
 	return 1;//its a file (or something else)
@@ -125,10 +130,17 @@ int Dirlist::handlepossiblefile(const std::string &possiblefile,
   using namespace std;
   struct stat info;
   
+  RDDEBUG("Now in handlepossiblefile with name "<<possiblefile.c_str()
+	  <<" and recursionlevel "<<recursionlevel<<std::endl);
+  
+
   //split filename into path and filename
   string path,filename;
   splitfilename(path,filename,possiblefile);
-  
+
+  RDDEBUG("split filename is path="<<path.c_str()
+	  <<" filename="<<filename.c_str()<<std::endl);
+
   //investigate what kind of file it is, dont follow symlink
   int statval=0;
   do {
@@ -136,14 +148,16 @@ int Dirlist::handlepossiblefile(const std::string &possiblefile,
   } while(statval<0 && errno==EINTR);
   
   if(statval<0) {
-    //cout<<" got negative from lstat:"<<statval<<endl;
     //probably file does not exist, or trouble with rights.
+    RDDEBUG("got negative statval "<<statval<<std::endl);
     (*m_report_failed_on_stat)(path,
 			       filename,
 			       recursionlevel);     
     return -1;
+  } else {
+    RDDEBUG("got positive statval "<<statval<<std::endl);
   }
-  
+
   
   /*     cout<<"input="<<possiblefile<<endl;
 	 cout<<"path="<<path<<endl;
@@ -151,11 +165,13 @@ int Dirlist::handlepossiblefile(const std::string &possiblefile,
   */
   
   if(S_ISLNK(info.st_mode)) {
-    //    cout<<"found symbolic link"<<endl;
+    RDDEBUG("found symlink"<<std::endl);
     (*m_report_symlink)(path,
 			filename,
 			recursionlevel);     
     return 0;
+  } else {
+    RDDEBUG("not a symlink"<<std::endl);
   }
   
   if(S_ISDIR(info.st_mode)) {  
@@ -166,14 +182,19 @@ int Dirlist::handlepossiblefile(const std::string &possiblefile,
     //maybe it happens if someone else is changing the file while we
     //are reading it?
     return -2;
+  } else {
+    RDDEBUG("not a dir"<<std::endl);
   }
   
   if(S_ISREG(info.st_mode)) {    
     //    cout<<"found regular file"<<endl;
+    RDDEBUG("it is a regular file"<<std::endl);
     (*m_report_regular_file)(path,
 			     filename,
 			     recursionlevel);     
     return 0;
+  } else {
+    RDDEBUG("not a regular file"<<std::endl);
   }
   cout<<"Dirlist.cc::handlepossiblefile: found something else than a dir or a regular file."<<endl;
   return -1;

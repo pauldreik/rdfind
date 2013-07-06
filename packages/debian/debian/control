@@ -2,7 +2,7 @@ Source: rdfind
 Section: utils
 Priority: extra
 Maintainer: Paul Sundvall <rdfind@paulsundvall.net>
-Build-Depends: debhelper (>= 7), autotools-dev, libnettle-dev
+Build-Depends: debhelper (>= 5), autotools-dev, libnettle-dev
 Standards-Version: 3.7.3
 Homepage: http://rdfind.paulsundvall.net
 

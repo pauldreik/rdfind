@@ -1,60 +1,90 @@
-CHANGELOG $Revision: 100 $
+2009-01-21  Paul Sundvall  <pauls@quadricepsjr.paulsundvall.net>
 
-20060321 1.2.2
-	sleep introduced, to reduce load.
-	examples in the manual introduced.
-	new formatting on usage() to not get line breaks.
-	new structure in configure.in, to get error messages from nettle quicker.
-	symlinks now work better, as they are made absolute.
-20060319 1.2.1
-	Changed to auto-tools.
+	* release version 1.2.4
+
+2009-01-21  Paul Sundvall  <rdfind@paulsundvall.net>
+
+	* fixed bug where a file given on the command line would be
+	prepended with / which made it appear in the wrong place.
+	*changed version to 1.2.3+ for now to avoid confusion
+
+2009-01-13  Paul Sundvall  <rdfind@paulsundvall.net>
+	* version 1.2.3 released
+
+2009-01-13  Paul Sundvall  <rdfind@paulsundvall.net>
+	* updated with new option outputname
+	* added names from people who helped
+	* clarified licens here and there
+	* added svn id keyword in file
+	* updated man page
+
+2008-10-03 Paul Sundvall  <rdfind@paulsundvall.net>
+	* minor changes for being able to compile with new compiler
 	
-20060302 1.2.0
-	Moved nettleclass to rdfind, to ease up installation.
-	finalized configure.in so that autoconf works.
+2008-09-01 Paul Sundvall  <rdfind@paulsundvall.net>
+	* spelling error corrected
+	
+2006-03-21 Paul Sundvall  <rdfind@paulsundvall.net> 
+	* new version 1.2.2
+	* sleep introduced, to reduce load.
+	* examples in the manual introduced.
+	* new formatting on usage() to not get line breaks.
+	* new structure in configure.in, to get error messages from nettle quicker.
+	* symlinks now work better, as they are made absolute.
+2006-03-19  Paul Sundvall  <rdfind@paulsundvall.net> 
+	* version 1.2.1
+	* Changed to auto-tools.
+	
+2006-03-02  Paul Sundvall  <rdfind@paulsundvall.net> 
+	*version 1.2.0
+	*Moved nettleclass to rdfind, to ease up installation.
+	*finalized configure.in so that autoconf works.
 
-20060302 1.1.2  
-	spelling error (and a test of version numbers...)
+2006-03-02  Paul Sundvall  <rdfind@paulsundvall.net> 
+	*version 1.1.2  
+	*spelling error (and a test of version numbers...)
 
-20060302 1.1.1
-	added VERSION as #define.
-	added flags --version etc
-	added install for make install.
+2006-03-02  Paul Sundvall  <rdfind@paulsundvall.net> 
+	* version 1.1.1
+	*added VERSION as #define.
+	*added flags --version etc
+	*added install for make install.
 
-20060228
-	now possible to specify also files as input arguments.
-	added possibility to use sha1 checksum.
-	changed ints to enums on default args to make it compile even on
+2006-02-28  Paul Sundvall  <rdfind@paulsundvall.net> 
+	*now possible to specify also files as input arguments.
+	*added possibility to use sha1 checksum.
+	*changed ints to enums on default args to make it compile even on
 	gcc 4.03 prerelease
 	
 
-20060225
-	moved into cvs. changed from RSA md5 to nettle.
+2006-02-25 Paul Sundvall  <rdfind@paulsundvall.net> 
+	*moved into cvs. changed from RSA md5 to nettle.
 
-20060117
-	replacing name "Bulk" with "Fileinfo"
-	INSTALL COPYRIGHT etc created.
-	calling this one 1.0.1
+2006-01-17 Paul Sundvall  <rdfind@paulsundvall.net> 
+	*replacing name "Bulk" with "Fileinfo"
+	*INSTALL COPYRIGHT etc created.
+	*calling this one 1.0.1
 
-20060116
-	release version 1.0.0
+2006-01-16  Paul Sundvall  <rdfind@paulsundvall.net> 
+	*release version 1.0.0
 
-20060113
-	hard links
+2006-01-13 Paul Sundvall  <rdfind@paulsundvall.net> 
+	*hard links
 
-20060112
-	using memcmp for comparison on byte.
-	dont read file if it already has been read and m_nbytes is longer
+2006-01-12  Paul Sundvall  <rdfind@paulsundvall.net> 
+	*using memcmp for comparison on byte.
+	*dont read file if it already has been read and m_nbytes is longer
 	than the file itself.
 	
 
-20060111
-	parsing of input args before starting to add files added nice
-	output of size in Gb etc. fixed bug on char comparison.
+2006-01-11  Paul Sundvall  <rdfind@paulsundvall.net> 
+	*parsing of input args before starting to add files added nice
+	*output of size in Gb etc. fixed bug on char comparison.
 
-20060110 
-	wrote man page.
+2006-01-10  Paul Sundvall  <rdfind@paulsundvall.net>  
+	*wrote man page.
 
 
-20060105 
-	started. first version.
+2006-01-05  Paul Sundvall  <rdfind@paulsundvall.net>  
+	*started. first version.
+	CHANGELOG $Revision: 567 $

@@ -3,8 +3,8 @@
   copyright Paul Sundvall 2006
 
   see LICENSE for details.
-  $Revision: 546 $
-  $Id: rdfind.cc 546 2009-01-13 18:05:11Z pauls $
+  $Revision: 561 $
+  $Id: rdfind.cc 561 2009-01-21 16:34:00Z pauls $
 
 
   version info:
@@ -21,6 +21,7 @@
 #include "Fileinfo.hh"//file container
 #include "Dirlist.hh" //to find files
 #include "Rdutil.hh" //to do some work
+#include "RdfindDebug.hh" //debug macro
 
 #include "config.h"//header file from autoconf
 
@@ -46,14 +47,23 @@ int currentpriority=0;
 
 //function to add items to the list of all files
 int report(const std::string &path, const std::string &name, int depth){
-  //  std::cout<<path<<"   "<<name<<std::endl;
-  Fileinfo tmp(path+"/"+name);
+  
+  RDDEBUG("report("<<path.c_str()<<","<<name.c_str()<<","<<depth<<")"
+	  <<std::endl);
+
+  //expand the name if the path is nonempty
+  std::string expandedname=
+    path.empty() ? 
+    name :
+    (path+"/"+name);
+
+  Fileinfo tmp(expandedname);
+  
   tmp.setpriority(currentpriority);
   tmp.setdepth(depth);
   if(tmp.readfileinfo()) {
     if(tmp.isRegularFile()) {
       filelist1.push_back(tmp);
-      //    std::cerr<<"size:"<<tmp.size()<<endl;
     }
   } else {
     std::cerr<<"failed to read file info on file \""<<tmp.name()<<std::endl;
@@ -94,8 +104,8 @@ void usage()
   cout<<"If properly installed, a man page should be available as man rdfind."<<endl;
   cout<<endl;
   cout<<endl<<"rdfind is written by Paul Sundvall 2006. License: GPL v2."<<endl;
-  cout<<"svn version of this file is $Revision: 546 $"<<endl;
-  cout<<"svn id of this file is $Id: rdfind.cc 546 2009-01-13 18:05:11Z pauls $"<<endl;
+  cout<<"svn version of this file is $Revision: 561 $"<<endl;
+  cout<<"svn id of this file is $Id: rdfind.cc 561 2009-01-21 16:34:00Z pauls $"<<endl;
   cout<<"version is "<<VERSION<<endl;
   cout<<endl;
 }

@@ -1,2 +1,5 @@
-well, not really.
-$Revision: 64 $
+1.2.3+
+fixed bug with failure to read files given directly on command line
+added debug support in configure script
+1.2.3
+$Revision: 564 $

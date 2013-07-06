@@ -1,0 +1,3 @@
+version number exist in the following places:
+configure.in
+rdfind.1
