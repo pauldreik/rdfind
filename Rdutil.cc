@@ -250,16 +250,16 @@ namespace littlehelper {
     return range;
   }
   
-  //helper
+  //helper. source of capitalization rules etc: https://en.wikipedia.org/wiki/Binary_prefix
   std::string byteprefix(int range) {
     switch (range) {
-    case 0: return "b";
-    case 1: return "kib";
-    case 2: return "Mib";
-    case 3: return "Gib";
-    case 4: return "Tib";//Tebibyte
-    case 5: return "Pib";//Pebibyte
-    case 6: return "Eib";//exbibyte
+    case 0: return "B";
+    case 1: return "KiB";
+    case 2: return "MiB";
+    case 3: return "GiB";
+    case 4: return "TiB";//Tebibyte
+    case 5: return "PiB";//Pebibyte
+    case 6: return "EiB";//exbibyte
     default: return "!way too much!";
     }
   }
