@@ -3,9 +3,9 @@
 .\"
 .\" Author Paul Dreik 2006
 .\" see LICENSE for details.
-.\" $Revision: 766 $
-.\" $Id: rdfind.1 766 2012-05-07 17:26:17Z pauls $
-.TH rdfind "1" 1.3.1 "May 2012" rdfind
+.\" $Revision: 798 $
+.\" $Id: rdfind.1 798 2012-11-27 19:52:04Z paul $
+.TH rdfind "1" 1.3.2 "Nov 2012" rdfind
 .SH NAME
 rdfind \- finds duplicate files
 .SH SYNOPSIS
@@ -95,7 +95,7 @@ Search for duplicate files in home directory and a backup directory:
 .B rdfind ~ /mnt/backup
 .TP
 Delete duplicate in a backup directory:
-.B rdfind -deletefiles true /mnt/backup
+.B rdfind -deleteduplicates true /mnt/backup
 .TP
 Search for duplicate files in directories called foo:
 .B find . -type d -name foo -print0 |xargs -0 rdfind
@@ -150,8 +150,8 @@ Several persons have helped with suggestions and improvements:
 Niels Möller, Carl Payne and Salvatore Ansani. Thanks also to you
 who tested the program and sent me feedback.
 .SH VERSION
-1.3.1 (release date 2012-05-07)
-svn id: $Id: rdfind.1 766 2012-05-07 17:26:17Z pauls $
+1.3.2 (release date 2012-11-27)
+svn id: $Id: rdfind.1 798 2012-11-27 19:52:04Z paul $
 .SH COPYRIGHT
 This program is distributed under GPLv2 or later, at your option.
 .SH "SEE ALSO"

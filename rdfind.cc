@@ -1,10 +1,10 @@
 /*
   rdfind.cc
-  copyright Paul Sundvall 2006
+  copyright Paul Dreik (earlier Sundvall)
 
   see LICENSE for details.
-  $Revision: 717 $
-  $Id: rdfind.cc 717 2011-07-24 11:54:16Z pauls $
+  $Revision: 767 $
+  $Id: rdfind.cc 767 2012-05-07 17:35:41Z pauls $
 
 
   version info:
@@ -104,9 +104,9 @@ void usage()
   cout<<"If properly installed, a man page should be available as man rdfind."<<endl;
   cout<<endl;
   cout<<endl
-      <<"rdfind is written by Paul Sundvall 2006. License: GPL v2 or later (at your option)."<<endl;
-  cout<<"svn version of this file is $Revision: 717 $"<<endl;
-  cout<<"svn id of this file is $Id: rdfind.cc 717 2011-07-24 11:54:16Z pauls $"<<endl;
+      <<"rdfind is written by Paul Dreik 2006. License: GPL v2 or later (at your option)."<<endl;
+  cout<<"svn version of this file is $Revision: 767 $"<<endl;
+  cout<<"svn id of this file is $Id: rdfind.cc 767 2012-05-07 17:35:41Z pauls $"<<endl;
   cout<<"version is "<<VERSION<<endl;
   cout<<endl;
 }
