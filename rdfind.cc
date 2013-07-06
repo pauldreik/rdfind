@@ -3,8 +3,8 @@
   copyright Paul Sundvall 2006
 
   see LICENSE for details.
-  $Revision: 561 $
-  $Id: rdfind.cc 561 2009-01-21 16:34:00Z pauls $
+  $Revision: 717 $
+  $Id: rdfind.cc 717 2011-07-24 11:54:16Z pauls $
 
 
   version info:
@@ -103,9 +103,10 @@ void usage()
   cout<<endl;               
   cout<<"If properly installed, a man page should be available as man rdfind."<<endl;
   cout<<endl;
-  cout<<endl<<"rdfind is written by Paul Sundvall 2006. License: GPL v2."<<endl;
-  cout<<"svn version of this file is $Revision: 561 $"<<endl;
-  cout<<"svn id of this file is $Id: rdfind.cc 561 2009-01-21 16:34:00Z pauls $"<<endl;
+  cout<<endl
+      <<"rdfind is written by Paul Sundvall 2006. License: GPL v2 or later (at your option)."<<endl;
+  cout<<"svn version of this file is $Revision: 717 $"<<endl;
+  cout<<"svn id of this file is $Id: rdfind.cc 717 2011-07-24 11:54:16Z pauls $"<<endl;
   cout<<"version is "<<VERSION<<endl;
   cout<<endl;
 }
@@ -315,6 +316,8 @@ int main(int narg, char *argv[])
 
   //command line parsing went OK to reach this point.
 
+  //set the dryrun string
+  const std::string dryruntext(dryrun?"(DRYRUN MODE) ":"");
 
   //an object to do sorting and duplicate finding
   Rdutil gswd(filelist1);
@@ -336,13 +339,13 @@ int main(int narg, char *argv[])
   for(vector<string>::iterator it=pathlist.begin();it!=pathlist.end();++it) {  
     currentpriority++;
     int lastsize=filelist1.size();
-    cout<<"Now scanning \""<<(*it)<<"\"";
+	  cout<<dryruntext<<"Now scanning \""<<(*it)<<"\"";
     cout.flush();
     int retval=dirlist.walk(*it,0);
     cout<<", found "<<filelist1.size()-lastsize<<" files."<<endl;    
   }
   
-  cout<<"Now have "<<filelist1.size()<<" files in total."<<endl;
+  cout<<dryruntext<<"Now have "<<filelist1.size()<<" files in total."<<endl;
   
   
 
@@ -364,7 +367,7 @@ int main(int narg, char *argv[])
     gswd.marknonuniq(&Fileinfo::equalinode,&Fileinfo::equaldevice);
     
     //remove non-duplicates
-    cout<<"Removed "<<
+    cout<<dryruntext<<"Removed "<<
       gswd.cleanup()<<
       " files due to nonunique device and inode."<<endl;		
   }
@@ -374,15 +377,15 @@ int main(int narg, char *argv[])
 
 
   if(ignoreempty) {
-    cout<<"Now removing files with zero size from list...";
+    cout<<dryruntext<<"Now removing files with zero size from list...";
     cout.flush();
     cout<<"removed "<<gswd.remove_if()<<" files"<<endl;
   }
 
-  cout<<"Total size is "<<gswd.totalsizeinbytes()<<" bytes or ";
+  cout<<dryruntext<<"Total size is "<<gswd.totalsizeinbytes()<<" bytes or ";
   gswd.totalsize(cout)<<endl;
     
-  cout<<"Now sorting on size:";
+  cout<<dryruntext<<"Now sorting on size:";
 
   sort(filelist1.begin(),
        filelist1.end(),
@@ -422,7 +425,7 @@ int main(int narg, char *argv[])
       case Fileinfo::CREATE_SHA1_CHECKSUM:description="sha1 checksum";break;
       default:description="--program error!!!---";break;
       }
-      cout<<"Now eliminating candidates based on "<<description<<":";
+      cout<<dryruntext<<"Now eliminating candidates based on "<<description<<":";
       
       cout.flush();
       
@@ -465,21 +468,21 @@ int main(int narg, char *argv[])
   gswd.markduplicates(&Fileinfo::equalsize,
 		      &Fileinfo::equalbytes);
   
-  cout<<"It seems like you have "<<filelist1.size()
+  cout<<dryruntext<<"It seems like you have "<<filelist1.size()
       <<" files that are not unique"<<endl;
 
-  cout<<"Totally, ";
+  cout<<dryruntext<<"Totally, ";
   gswd.saveablespace(cout)<<" can be reduced."<<endl;
 
   //traverse the list and make a nice file with the results
   if(makeresultsfile) {
-    cout<<"Now making results file "<<resultsfile<<endl;
+    cout<<dryruntext<<"Now making results file "<<resultsfile<<endl;
     gswd.printtofile(resultsfile);
   }
 
   //traverse the list and replace with symlinks
   if(makesymlinks) {
-     cout<<"Now making symbolic links. creating "<<endl;
+     cout<<dryruntext<<"Now making symbolic links. creating "<<endl;
     int tmp=gswd.makesymlinks(dryrun);
     cout<<"Making "<<tmp<<" links."<<endl;
     return 0;
@@ -487,7 +490,7 @@ int main(int narg, char *argv[])
 
   //traverse the list and replace with symlinks
   if(makehardlinks) {
-    cout<<"Now making hard links."<<endl;
+    cout<<dryruntext<<"Now making hard links."<<endl;
     int tmp=gswd.makehardlinks(dryrun);
     cout<<"Making "<<tmp<<" links."<<endl;
     return 0;
@@ -495,7 +498,7 @@ int main(int narg, char *argv[])
 
  //traverse the list and delete files
   if(deleteduplicates) {
-    cout<<"Now deleting duplicates:"<<endl;
+    cout<<dryruntext<<"Now deleting duplicates:"<<endl;
     int tmp=gswd.deleteduplicates(dryrun);
     cout<<"Deleted "<<tmp<<" files."<<endl;
     return 0;

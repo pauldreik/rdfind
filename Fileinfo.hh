@@ -3,8 +3,8 @@ a class to hold information about a file.
 
 Author Paul Sundvall 2006
 see LICENSE for details.
-$Revision: 530 $
-$Id: Fileinfo.hh 530 2008-10-03 09:41:29Z pauls $
+$Revision: 719 $
+$Id: Fileinfo.hh 719 2011-07-24 12:17:18Z pauls $
  */
 
 #ifndef Fileinfo_hh
@@ -45,7 +45,7 @@ public:
   //type of duplicate
   enum duptype {
     DUPTYPE_UNKNOWN,
-    DUPTYPE_FIRST_OCCURENCE,
+    DUPTYPE_FIRST_OCCURRENCE,
     DUPTYPE_WITHIN_SAME_TREE,
     DUPTYPE_OUTSIDE_TREE
   };

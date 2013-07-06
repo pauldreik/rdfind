@@ -1,11 +1,11 @@
 .\" View this file with
 .\" groff -man -Tascii rdfind.1 |less
 .\"
-.\" Author Paul Sundvall 2006
+.\" Author Paul Dreik 2006
 .\" see LICENSE for details.
-.\" $Revision: 567 $
-.\" $Id: rdfind.1 567 2009-01-21 17:27:30Z pauls $
-.TH rdfind 1.2.4 "January 2009" rdfind
+.\" $Revision: 721 $
+.\" $Id: rdfind.1 721 2011-07-24 12:38:14Z pauls $
+.TH rdfind "." 1.3.0 "July 2011" rdfind
 .SH NAME
 rdfind \- finds duplicate files
 .SH SYNOPSIS
@@ -70,7 +70,7 @@ what type of checksum to be used: md5 or sha1. Default is md5.
 .IP "-makesymlinks true|false"
 Replace duplicate files with symbolic links
 .IP "-makehardlinks true|false"
-Replace duplicate files with symbolic links
+Replace duplicate files with hard links
 .IP "-makeresultsfile true|false"
 Make a results file results.txt (default) in the current directory.
 .IP "-outputname name"
@@ -103,12 +103,12 @@ Search for duplicate files in directories called foo:
 .I results.txt
 (the default name is results.txt and can be changed with option outputname,
 see above) The results file results.txt will contain one row per duplicate file
-found, along with a header row explainging the columns.
+found, along with a header row explaining the columns.
 A text describes why the file is considered a duplicate:
 
 DUPTYPE_UNKNOWN some internal error
 
-DUPTYPE_FIRST_OCCURENCE the file that is considered to be the original.
+DUPTYPE_FIRST_OCCURRENCE the file that is considered to be the original.
 
 DUPTYPE_WITHIN_SAME_TREE files in the same tree (found when processing
 the directory in the same input argument as the original)
@@ -123,15 +123,23 @@ argument than the original.
 When specifying the same directory twice, it keeps the first
 encountered as the most important (original), and the rest as
 duplicates. This might not be what you want.
-The symlink creates absolute links. 
+
+The symlink creates absolute links. This might not be what you
+want. To create relative links instead, you may use the symlinks (2)
+command, which is able to convert absolute links to relative links.
+
+Older versions unfortunately contained a misspelling on the word
+occurrence. This is now corrected (since 1.3), which might affect
+user scripts parsing the output file written by rdfind.
+
 There are lots of enhancements left to do. Please contribute!
 .SH SECURITY CONSIDERATIONS
 Avoid manipulating the directories while rdfind is reading.
-rdfind is quite britle in that case. Especially, when deleting
+rdfind is quite brittle in that case. Especially, when deleting
 or making links, rdfind can be subject to a symlink attack.
 Use with care!
 .SH AUTHOR
-Paul Sundvall 2006, reachable at rdfind@paulsundvall.net
+Paul Dreik 2006, reachable at rdfind@paulsundvall.net
 Rdfind can be found at http://rdfind.paulsundvall.net/
 
 Do you find rdfind useful? Drop me a line! It is always fun to
@@ -141,10 +149,10 @@ Several persons have helped with suggestions and improvements:
 Niels Möller, Carl Payne and Salvatore Ansani. Thanks also to you
 who tested the program and sent me feedback.
 .SH VERSION
-1.2.4 (release date 20090121)
-svn id: $Id: rdfind.1 567 2009-01-21 17:27:30Z pauls $
+1.3.0 (release date 20110724)
+svn id: $Id: rdfind.1 721 2011-07-24 12:38:14Z pauls $
 .SH COPYRIGHT
-This program is distributed under GPLv2.
+This program is distributed under GPLv2 or later, at your option.
 .SH "SEE ALSO"
 .BR md5sum (1),
 .BR find (1),

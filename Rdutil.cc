@@ -4,8 +4,8 @@ functionality in rdfind.
 
 Author Paul Sundvall 2006
 see LICENSE for details.
-$Revision: 91 $
-$Id: Rdutil.cc 91 2006-03-26 09:12:16Z pauls $
+$Revision: 719 $
+$Id: Rdutil.cc 719 2011-07-24 12:17:18Z pauls $
  */
 #include "Rdutil.hh"
 #include <fstream> //for file writing
@@ -67,7 +67,7 @@ int applyactiononfile(std::vector<Fileinfo> &m_list, Function f) {
 
     //loop over files
     for(it=m_list.begin(); it!=m_list.end();++it){
-      if(it->getduptype()==Fileinfo::DUPTYPE_FIRST_OCCURENCE) {
+      if(it->getduptype()==Fileinfo::DUPTYPE_FIRST_OCCURRENCE) {
 	src=it;
 
 	if(src->identity()<=0)
@@ -216,7 +216,7 @@ int Rdutil::remove_if()
 
 //total size
 //opmode=0 just add everything
-//opmode=1 only elements with m_duptype=Fileinfo::DUPTYPE_FIRST_OCCURENCE
+//opmode=1 only elements with m_duptype=Fileinfo::DUPTYPE_FIRST_OCCURRENCE
 unsigned long long Rdutil::totalsizeinbytes(int opmode) 
 {
   //for some reason, for_each does not work. 
@@ -227,7 +227,7 @@ unsigned long long Rdutil::totalsizeinbytes(int opmode)
       adder(*it);	
   else if(opmode==1)
     for(it=m_list.begin();it!=m_list.end();++it)
-      if(it->getduptype()==Fileinfo::DUPTYPE_FIRST_OCCURENCE)
+      if(it->getduptype()==Fileinfo::DUPTYPE_FIRST_OCCURRENCE)
 	adder(*it);
   
   return adder.getsize();
@@ -455,7 +455,7 @@ int Rdutil::marksingle(std::vector<Fileinfo>::iterator start,
     for(it=start; it!=stop;++it){
       if(it==start) {
 	//	output<<"#FILE:";
-	it->m_duptype=Fileinfo::DUPTYPE_FIRST_OCCURENCE;
+	it->m_duptype=Fileinfo::DUPTYPE_FIRST_OCCURRENCE;
       } else {
 	//point out the file that it is a copy of
 	it->setidentity(-Fileinfo::identity(*start));

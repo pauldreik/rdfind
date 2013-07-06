@@ -2,7 +2,7 @@
 #at  http://club.mandriva.com/xwiki/bin/KB/MandrivaRpmHowTo
 # To make it work with redhat, %make had to be replaced with make.
 #
-# this spec-file is in cvs. $Revision: 100 $
+# this spec-file is in cvs. $Revision: 666 $
 #
 #to build with rpm on debian (or fedora, I guess):
 #
@@ -21,7 +21,7 @@ URL: http://rdfind.paulsundvall.net
 Group: File tools 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot 
 License: GPL 
-Packager: Paul Sundvall <rdfind@paulsundvall.net>
+Packager: Paul Dreik <rdfind@paulsundvall.net>
 
 %description
 This is a small program that searches for duplicate files using

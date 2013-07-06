@@ -2,8 +2,8 @@
 a class to hold information about a file.
 
 cvs info:
-$Revision: 91 $
-$Id: Fileinfo.cc 91 2006-03-26 09:12:16Z pauls $
+$Revision: 719 $
+$Id: Fileinfo.cc 719 2011-07-24 12:17:18Z pauls $
 Author Paul Sundvall 2006
 See LICENSE for details.
 */
@@ -134,8 +134,8 @@ const std::string Fileinfo::getduptypestring(const Fileinfo &A) {
   switch (A.getduptype()) {
   case DUPTYPE_UNKNOWN:
     return "DUPTYPE_UNKNOWN";
-  case DUPTYPE_FIRST_OCCURENCE:
-    return "DUPTYPE_FIRST_OCCURENCE";
+  case DUPTYPE_FIRST_OCCURRENCE:
+    return "DUPTYPE_FIRST_OCCURRENCE";
   case DUPTYPE_WITHIN_SAME_TREE:
     return "DUPTYPE_WITHIN_SAME_TREE";
   case DUPTYPE_OUTSIDE_TREE:

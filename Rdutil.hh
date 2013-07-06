@@ -4,8 +4,8 @@ functionality in rdfind.
 
 Author Paul Sundvall 2006
 see LICENSE for details.
-$Revision: 530 $
-$Id: Rdutil.hh 530 2008-10-03 09:41:29Z pauls $
+$Revision: 719 $
+$Id: Rdutil.hh 719 2011-07-24 12:17:18Z pauls $
  */
 #ifndef rdutil_hh
 #define rdutil_hh
@@ -108,7 +108,7 @@ public:
 
   //gets the total size, in bytes.
   //opmode=0 just add everything
-  //opmode=1 only elements with m_duptype=Fileinfo::DUPTYPE_FIRST_OCCURENCE
+  //opmode=1 only elements with m_duptype=Fileinfo::DUPTYPE_FIRST_OCCURRENCE
   unsigned long long int totalsizeinbytes(int opmode=0);
 
   //outputs a nicely formatted string "45 bytes" or "3 Gibytes"
