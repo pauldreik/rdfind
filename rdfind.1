@@ -3,9 +3,9 @@
 .\"
 .\" Author Paul Sundvall 2006
 .\" see LICENSE for details.
-.\" $Revision: 92 $
-.\" $Id: rdfind.1 92 2006-03-26 09:27:32Z pauls $
-.TH rdfind 1.2.2 "March 2006" rdfind
+.\" $Revision: 546 $
+.\" $Id: rdfind.1 546 2009-01-13 18:05:11Z pauls $
+.TH rdfind 1.2.2+ "March 2006" rdfind
 .SH NAME
 rdfind \- finds duplicate files
 .SH SYNOPSIS
@@ -20,17 +20,42 @@ finds duplicate files across and/or within several directories. It calculates
 checksum only if necessary.
 rdfind runs in O(Nlog(N)) time.
 
-If duplicates are found, the duplicate first encountered on the command line
-is considered the original. If duplicates exist within the
-same directory found during processing a specific input argument, 
-the file with lowest depth is considered to be the original.
-Depth is calculated relative to the input argument, not relative to /.
-If identical files are found in the same directory and during processing a
-specific input argument, precedence is undefined.
+If two (or more) equal files are found, the program decides which of
+them is the original and the rest are considered duplicates. This
+is done by ranking the files to each other and deciding which has the
+highest rank. See section RANKING for details.
+
+If you need better control over the ranking than given, you can use
+some preprocessor which sorts the file names in desired order and then
+run the program using xargs. See examples below for how to use find
+and xargs in conjunction with rdfind.
+
 To include files or directories that have names starting with -, use 
 rdfind ./- to not confuse them with options.
+
+.SH RANKING
+Given two or more equal files, the one with the highest rank is
+selected to be the original and the rest are duplicates. The rules of
+ranking are given below, where the rules are executed from start until
+an original has been found. Given two files A and B which have equal
+content, the ranking is as follows: 
+
+If A was found while scanning an input argument earlier than than B, A
+is higher ranked.
+
+If A was found at a depth lower than B, A is higher ranked (A closer
+to the root)
+
+If A was found earlier than B, A is higher ranked.
+
+The last rule is needed when two files are found in the same directory
+(obviously not given in separate arguments, otherwise the first rule applies)
+and gives the same order between the files as the operating system
+delivers the files while listing the directory. This is operating
+system specific behaviour.
+
 .SH OPTIONS
-Searching etc:
+.B Searching options etc:
 .IP "-ignoreempty true|false"
 Ignore empty files. (default)
 .IP "-followsymlinks true|false"
@@ -41,17 +66,19 @@ is true
 .IP "-checksum md5|sha1"
 what type of checksum to be used: md5 or sha1. Default is md5.
 .PP
-Actions:
+.B Action options:
 .IP "-makesymlinks true|false"
 Replace duplicate files with symbolic links
 .IP "-makehardlinks true|false"
 Replace duplicate files with symbolic links
 .IP "-makeresultsfile true|false"
 Make a results file results.txt (default) in the current directory.
+.IP "-outputname name"
+Make the results file name to be "name" instead of the default results.txt.
 .IP "-deleteduplicates true|false"
 Delete (unlink) files.
 .PP
-General:
+.B General options:
 .IP "-sleep Xms"
 sleeps X milliseconds between reading each file, to reduce
 load. Default is 0 (no sleep). Note that only a few values are
@@ -74,7 +101,8 @@ Search for duplicate files in directories called foo:
 .B find . -type d -name foo -print0 |xargs -0 rdfind
 .SH FILES
 .I results.txt
-The results file results.txt will contain one row per duplicate file
+(the default name is results.txt and can be changed with option outputname,
+see above) The results file results.txt will contain one row per duplicate file
 found, along with a header row explainging the columns.
 A text describes why the file is considered a duplicate:
 
@@ -87,8 +115,6 @@ the directory in the same input argument as the original)
 
 DUPTYPE_OUTSIDE_TREE the file is found during processing another input
 argument than the original. 
-.RS
-The default output file with a description of the duplicate found.
 .SH ENVIRONMENT
 .SH DIAGNOSTICS
 .SH EXIT VALUES
@@ -108,11 +134,17 @@ Use with care!
 Paul Sundvall 2006, reachable at rdfind@paulsundvall.net
 Rdfind can be found at http://rdfind.paulsundvall.net/
 
-Do you find rdfind useful? Drop me a line!
+Do you find rdfind useful? Drop me a line! It is always fun to
+hear from people who actually use it.
+.SH THANKS
+Several persons have helped with suggestions and improvements:
+Niels Möller, Carl Payne and Salvatore Ansani. Thanks also to you
+who tested the program and sent me feedback.
 .SH VERSION
-1.2.2 (release date 20060326)
+1.2.3 (release date 20090113)
+svn id: $Id: rdfind.1 546 2009-01-13 18:05:11Z pauls $
 .SH COPYRIGHT
-This program is distributed under GPL.
+This program is distributed under GPLv2.
 .SH "SEE ALSO"
 .BR md5sum (1),
 .BR find (1),

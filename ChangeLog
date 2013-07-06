@@ -1,6 +1,6 @@
-CHANGELOG $Revision: 91 $
+CHANGELOG $Revision: 100 $
 
-20060321 1.2.1+
+20060321 1.2.2
 	sleep introduced, to reduce load.
 	examples in the manual introduced.
 	new formatting on usage() to not get line breaks.

@@ -4,13 +4,14 @@ functionality in rdfind.
 
 Author Paul Sundvall 2006
 see LICENSE for details.
-$Revision: 91 $
-$Id: Rdutil.hh 91 2006-03-26 09:12:16Z pauls $
+$Revision: 530 $
+$Id: Rdutil.hh 530 2008-10-03 09:41:29Z pauls $
  */
 #ifndef rdutil_hh
 #define rdutil_hh
 
 #include <fstream> //for file writing
+#include <algorithm>
 
 #include "MultiAttributeCompare.hh"//for sorting on multiple attributes
 

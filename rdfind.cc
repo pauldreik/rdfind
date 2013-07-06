@@ -3,8 +3,8 @@
   copyright Paul Sundvall 2006
 
   see LICENSE for details.
-  $Revision: 91 $
-  $Id: rdfind.cc 91 2006-03-26 09:12:16Z pauls $
+  $Revision: 546 $
+  $Id: rdfind.cc 546 2009-01-13 18:05:11Z pauls $
 
 
   version info:
@@ -16,6 +16,7 @@
 #include <iostream>//cout etc
 #include <vector>
 #include <string>
+#include <algorithm>
 
 #include "Fileinfo.hh"//file container
 #include "Dirlist.hh" //to find files
@@ -81,7 +82,8 @@ void usage()
   cout<<" -deleteduplicates  true |(false) delete duplicate files"<<endl;
   cout<<" -ignoreempty      (true)| false  ignore empty files"<<endl;
   cout<<" -removeidentinode (true)| false  ignore files with nonunique device and inode"<<endl;
-  cout<<" -makeresultsfile  (true)| false  makes a results file results.txt"<<endl;
+  cout<<" -makeresultsfile  (true)| false  makes a results file"<<endl;
+  cout<<" -outputname  name  sets the results file name to \"name\" (default results.txt)"<<endl;
   cout<<" -followsymlinks    true |(false) follow symlinks"<<endl;
   cout<<" -dryrun|-n         true |(false) print to stdout instead of changing anything"<<endl;
   cout<<" -checksum          (md5)| sha1   checksum type"<<endl;
@@ -89,10 +91,11 @@ void usage()
   cout<<"                                  Default is 0. Currently, only a few values"<<endl;
   cout<<"                                  are supported; 0,1-5,10,25,50,100"<<endl;
   cout<<endl;               
-  cout<<"If proper installed, a man page should be available as man rdfind."<<endl;
+  cout<<"If properly installed, a man page should be available as man rdfind."<<endl;
   cout<<endl;
-  cout<<endl<<"rdfind is written by Paul Sundvall 2006. License: GPL."<<endl;
-  cout<<"cvs version of this file is $Revision: 91 $"<<endl;
+  cout<<endl<<"rdfind is written by Paul Sundvall 2006. License: GPL v2."<<endl;
+  cout<<"svn version of this file is $Revision: 546 $"<<endl;
+  cout<<"svn id of this file is $Id: rdfind.cc 546 2009-01-13 18:05:11Z pauls $"<<endl;
   cout<<"version is "<<VERSION<<endl;
   cout<<endl;
 }
@@ -176,6 +179,10 @@ int main(int narg, char *argv[])
 	  cerr<<"expected true or false, not \""<<nextarg<<"\""<<endl;
 	  return -1;
 	}
+      }
+      else if (arg=="-outputname" && n<(narg-1)) {
+	string nextarg(argv[1+n]);n++;     
+	resultsfile=nextarg;
       }
       else if (arg=="-ignoreempty" && n<(narg-1)) {
 	string nextarg(argv[1+n]);n++;     
@@ -357,7 +364,7 @@ int main(int narg, char *argv[])
 
 
   if(ignoreempty) {
-    cout<<"Now removing files with zero size...";
+    cout<<"Now removing files with zero size from list...";
     cout.flush();
     cout<<"removed "<<gswd.remove_if()<<" files"<<endl;
   }
@@ -379,7 +386,7 @@ int main(int narg, char *argv[])
   gswd.markuniq(&Fileinfo::equalsize);
 
   //remove non-duplicates
-  cout<<"removed "<<gswd.cleanup()<<" files due to unique sizes.";
+  cout<<"removed "<<gswd.cleanup()<<" files due to unique sizes from list.";
   cout<<filelist1.size()<<" files left."<<endl;
 
   if(0) for_each(filelist1.begin(),filelist1.end(), print<Fileinfo>(std::cout));
@@ -422,7 +429,7 @@ int main(int narg, char *argv[])
       //remove non-duplicates
       cout<<"removed "<<
 	gswd.cleanup()<<
-	" files.";
+	" files from list.";
       cout<<filelist1.size()<<" files left."<<endl;
       
       lasttype=type[i];
@@ -443,7 +450,8 @@ int main(int narg, char *argv[])
 		&Fileinfo::compareondepth,&Fileinfo::equaldepth,
 		&Fileinfo::compareonidentity,&Fileinfo::equalidentity);
 
-  //mark duplicates with the right tag
+  //mark duplicates with the right tag (will stable sort the list
+  //internally on priority)
   gswd.markduplicates(&Fileinfo::equalsize,
 		      &Fileinfo::equalbytes);
   
@@ -475,7 +483,7 @@ int main(int narg, char *argv[])
     return 0;
   }
 
- //traverse the list and replace with symlinks
+ //traverse the list and delete files
   if(deleteduplicates) {
     cout<<"Now deleting duplicates:"<<endl;
     int tmp=gswd.deleteduplicates(dryrun);

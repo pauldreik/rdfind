@@ -3,13 +3,14 @@ files for reading entries from a file structure.
 
 Author Paul Sundvall 2006
 see LICENSE for details.
-$Revision: 43 $
-$Id: Dirlist.hh 43 2006-02-28 17:56:41Z pauls $
+$Revision: 530 $
+$Id: Dirlist.hh 530 2008-10-03 09:41:29Z pauls $
  */
 #ifndef Dirlist_hh
 #define Dirlist_hh
 
 #include <string>
+#include <cstring>
 
 //class that traverses a directory
 class Dirlist {

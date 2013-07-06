@@ -1,0 +1,19 @@
+för att göra rpm-en
+editera filerna ~/.rpm* 
+skapade gpg-nyckel
+gpg --gen-key 
+gpg -a --export rdfind  >rdfind-distribution-key.gpg 
+
+bygga rpm
+rpm -ba SPECS/rdfind.spec --sign
+
+kolla rpm (gör för både source och vanlig)
+rpmlint -i SRPMS/rdfind-1.2.0-0.1.20060mdk.src.rpm
+
+kolla rpm på annat sätt
+rpm -qlivp --changelog RPMS/i586/rdfind-1.2.0-0.1.20060mdk.i586.rpm 
+
+
+verifiera paket:
+rpm --import /tmp/rdfind-distribution-key.gpg
+rpm -K /tmp/rdfind-1.2.0-0.1.20060mdk.i586.rpm

@@ -3,8 +3,8 @@ a class to hold information about a file.
 
 Author Paul Sundvall 2006
 see LICENSE for details.
-$Revision: 43 $
-$Id: Fileinfo.hh 43 2006-02-28 17:56:41Z pauls $
+$Revision: 530 $
+$Id: Fileinfo.hh 530 2008-10-03 09:41:29Z pauls $
  */
 
 #ifndef Fileinfo_hh
@@ -13,6 +13,7 @@ $Id: Fileinfo.hh 43 2006-02-28 17:56:41Z pauls $
 
 
 #include <iostream> //for cout etc.
+#include <cstring>
 
 using std::cout;
 using std::endl;

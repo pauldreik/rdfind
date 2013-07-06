@@ -1,0 +1,35 @@
+#!/bin/bash
+#this file is version $Revision: 235 $
+
+#follow http://www.debian.org/doc/maint-guide/ch-start.en.html
+
+
+mkdir -p debianize_rdfind
+cd debianize_rdfind/
+cp ~/code/eget/cvs/paulsundvall.net/rdfind/rdfind-1.2.2.tar.gz . 
+tar xvzf rdfind-1.2.2.tar.gz
+cd rdfind-1.2.2
+dh_make -e rdfind@paulsundvall.net -f ../rdfind-1.2.2.tar.gz 
+#(answer s, single binary)
+#emacs debian/control
+cp /tmp/control debian/
+#emacs debian/copyright
+
+#emacs debian/changelog
+cp /tmp/copyright debian/
+#leave debian/rules unchanged
+rm debian/README.Debian
+#debian/conffiles.ex was missing! should be deleted anyway...
+rm debian/*.ex
+#rm debian/cron.d.ex
+#changed debian/dirs to contain only usr/bin
+echo "usr/bin"> debian/dirs
+#debian/docs unchanged
+rm debian/emacsen-*
+# rm debian/init.d.ex
+cp /tmp/rdfind.1 debian/
+#emacs debian/menu.ex
+echo '?package(rdfind):needs="text" section="Apps/Util"\
+         title="rdfind" command="/usr/bin/rdfind"'>debian/menu
+rm debian/rdfind.doc-base.EX
+dpkg-buildpackage -rfakeroot -k0x509CCB46                                         

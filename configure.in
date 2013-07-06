@@ -1,11 +1,11 @@
 dnl configure.in for rdfind. Written By Paul Sundvall.
-dnl This file is cvs version $Revision: 92 $
+dnl This file is cvs version $Revision: 546 $
 
-VERSION="1.2.2"
-AC_INIT(rdfind.cc,1.2.2)
+VERSION="1.2.3"
+AC_INIT(rdfind.cc,1.2.3)
 AM_CONFIG_HEADER(config.h)       
 
-AM_INIT_AUTOMAKE(rdfind,1.2.2)
+AM_INIT_AUTOMAKE(rdfind,1.2.3)
 
 
 dnl find and test the C compiler
@@ -36,7 +36,7 @@ AC_CHECK_LIB(nettle,main,,[AC_MSG_ERROR([
 ])])
 
 dnl test for some specific functions
-AC_CHECK_FUNC(stat,,AC_MSG_ERROR(oops! no start ?!?))
+AC_CHECK_FUNC(stat,,AC_MSG_ERROR(oops! no stat ?!?))
 AC_CHECK_FUNC(nanosleep,,AC_MSG_WARN(cant do nanosleep ?))
 
 AC_CHECK_LIB(stdc++, main,,AC_MSG_ERROR(rdfind requires libstdc++))          
