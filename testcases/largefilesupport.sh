@@ -15,7 +15,7 @@ echo -n "checking for mktemp ..." && [ -x mktemp ] && echo " OK."
 
 #create a temporary directory, which is automatically deleted
 #on exit
-datadir=$(mktemp --tmpdir=/tmp -d rdfindtestcases.d.XXXXXXXXXXXX)
+datadir=$(mktemp -d -t rdfindtestcases.d.XXXXXXXXXXXX)
 dbgecho "temp dir is $datadir"
 
 cleanup () {
