@@ -1,10 +1,11 @@
-dnl configure.in for rdfind.
+dnl configure.in for rdfind. Written By Paul Sundvall.
+dnl This file is cvs version $Revision: 804 $
 
-VERSION="1.3.4"
-AC_INIT(rdfind.cc,1.3.4)
-AM_CONFIG_HEADER(config.h)       
+VERSION="1.3.3pre"
+AC_INIT(rdfind.cc,1.3.3pre)
+AC_CONFIG_HEADERS(config.h)       
 
-AM_INIT_AUTOMAKE(rdfind,1.3.4)
+AM_INIT_AUTOMAKE(rdfind,1.3.3pre)
 
 
 dnl find and test the C compiler
