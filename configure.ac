@@ -1,8 +1,8 @@
 dnl configure.in for rdfind. Written By Paul Sundvall.
 dnl This file is cvs version $Revision: 804 $
 
-VERSION="1.3.3pre"
-AC_INIT(rdfind,1.3.3pre)
+VERSION="1.3.5pre"
+AC_INIT(rdfind,1.3.5pre)
 AC_CONFIG_SRCDIR(rdfind.cc)
 AC_CONFIG_HEADERS(config.h)       
 
