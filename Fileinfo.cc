@@ -56,10 +56,9 @@ int Fileinfo::fillwithbytes(enum readtobuffermode filltype,
     f1.read(m_somebytes,m_nbytes);
     break;
   case CREATE_MD5_CHECKSUM://note: fall through is on purpose
-    checksumtype=Checksum::MD5;
   case CREATE_SHA1_CHECKSUM:
-     checksumtype=Checksum::SHA1;
-    {//checksum calculation      
+    {//checksum calculation
+       checksumtype= (filltype==CREATE_MD5_CHECKSUM ? Checksum::MD5 : Checksum::SHA1);
       Checksum chk;
       if(chk.init(checksumtype))
 	std::cerr<<"error in checksum init"<<std::endl;
