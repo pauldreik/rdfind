@@ -9,9 +9,17 @@ rdfind_SOURCES = rdfind.cc Checksum.cc  Dirlist.cc  Fileinfo.cc  Rdutil.cc
 #feedback welcome.
 TESTS=testcases/largefilesupport.sh
 
-EXTRA_DIST = LICENSE algos.hh Dirlist.hh MultiAttributeCompare.hh Checksum.hh  Fileinfo.hh Rdutil.hh rdfind.1 bootstrap.sh RdfindDebug.hh $(TESTS)
+EXTRA_DIST = \
+  algos.hh Dirlist.hh MultiAttributeCompare.hh Checksum.hh  Fileinfo.hh \
+  Rdutil.hh bootstrap.sh RdfindDebug.hh \
+  $(TESTS) \
+  rdfind.1 LICENSE \
+  ./do_clang_format.sh .clang-format
 
 man_MANS = rdfind.1
 
 
+#for formatting the source
+format:
+	./do_clang_format.sh
 
