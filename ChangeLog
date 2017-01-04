@@ -1,5 +1,12 @@
-2014-08-23 Paul Dreik <rdfind|pauldreik.se>
-    * fix bug in using sha1 even if md5 is selected
+2017-01-04 Paul Dreik <rdfind@pauldreik.se>
+	* release 1.3.5
+	* source cleanup like removing obsolete comments, formatting.
+	* fix man page typo on dryrun
+	* console output showing how much space that can be saved
+	  is now properly capitalized. as you may have noted, I do not
+          really like uppercase...
+2014-08-23 Paul Dreik <rdfind@pauldreik.se>
+	* fix bug in using sha1 even if md5 is selected
 2013-06-19  Paul Dreik  <rdfind@pauldreik.se>
 	* release of 1.3.4
 	workaround for unit test for filesize which did not run on Hurd

@@ -40,7 +40,9 @@ AC_CHECK_HEADER(nettle/sha.h,,[AC_MSG_ERROR([
  first. If you have already done so and get this error message 
  anyway, it may be installed somewhere else, maybe because you 
  don't have root access. Pass CPPFLAGS=-I/your/path/to/nettle to configure
- and try again. The path should be so that #include nettle/headerfile.h works.
+ and try again. The path should be so that #include \"nettle/sha.h\" works.
+ On Debian-ish systems, use \"apt-get install nettle-dev\" to get a system
+ wide nettle install.
 ])]) 
 AC_CHECK_LIB(nettle,main,,[AC_MSG_ERROR([
  Could not link to libnettle. Please install nettle
