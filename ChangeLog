@@ -5,6 +5,8 @@
 	* console output showing how much space that can be saved
 	  is now properly capitalized. as you may have noted, I do not
           really like uppercase...
+        * make check now works again (for some reason, it broke. maybe
+          due to autotools updates)
 2014-08-23 Paul Dreik <rdfind@pauldreik.se>
 	* fix bug in using sha1 even if md5 is selected
 2013-06-19  Paul Dreik  <rdfind@pauldreik.se>
