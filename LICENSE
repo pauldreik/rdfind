@@ -1,8 +1,11 @@
-This software is written by Paul Sundvall 2006. Paul switched name to
-Paul Dreik 2010.
+rdfind -  a redundant file finder.
+
+This software is written by Paul Dreik, starting in 2006.
+Paul switched name from Paul Sundvall to Paul Dreik in 2010.
 
 It is distributed under GNU General Public Licence (GPL) version 2 or,
 at your option, a later version. See the note at the bottom of this file.
+The full license is included in the COPYING file.
 
 It uses nettle, a cryptographic library by Niels Möller. The parts of
 nettle that are used are released into the public domain.
@@ -10,9 +13,7 @@ nettle that are used are released into the public domain.
 Do you think rdfind is useful? Drop me a line at rdfind@pauldreik.se
 
 
-
-rdfind -  a redundant file finder.
-Copyright (C) 2006 Paul Sundvall
+Copyright (C) 2006-2017 Paul Dreik
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
