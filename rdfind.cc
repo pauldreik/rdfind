@@ -1,9 +1,8 @@
 /**
- rdfind.cc
- copyright Paul Dreik (earlier Sundvall)
-
- see LICENSE for details.
- */
+   copyright 20016-2017 Paul Dreik (earlier Paul Sundvall)
+   Distributed under GPL v 2.0 or later, at your option.
+   See LICENSE for further details.
+*/
 
 #include "config.h"
 

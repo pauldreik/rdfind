@@ -1,6 +1,10 @@
 /*
-this file contains functions and templates that implement most of the
-functionality in rdfind.
+   copyright 20016-2017 Paul Dreik (earlier Paul Sundvall)
+   Distributed under GPL v 2.0 or later, at your option.
+   See LICENSE for further details.
+
+   this file contains functions and templates that implement most of the
+   functionality in rdfind.
  */
 #ifndef rdutil_hh
 #define rdutil_hh

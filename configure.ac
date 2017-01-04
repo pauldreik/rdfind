@@ -1,5 +1,7 @@
-dnl configure.in for rdfind. Written By Paul Sundvall.
-dnl This file is cvs version $Revision: 804 $
+dnl configure.in for rdfind.
+dnl copyright 20016-2017 Paul Dreik (earlier Paul Sundvall)
+dnl Distributed under GPL v 2.0 or later, at your option.
+dnl See LICENSE for further details.
 
 VERSION="1.3.5pre"
 AC_INIT(rdfind,1.3.5pre)

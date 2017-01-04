@@ -1,10 +1,8 @@
 /*
-some algorithms that may come in handy.
-Author Paul Sundvall 2006
-see LICENSE for details.
-$Revision: 26 $
-$Id: algos.hh 26 2006-02-25 14:14:20Z pauls $
- */
+   copyright 20016-2017 Paul Dreik (earlier Paul Sundvall)
+   Distributed under GPL v 2.0 or later, at your option.
+   See LICENSE for further details.
+*/
 
 #ifndef algos_hh
 #define algos_hh
