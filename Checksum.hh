@@ -7,46 +7,48 @@
 /**
  * class for checksum calculation
  */
-class Checksum {
+class Checksum
+{
 public:
-	Checksum() :
-			m_checksumtype(NOTSET), m_state(0), m_digest(0) {
-	}
+  Checksum () : m_checksumtype (NOTSET), m_state (0), m_digest (0) {}
 
-	~Checksum();
+  ~Checksum ();
 
-	//these are the checksums that can be calculated
-	enum checksumtypes {
-		NOTSET = 0, MD5, SHA1,
-	};
+  // these are the checksums that can be calculated
+  enum checksumtypes
+  {
+    NOTSET = 0,
+    MD5,
+    SHA1,
+  };
 
-	//init the object
-	int init(int checksumtype);
+  // init the object
+  int init (int checksumtype);
 
-	///FIXME size_t
-	int update(unsigned int length, unsigned char *buffer);
+  /// FIXME size_t
+  int update (unsigned int length, unsigned char *buffer);
 
-	///prints the checksum on stdout
-	int print();
+  /// prints the checksum on stdout
+  int print ();
 
-	//writes the checksum to buffer.
-	//returns 0 if everything went ok.
-	int printToBuffer(void *buffer);
+  // writes the checksum to buffer.
+  // returns 0 if everything went ok.
+  int printToBuffer (void *buffer);
 
-	//returns the number of bytes that the buffer needs to be
-	//returns negative if something is wrong.
-	int getDigestLength() const;
+  // returns the number of bytes that the buffer needs to be
+  // returns negative if something is wrong.
+  int getDigestLength () const;
 
 private:
-	//deletes allocated memory
-	int release();
-	//prints the checksum to stdout
-	void display_hex(unsigned length, void *data_);
+  // deletes allocated memory
+  int release ();
+  // prints the checksum to stdout
+  void display_hex (unsigned length, void *data_);
 
-	//to know what type of checksum we are doing
-	int m_checksumtype;
-	//the checksum calculation internal state
-	void *m_state;
-	//the result is stored in this variable
-	void *m_digest;
+  // to know what type of checksum we are doing
+  int m_checksumtype;
+  // the checksum calculation internal state
+  void *m_state;
+  // the result is stored in this variable
+  void *m_digest;
 };
