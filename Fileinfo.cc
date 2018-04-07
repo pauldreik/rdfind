@@ -85,7 +85,7 @@ int Fileinfo::fillwithbytes (enum readtobuffermode filltype,
         int digestlength = chk.getDigestLength ();
         if (digestlength <= 0 || digestlength >= m_nbytes)
           std::cerr << "wrong answer from getDigestLength! FIXME" << std::endl;
-        if (chk.printToBuffer (m_somebytes))
+        if (chk.printToBuffer (m_somebytes,sizeof(m_somebytes)))
           std::cerr << "failed writing digest to buffer!!" << std::endl;
       }
       break;

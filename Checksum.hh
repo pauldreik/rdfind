@@ -4,13 +4,15 @@
    See LICENSE for further details.
 */
 
+#include <cstddef>
+
 /**
  * class for checksum calculation
  */
 class Checksum
 {
 public:
-  Checksum () : m_checksumtype (NOTSET), m_state (0), m_digest (0) {}
+  Checksum () : m_checksumtype (NOTSET), m_state (0) {}
 
   ~Checksum ();
 
@@ -33,7 +35,7 @@ public:
 
   // writes the checksum to buffer.
   // returns 0 if everything went ok.
-  int printToBuffer (void *buffer);
+  int printToBuffer (void *buffer, std::size_t N);
 
   // returns the number of bytes that the buffer needs to be
   // returns negative if something is wrong.
@@ -49,6 +51,5 @@ private:
   int m_checksumtype;
   // the checksum calculation internal state
   void *m_state;
-  // the result is stored in this variable
-  void *m_digest;
+
 };

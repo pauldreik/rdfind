@@ -80,6 +80,7 @@ public:
   // some bytes of the file, good for comparision.
   static const int m_nbytes = 64;
   char m_somebytes[m_nbytes];
+  //FIXME make into a std array
 
   // This is a number that ranks this particular file on how important it is.
   // If two files are found to be identical, the one with most positive

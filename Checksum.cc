@@ -5,6 +5,9 @@
 */
 #include "Checksum.hh"
 #include <cstdio>
+#include <cassert>
+#include <array>
+
 
 #include <cstring> //for memcpy
 // all this rubbish to include sha.h from nettle in the right way
@@ -40,18 +43,15 @@ int Checksum::release ()
       break;
     case SHA1:
       delete (struct sha1_ctx *)m_state;
-      delete[](uint8_t *)m_digest;
       break;
     case MD5:
       delete (struct md5_ctx *)m_state;
-      delete[](uint8_t *)m_digest;
       break;
     default:
       // this is never reached
       return -1;
     }
   m_state = 0;
-  m_digest = 0;
   return 0;
 }
 
@@ -74,14 +74,13 @@ int Checksum::init (int checksumtype)
     case SHA1:
       {
         m_state = new struct sha1_ctx;
-        m_digest = new uint8_t[SHA1_DIGEST_SIZE];
         sha1_init ((sha1_ctx *)m_state);
       }
       break;
     case MD5:
       {
         m_state = new struct md5_ctx;
-        m_digest = new uint8_t[MD5_DIGEST_SIZE];
+        //fixme assert
         md5_init ((md5_ctx *)m_state);
       }
       break;
@@ -111,15 +110,20 @@ int Checksum::update (unsigned int length, unsigned char *buffer)
 
 int Checksum::print ()
 {
+	  // the result is stored in this variable
   switch (m_checksumtype)
     {
-    case SHA1:
-      sha1_digest ((sha1_ctx *)m_state, SHA1_DIGEST_SIZE, (uint8_t *)m_digest);
-      display_hex (SHA1_DIGEST_SIZE, m_digest);
+    case SHA1: {
+  	  std::array<unsigned char,SHA1_DIGEST_SIZE> digest;
+    	sha1_digest ((sha1_ctx *)m_state, SHA1_DIGEST_SIZE, digest.data());
+      display_hex (SHA1_DIGEST_SIZE, digest.data());
+    }
       break;
-    case MD5:
-      md5_digest ((md5_ctx *)m_state, MD5_DIGEST_SIZE, (uint8_t *)m_digest);
-      display_hex (MD5_DIGEST_SIZE, m_digest);
+    case MD5: {
+    	  std::array<unsigned char,MD5_DIGEST_SIZE> digest;
+      md5_digest ((md5_ctx *)m_state, MD5_DIGEST_SIZE, digest.data());
+      display_hex (MD5_DIGEST_SIZE, digest.data());
+    }
       break;
     default:
       return -1;
@@ -143,17 +147,28 @@ int Checksum::getDigestLength () const
 }
 
 // writes the checksum to buffer
-int Checksum::printToBuffer (void *buffer)
+int Checksum::printToBuffer (void *buffer, std::size_t N)
 {
+
+	assert(buffer);
+
   switch (m_checksumtype)
     {
     case SHA1:
-      sha1_digest ((sha1_ctx *)m_state, SHA1_DIGEST_SIZE, (uint8_t *)m_digest);
-      memcpy (buffer, m_digest, SHA1_DIGEST_SIZE);
+    	if(N>=SHA1_DIGEST_SIZE) {
+      sha1_digest ((sha1_ctx *)m_state, SHA1_DIGEST_SIZE, static_cast<unsigned char*>(buffer));
+    	} else {
+    		//bad size.
+    		return -1;
+    	}
       break;
     case MD5:
-      md5_digest ((md5_ctx *)m_state, MD5_DIGEST_SIZE, (uint8_t *)m_digest);
-      memcpy (buffer, m_digest, MD5_DIGEST_SIZE);
+    	if(N>=MD5_DIGEST_SIZE) {
+      md5_digest ((md5_ctx *)m_state, MD5_DIGEST_SIZE,static_cast<unsigned char*>(buffer));
+    	} else {
+    	    		//bad size.
+    	    		return -1;
+    	    	}
       break;
     default:
       return -1;
