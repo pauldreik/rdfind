@@ -69,6 +69,10 @@ AC_CHECK_HEADERS(time.h,,AC_MSG_WARN(nanosleep header time.h missing?))
 dnl check for 64 bit support
 AC_SYS_LARGEFILE
 
+dnl make sure we have c++11 or better
+AX_CXX_COMPILE_STDCXX_11([noext], [mandatory])
+
+
 AC_SUBST(VERSION)
 
 
@@ -99,7 +103,7 @@ if test "x$set_more_warnings" != xno; then
 
 	dnl see https://github.com/lefticus/cppbestpractices/blob/master/02-Use_the_Tools_Available.md#compilers for a list of suggestions. Let's start
 	dnl small to begin with, and gradually increase.
-	warning_options="-Wall -Wextra -Wbiznafronck"			
+	warning_options="-Wall -Wextra -pedantic -Wbiznafronck"			
 	for option in $warning_options ; do
 		SAVE_CXXFLAGS="$CXXFLAGS"
 		CXXFLAGS="$CXXFLAGS $uwoption $option"
