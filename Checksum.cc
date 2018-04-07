@@ -4,9 +4,9 @@
    See LICENSE for further details.
 */
 #include "Checksum.hh"
-#include <stdio.h>
+#include <cstdio>
 
-#include <string.h> //for memcpy
+#include <cstring> //for memcpy
 // all this rubbish to include sha.h from nettle in the right way
 #ifdef __cplusplus
 extern "C" {
@@ -19,13 +19,12 @@ extern "C" {
 #endif
 
 // this is a small function to print the checksum to stdout
-void Checksum::display_hex (unsigned length, void *data_)
+void Checksum::display_hex (unsigned length, const void *data_)
 {
-  uint8_t *data = (uint8_t *)data_;
-  unsigned i;
-  for (i = 0; i < length; i++)
-    printf ("%02x", data[i]);
-  printf ("\n");
+  const char* data=static_cast<const char*>(data_);
+  for (unsigned i = 0; i < length; i++)
+    std::printf ("%02x", data[i]);
+  std::printf ("\n");
 }
 
 // destructor

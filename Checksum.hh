@@ -43,7 +43,7 @@ private:
   // deletes allocated memory
   int release ();
   // prints the checksum to stdout
-  void display_hex (unsigned length, void *data_);
+  static void display_hex (unsigned length, const void *data_);
 
   // to know what type of checksum we are doing
   int m_checksumtype;
