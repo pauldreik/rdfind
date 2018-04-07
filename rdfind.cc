@@ -391,7 +391,7 @@ int main (int narg, char *argv[])
       int lastsize = filelist1.size ();
       cout << dryruntext << "Now scanning \"" << (*it) << "\"";
       cout.flush ();
-      int retval = dirlist.walk (*it, 0);
+      dirlist.walk (*it, 0);
       cout << ", found " << filelist1.size () - lastsize << " files." << endl;
     }
 
