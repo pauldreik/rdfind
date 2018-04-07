@@ -71,5 +71,56 @@ AC_SYS_LARGEFILE
 
 AC_SUBST(VERSION)
 
+
+dnl check for how to set warning flags
+set_more_warnings=no
+AC_ARG_ENABLE(warnings,
+ 	AC_HELP_STRING(
+ 	    [--enable-warnings],
+ 	    [enable compiler warnings (default=no)]
+ 	),
+   	set_more_warnings="$enableval"
+)
+dnl the following warning related paragraph is from the gnumeric project, which
+dnl is gpl-v2 licensed. I modified and expanded it a bit.
+if test "x$set_more_warnings" != xno; then
+	dnl Clang needs this option, or else it will appear to support any
+	dnl warning option, only to spew warnings about them later.
+	uwoption="-Werror=unknown-warning-option"
+	SAVE_CXXFLAGS="$CXXFLAGS"
+	CXXFLAGS="$CXXFLAGS $uwoption"
+	AC_MSG_CHECKING([whether compiler understands $uwoption])
+	AC_COMPILE_IFELSE(
+		[AC_LANG_PROGRAM([], [])],
+		[has_unknown_warning_option=yes],
+		[has_unknown_warning_option=no; uwoption=""])
+	AC_MSG_RESULT($has_unknown_warning_option)
+	CXXFLAGS="$SAVE_CXXFLAGS"
+
+	dnl see https://github.com/lefticus/cppbestpractices/blob/master/02-Use_the_Tools_Available.md#compilers for a list of suggestions. Let's start
+	dnl small to begin with, and gradually increase.
+	warning_options="-Wall -Wbiznafronck"			
+	for option in $warning_options ; do
+		SAVE_CXXFLAGS="$CXXFLAGS"
+		CXXFLAGS="$CXXFLAGS $uwoption $option"
+		AC_MSG_CHECKING([whether compiler understands $option])
+		dnl Include a system header so we ignore Werror=... flags
+		dnl that cause trouble.
+		AC_COMPILE_IFELSE(
+			[AC_LANG_PROGRAM([[#include <stdio.h>]], [])],
+			[has_option=yes],
+			[has_option=no])
+		CXXFLAGS="$SAVE_CXXFLAGS"
+		if test $has_option = yes; then
+			CXXFLAGS="$CXXFLAGS $option"
+		fi
+		AC_MSG_RESULT(got result $has_option)
+		unset has_option
+		unset SAVE_CXXFLAGS
+	done
+	unset option
+fi
+
+
 dnl read Makefile.in and write Makefile
 AC_OUTPUT(Makefile)
