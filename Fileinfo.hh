@@ -160,10 +160,10 @@ public:
   const std::string &name () const { return m_filename; }
 
   // gets the priority
-  const int priority () const { return m_priority; }
+  int priority () const { return m_priority; }
 
   // gets the depth
-  const int depth () const { return m_depth; }
+  int depth () const { return m_depth; }
 
   // sets the depth
   void setdepth (int depth) { m_depth = depth; }

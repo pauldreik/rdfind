@@ -18,3 +18,5 @@ rdfind
 stamp-h1
 *~
 
+compile
+test-driver

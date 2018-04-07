@@ -274,7 +274,7 @@ int Fileinfo::makehardlink (const Fileinfo &A)
   return retval;
 }
 
-int Fileinfo::static_deletefile (Fileinfo &A, const Fileinfo &B)
+int Fileinfo::static_deletefile (Fileinfo &A, const Fileinfo &/*B*/)
 {
   // delete A.
 

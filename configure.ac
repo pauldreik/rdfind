@@ -99,7 +99,7 @@ if test "x$set_more_warnings" != xno; then
 
 	dnl see https://github.com/lefticus/cppbestpractices/blob/master/02-Use_the_Tools_Available.md#compilers for a list of suggestions. Let's start
 	dnl small to begin with, and gradually increase.
-	warning_options="-Wall -Wbiznafronck"			
+	warning_options="-Wall -Wextra -Wbiznafronck"			
 	for option in $warning_options ; do
 		SAVE_CXXFLAGS="$CXXFLAGS"
 		CXXFLAGS="$CXXFLAGS $uwoption $option"
