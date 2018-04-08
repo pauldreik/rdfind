@@ -7,6 +7,7 @@
 #ifndef Fileinfo_hh
 #define Fileinfo_hh
 
+#include <array>
 #include <cstring>
 #include <iostream> //for cout etc.
 
@@ -33,7 +34,7 @@ public:
     , m_identity(0)
     , m_depth(0)
   {
-    memset(m_somebytes, 0, sizeof(m_somebytes));
+    m_somebytes.fill('\0');
   }
 
   // for fault checking - has no meaning for other purposes than
@@ -82,9 +83,7 @@ public:
   struct Fileinfostat m_info;
 
   // some bytes of the file, good for comparision.
-  static const int m_nbytes = 64;
-  char m_somebytes[m_nbytes];
-  // FIXME make into a std array
+  std::array<char, 64> m_somebytes;
 
   // This is a number that ranks this particular file on how important it is.
   // If two files are found to be identical, the one with most positive
@@ -216,13 +215,18 @@ public:
                     enum readtobuffermode lasttype = NOT_DEFINED);
 
   // display the bytes that are read from the file.
-  void displaybytes() { cout << "bytes are \"" << m_somebytes << "\"" << endl; }
+  // hmm, this looks suspicious. what about the case where it does not contain a
+  // null terminator?
+  void displaybytes() const
+  {
+    cout << "bytes are \"" << m_somebytes.data() << "\"" << endl;
+  }
 
   // get a specific byte of the buffer
   char getreadbyte(int n) const { return m_somebytes[n]; }
 
   // get a pointer to the bytes read from the file
-  const char* getbyteptr() const { return m_somebytes; }
+  const char* getbyteptr() const { return m_somebytes.data(); }
 
   static bool compareonbytes(const Fileinfo& a, const Fileinfo& b);
 

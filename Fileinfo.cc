@@ -25,7 +25,7 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
   // Decide if we are going to read from file or not.
   // If file is short, first bytes might be ALL bytes!
   if (lasttype != -1) {
-    if (this->size() <= (Fileinfo::filesizetype)m_nbytes) {
+    if (this->size() <= static_cast<filesizetype>(m_somebytes.size())) {
       // pointless to read - all bytes in the file are in the field
       // m_somebytes, or checksum is calculated!
       //      cout<<"Skipped reading from file because lasttype="<<lasttype
@@ -35,9 +35,7 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
   }
 
   // set memory to zero
-  //(this command is equivalent to memset(m_somebytes,0,sizeeof(m_somebytes))
-  // but this is easier to understand.)
-  memset(m_somebytes, 0, m_nbytes * sizeof(m_somebytes[0]));
+  m_somebytes.fill('\0');
 
   std::fstream f1;
   f1.open(m_filename.c_str(), std::ios_base::in);
@@ -52,12 +50,12 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
   switch (filltype) {
     case READ_FIRST_BYTES:
       // read at start of file
-      f1.read(m_somebytes, m_nbytes);
+      f1.read(m_somebytes.data(), m_somebytes.size());
       break;
     case READ_LAST_BYTES:
       // read at end of file
-      f1.seekg(-m_nbytes, std::ios_base::end);
-      f1.read(m_somebytes, m_nbytes);
+      f1.seekg(-static_cast<long>(m_somebytes.size()), std::ios_base::end);
+      f1.read(m_somebytes.data(), m_somebytes.size());
       break;
     case CREATE_MD5_CHECKSUM:    // note: fall through is on purpose
     case CREATE_SHA1_CHECKSUM: { // checksum calculation
@@ -78,9 +76,10 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
 
       // store the result of the checksum calculation in somebytes
       int digestlength = chk.getDigestLength();
-      if (digestlength <= 0 || digestlength >= m_nbytes)
+      if (digestlength <= 0 ||
+          digestlength >= static_cast<int>(m_somebytes.size()))
         std::cerr << "wrong answer from getDigestLength! FIXME" << std::endl;
-      if (chk.printToBuffer(m_somebytes, sizeof(m_somebytes)))
+      if (chk.printToBuffer(m_somebytes.data(), m_somebytes.size()))
         std::cerr << "failed writing digest to buffer!!" << std::endl;
     } break;
     default:
@@ -293,7 +292,7 @@ Fileinfo::static_makehardlink(Fileinfo& A, const Fileinfo& B)
 bool
 Fileinfo::compareonbytes(const Fileinfo& a, const Fileinfo& b)
 {
-  int retval = memcmp(a.getbyteptr(), b.getbyteptr(), m_nbytes);
+  int retval = memcmp(a.getbyteptr(), b.getbyteptr(), a.m_somebytes.size());
   return (retval < 0);
   /*
   for(int i=0;i<m_nbytes;i++)
@@ -306,7 +305,7 @@ Fileinfo::compareonbytes(const Fileinfo& a, const Fileinfo& b)
 bool
 Fileinfo::equalbytes(const Fileinfo& a, const Fileinfo& b)
 {
-  int retval = memcmp(a.getbyteptr(), b.getbyteptr(), m_nbytes);
+  int retval = memcmp(a.getbyteptr(), b.getbyteptr(), a.m_somebytes.size());
   return (retval == 0);
 }
 
