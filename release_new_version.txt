@@ -1,3 +1,6 @@
 version number exist in the following places:
 configure.ac
-rdfind.1
+rdfind.1 (multiple times)
+VERSION
+Changelog
+

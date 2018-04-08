@@ -1,3 +1,7 @@
+2018-04-xx Paul Dreik <rdfind@pauldreik.se>
+	* placeholder for 1.4.0
+	* cleanup of source to remove compiler warnings
+	  and switch to c++11
 2017-01-04 Paul Dreik <rdfind@pauldreik.se>
 	* release 1.3.5
 	* source cleanup like removing obsolete comments, formatting.

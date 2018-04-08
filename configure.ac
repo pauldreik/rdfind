@@ -3,8 +3,8 @@ dnl copyright 20016-2017 Paul Dreik (earlier Paul Sundvall)
 dnl Distributed under GPL v 2.0 or later, at your option.
 dnl See LICENSE for further details.
 
-VERSION="1.3.5"
-AC_INIT(rdfind,1.3.5)
+VERSION="1.4.0alpha"
+AC_INIT(rdfind,1.4.0alpha)
 AC_CONFIG_SRCDIR(rdfind.cc)
 AC_CONFIG_HEADERS(config.h)       
 

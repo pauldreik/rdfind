@@ -1,9 +1,1 @@
-1.3.4pre
-
-Note that the version number exists at three places:
-here (file VERSION)
-configure.in
-rdfind.1 (the man page)
-
-$Revision: 798 $
-$Id: VERSION 798 2012-11-27 19:52:04Z paul $
+1.4.0alpha

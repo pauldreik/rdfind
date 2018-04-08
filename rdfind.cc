@@ -82,7 +82,7 @@ usage()
   cout << " encountered on the command line is kept, and the others are "
           "considered duplicate."
        << endl;
-  cout << " options are (default choice within parantheses) " << endl << endl;
+  cout << " options are (default choice within parentheses) " << endl << endl;
   cout << " -makesymlinks      true |(false) replace duplicate files with "
           "symbolic links"
        << endl;
@@ -116,7 +116,7 @@ usage()
        << endl;
   cout << endl;
   cout << endl
-       << "rdfind is written by Paul Dreik 2006. License: GPL v2 or "
+       << "rdfind is written by Paul Dreik 2006 onwards. License: GPL v2 or "
           "later (at your option)."
        << endl;
   cout << "version is " << VERSION << endl;
