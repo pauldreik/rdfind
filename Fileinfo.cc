@@ -65,13 +65,9 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
       if (chk.init(checksumtype))
         std::cerr << "error in checksum init" << std::endl;
       char buffer[1024];
-      int len = 1;
-      while (len) {
-        f1.read(buffer, 1024);
-        len = f1.gcount();
-        if (len)
-          if (chk.update((unsigned int)len, (unsigned char*)buffer))
-            std::cerr << "error in update" << std::endl;
+      while (f1) {
+        f1.read(buffer, sizeof(buffer));
+        chk.update(f1.gcount(), buffer);
       }
 
       // store the result of the checksum calculation in somebytes

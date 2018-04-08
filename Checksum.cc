@@ -47,7 +47,7 @@ Checksum::init(int checksumtype)
 
 // update
 int
-Checksum::update(unsigned int length, unsigned char* buffer)
+Checksum::update(std::size_t length, const unsigned char* buffer)
 {
   switch (m_checksumtype) {
     case SHA1:
@@ -60,6 +60,13 @@ Checksum::update(unsigned int length, unsigned char* buffer)
       return -1;
   }
   return 0;
+}
+int
+Checksum::update(std::size_t length, const char* buffer)
+{
+  return update(
+    length,
+    static_cast<const unsigned char*>(static_cast<const void*>(buffer)));
 }
 
 int
