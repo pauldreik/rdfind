@@ -50,12 +50,12 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
   switch (filltype) {
     case READ_FIRST_BYTES:
       // read at start of file
-      f1.read(m_somebytes.data(), m_somebytes.size());
+      f1.read(m_somebytes.data(), SomeByteSize);
       break;
     case READ_LAST_BYTES:
       // read at end of file
-      f1.seekg(-static_cast<long>(m_somebytes.size()), std::ios_base::end);
-      f1.read(m_somebytes.data(), m_somebytes.size());
+      f1.seekg(-SomeByteSize, std::ios_base::end);
+      f1.read(m_somebytes.data(), SomeByteSize);
       break;
     case CREATE_MD5_CHECKSUM:    // note: fall through is on purpose
     case CREATE_SHA1_CHECKSUM: { // checksum calculation
@@ -290,12 +290,6 @@ Fileinfo::compareonbytes(const Fileinfo& a, const Fileinfo& b)
 {
   int retval = memcmp(a.getbyteptr(), b.getbyteptr(), a.m_somebytes.size());
   return (retval < 0);
-  /*
-  for(int i=0;i<m_nbytes;i++)
-    if(a.getreadbyte(i)<b.getreadbyte(i))
-      return true;
-  return false;
-  */
 }
 
 bool

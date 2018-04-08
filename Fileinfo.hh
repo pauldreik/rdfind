@@ -83,7 +83,11 @@ public:
   struct Fileinfostat m_info;
 
   // some bytes of the file, good for comparision.
-  std::array<char, 64> m_somebytes;
+  enum ByteSize
+  {
+    SomeByteSize = 64
+  };
+  std::array<char, SomeByteSize> m_somebytes;
 
   // This is a number that ranks this particular file on how important it is.
   // If two files are found to be identical, the one with most positive
@@ -221,9 +225,6 @@ public:
   {
     cout << "bytes are \"" << m_somebytes.data() << "\"" << endl;
   }
-
-  // get a specific byte of the buffer
-  char getreadbyte(int n) const { return m_somebytes[n]; }
 
   // get a pointer to the bytes read from the file
   const char* getbyteptr() const { return m_somebytes.data(); }

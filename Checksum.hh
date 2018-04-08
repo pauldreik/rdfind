@@ -28,6 +28,7 @@ public:
 
   int update(std::size_t length, const unsigned char* buffer);
   int update(std::size_t length, const char* buffer);
+  int update(long length, const char* buffer);
 
   /// prints the checksum on stdout
   int print();

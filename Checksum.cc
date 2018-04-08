@@ -70,6 +70,14 @@ Checksum::update(std::size_t length, const char* buffer)
 }
 
 int
+Checksum::update(long length, const char* buffer)
+{
+  return update(
+    static_cast<std::size_t>(length),
+    static_cast<const unsigned char*>(static_cast<const void*>(buffer)));
+}
+
+int
 Checksum::print()
 {
   // the result is stored in this variable
