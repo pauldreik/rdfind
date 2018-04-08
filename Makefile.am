@@ -7,7 +7,8 @@ rdfind_SOURCES = rdfind.cc Checksum.cc  Dirlist.cc  Fileinfo.cc  Rdutil.cc
 
 #these are the test scripts to execute - I do not know how to glob here,
 #feedback welcome.
-TESTS=testcases/largefilesupport.sh
+TESTS=testcases/largefilesupport.sh \
+	testcases/md5collisions.sh
 
 EXTRA_DIST = \
   algos.hh Dirlist.hh MultiAttributeCompare.hh Checksum.hh  Fileinfo.hh \
