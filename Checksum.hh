@@ -6,19 +6,15 @@
 
 #include <cstddef>
 
+#include <nettle/md5.h>
+#include <nettle/sha.h>
+
 /**
  * class for checksum calculation
  */
 class Checksum
 {
 public:
-  Checksum()
-    : m_checksumtype(NOTSET)
-    , m_state(0)
-  {}
-
-  ~Checksum();
-
   // these are the checksums that can be calculated
   enum checksumtypes
   {
@@ -45,13 +41,12 @@ public:
   int getDigestLength() const;
 
 private:
-  // deletes allocated memory
-  int release();
-  // prints the checksum to stdout
-  static void display_hex(unsigned length, const void* data_);
-
   // to know what type of checksum we are doing
-  int m_checksumtype;
+  int m_checksumtype = NOTSET;
   // the checksum calculation internal state
-  void* m_state;
+  union ChecksumStruct
+  {
+    sha1_ctx sha1;
+    md5_ctx md5;
+  } m_state;
 };

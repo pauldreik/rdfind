@@ -9,20 +9,10 @@
 #include <cstdio>
 
 #include <cstring> //for memcpy
-// all this rubbish to include sha.h from nettle in the right way
-#ifdef __cplusplus
-extern "C" {
-#include <nettle/md5.h>
-#include <nettle/sha.h>
-}
-#else
-#include <nettle/md5.h>
-#include <nettle/sha.h>
-#endif
 
 // this is a small function to print the checksum to stdout
-void
-Checksum::display_hex(unsigned length, const void* data_)
+static void
+display_hex(unsigned length, const void* data_)
 {
   const char* data = static_cast<const char*>(data_);
   for (unsigned i = 0; i < length; i++)
@@ -30,42 +20,10 @@ Checksum::display_hex(unsigned length, const void* data_)
   std::printf("\n");
 }
 
-// destructor
-Checksum::~Checksum()
-{
-  release();
-}
-
-// deletes allocated memory
-int
-Checksum::release()
-{
-  switch (m_checksumtype) {
-    case NOTSET:
-      return 0;
-      break;
-    case SHA1:
-      delete (struct sha1_ctx*)m_state;
-      break;
-    case MD5:
-      delete (struct md5_ctx*)m_state;
-      break;
-    default:
-      // this is never reached
-      return -1;
-  }
-  m_state = 0;
-  return 0;
-}
-
 // init
 int
 Checksum::init(int checksumtype)
 {
-
-  // first release allocated memory if it exists
-  if (release())
-    return -1;
 
   m_checksumtype = checksumtype;
 
@@ -75,13 +33,10 @@ Checksum::init(int checksumtype)
 
   switch (m_checksumtype) {
     case SHA1: {
-      m_state = new struct sha1_ctx;
-      sha1_init((sha1_ctx*)m_state);
+      sha1_init(&m_state.sha1);
     } break;
     case MD5: {
-      m_state = new struct md5_ctx;
-      // fixme assert
-      md5_init((md5_ctx*)m_state);
+      md5_init(&m_state.md5);
     } break;
     default:
       // not allowed to have something that is not recognized.
@@ -96,10 +51,10 @@ Checksum::update(unsigned int length, unsigned char* buffer)
 {
   switch (m_checksumtype) {
     case SHA1:
-      sha1_update((sha1_ctx*)m_state, length, buffer);
+      sha1_update(&m_state.sha1, length, buffer);
       break;
     case MD5:
-      md5_update((md5_ctx*)m_state, length, buffer);
+      md5_update(&m_state.md5, length, buffer);
       break;
     default:
       return -1;
@@ -114,12 +69,12 @@ Checksum::print()
   switch (m_checksumtype) {
     case SHA1: {
       std::array<unsigned char, SHA1_DIGEST_SIZE> digest;
-      sha1_digest((sha1_ctx*)m_state, SHA1_DIGEST_SIZE, digest.data());
+      sha1_digest(&m_state.sha1, SHA1_DIGEST_SIZE, digest.data());
       display_hex(SHA1_DIGEST_SIZE, digest.data());
     } break;
     case MD5: {
       std::array<unsigned char, MD5_DIGEST_SIZE> digest;
-      md5_digest((md5_ctx*)m_state, MD5_DIGEST_SIZE, digest.data());
+      md5_digest(&m_state.md5, MD5_DIGEST_SIZE, digest.data());
       display_hex(MD5_DIGEST_SIZE, digest.data());
     } break;
     default:
@@ -153,9 +108,8 @@ Checksum::printToBuffer(void* buffer, std::size_t N)
   switch (m_checksumtype) {
     case SHA1:
       if (N >= SHA1_DIGEST_SIZE) {
-        sha1_digest((sha1_ctx*)m_state,
-                    SHA1_DIGEST_SIZE,
-                    static_cast<unsigned char*>(buffer));
+        sha1_digest(
+          &m_state.sha1, SHA1_DIGEST_SIZE, static_cast<unsigned char*>(buffer));
       } else {
         // bad size.
         return -1;
@@ -163,9 +117,8 @@ Checksum::printToBuffer(void* buffer, std::size_t N)
       break;
     case MD5:
       if (N >= MD5_DIGEST_SIZE) {
-        md5_digest((md5_ctx*)m_state,
-                   MD5_DIGEST_SIZE,
-                   static_cast<unsigned char*>(buffer));
+        md5_digest(
+          &m_state.md5, MD5_DIGEST_SIZE, static_cast<unsigned char*>(buffer));
       } else {
         // bad size.
         return -1;
