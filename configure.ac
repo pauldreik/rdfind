@@ -106,7 +106,22 @@ if test "x$set_more_warnings" != xno; then
 	warning_options="-Wall -Wextra -pedantic \
 	                 -Wshadow \
 			 -Wold-style-cast \
-	                 -Wbiznafronck"		
+			 -Wnon-virtual-dtor \
+			 -Wold-style-cast \
+			 -Wcast-align \
+			 -Wunused \
+			 -Woverloaded-virtual \
+			 -Wconversion \
+			 -Wsign-conversion \
+			 -Wmisleading-indentation \
+			 -Wduplicated-cond \
+			 -Wduplicated-branches \
+			 -Wlogical-op \
+			 -Wnull-dereference \
+			 -Wuseless-cast \
+			 -Wdouble-promotion \
+			 -Wformat=2 \
+	                 -Wbiznafronck"	
 	for option in $warning_options ; do
 		SAVE_CXXFLAGS="$CXXFLAGS"
 		CXXFLAGS="$CXXFLAGS $uwoption $option"

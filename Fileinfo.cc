@@ -110,7 +110,7 @@ Fileinfo::readfileinfo()
   }
 
   // only keep the relevant information
-  m_info.stat_size = static_cast<Fileinfo::filesizetype>(info.st_size);
+  m_info.stat_size = info.st_size;
   m_info.stat_ino = info.st_ino;
   m_info.stat_dev = info.st_dev;
 

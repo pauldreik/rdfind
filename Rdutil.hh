@@ -32,7 +32,7 @@ public:
   int printtofile(const std::string& filename);
 
   // mark files with a unique number
-  int markitems();
+  void markitems();
 
   // sort list on multiple attributes.
   int sortlist(bool (*lessthan1)(const Fileinfo&, const Fileinfo&),
@@ -45,7 +45,7 @@ public:
                bool (*equal4)(const Fileinfo&, const Fileinfo&) = NULL);
 
   // cleans up, by removing all items that have the deleteflag set to true.
-  int cleanup();
+  std::size_t cleanup();
 
   // marks non unique elements for deletion. list must be sorted first.
   // this is good to eliminate duplicates on inode, to prevent from
@@ -75,7 +75,7 @@ public:
 
   // removes items that rem returns true for.
   // returns the number of removed elements.
-  int remove_if();
+  std::size_t remove_if();
 
   // read some bytes. note! destroys the order of the list.
   // if lasttype is supplied, it does not reread files if they are shorter

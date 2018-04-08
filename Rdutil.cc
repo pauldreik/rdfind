@@ -164,7 +164,7 @@ Rdutil::makehardlinks(bool dryrun)
 }
 
 // mark files with a unique number
-int
+void
 Rdutil::markitems()
 {
   std::vector<Fileinfo>::iterator it;
@@ -173,7 +173,6 @@ Rdutil::markitems()
     it->setidentity(fileno);
     fileno++;
   }
-  return m_list.size();
 }
 
 // sort list
@@ -199,32 +198,29 @@ Rdutil::sortlist(bool (*lessthan1)(const Fileinfo&, const Fileinfo&),
 }
 
 // cleans up, by removing all items that have the deleteflag set to true.
-int
+std::size_t
 Rdutil::cleanup()
 {
-  std::vector<Fileinfo>::iterator it;
-  it =
+  const auto size_before = m_list.size();
+  auto it =
     std::remove_if(m_list.begin(), m_list.end(), Fileinfo::static_deleteflag);
 
-  int removed = m_list.end() - it;
-
-  if (0)
-    cout << "will remove " << removed << " items" << endl;
-
   m_list.erase(it, m_list.end());
-  return removed;
+
+  const auto size_after = m_list.size();
+
+  return size_before - size_after;
 }
 
 // removes items
-int
+std::size_t
 Rdutil::remove_if()
 {
   //  remove_if_helper hlp(rem);
-  std::vector<Fileinfo>::iterator it;
-  it = std::remove_if(m_list.begin(), m_list.end(), &Fileinfo::isempty);
-  int removed = m_list.end() - it;
+  const auto size_before = m_list.size();
+  auto it = std::remove_if(m_list.begin(), m_list.end(), &Fileinfo::isempty);
   m_list.erase(it, m_list.end());
-  return removed;
+  return size_before - m_list.size();
 }
 
 // total size
@@ -247,7 +243,7 @@ Rdutil::totalsizeinbytes(int opmode) const
       }
     }
   } else {
-    assert(!"bad input, mode should be 0 or 1");
+    throw std::runtime_error("bad input, mode should be 0 or 1");
   }
 
   return adder.getsize();

@@ -345,7 +345,7 @@ main(int narg, char* argv[])
   for (vector<string>::iterator it = pathlist.begin(); it != pathlist.end();
        ++it) {
     currentpriority++;
-    int lastsize = filelist1.size();
+    auto lastsize = filelist1.size();
     cout << dryruntext << "Now scanning \"" << (*it) << "\"";
     cout.flush();
     dirlist.walk(*it, 0);
