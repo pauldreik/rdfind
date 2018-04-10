@@ -21,15 +21,11 @@
 class Rdutil
 {
 public:
-  Rdutil(std::vector<Fileinfo>& list)
+  explicit Rdutil(std::vector<Fileinfo>& list)
     : m_list(list){};
-  ~Rdutil(){};
-  std::vector<Fileinfo>& m_list;
-  //  std::vector<std::vector<Fileinfo> > &m_duplist;
 
-public:
   // print file names to a file, with extra information.
-  int printtofile(const std::string& filename);
+  int printtofile(const std::string& filename) const;
 
   // mark files with a unique number
   void markitems();
@@ -89,13 +85,13 @@ public:
     long nsecsleep = 0);
 
   // make symlinks of duplicates.
-  int makesymlinks(bool dryrun);
+  int makesymlinks(bool dryrun) const;
 
   // make hardlinks of duplicates.
-  int makehardlinks(bool dryrun);
+  int makehardlinks(bool dryrun) const;
 
   // delete duplicates.
-  int deleteduplicates(bool dryrun);
+  int deleteduplicates(bool dryrun) const;
 
   // a little helper class
   class adder_helper
@@ -119,10 +115,13 @@ public:
 
   // outputs a nicely formatted string "45 bytes" or "3 Gibytes"
   // where 1024 is used as base
-  std::ostream& totalsize(std::ostream& out, int opmode = 0);
+  std::ostream& totalsize(std::ostream& out, int opmode = 0) const;
 
   // outputs the saveable amount of space
-  std::ostream& saveablespace(std::ostream& out);
+  std::ostream& saveablespace(std::ostream& out) const;
+
+private:
+  std::vector<Fileinfo>& m_list;
 };
 
 #endif

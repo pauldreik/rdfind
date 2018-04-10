@@ -22,7 +22,7 @@ using std::endl;
 using std::string;
 
 int
-Rdutil::printtofile(const std::string& filename)
+Rdutil::printtofile(const std::string& filename) const
 {
   // open a file to print to
   std::ofstream f1;
@@ -133,7 +133,7 @@ public:
 };
 
 int
-Rdutil::deleteduplicates(bool dryrun)
+Rdutil::deleteduplicates(bool dryrun) const
 {
   if (dryrun) {
     dryrun_helper<std::ostream> obj(cout, "delete ", "", "");
@@ -144,7 +144,7 @@ Rdutil::deleteduplicates(bool dryrun)
 }
 
 int
-Rdutil::makesymlinks(bool dryrun)
+Rdutil::makesymlinks(bool dryrun) const
 {
   if (dryrun) {
     dryrun_helper<std::ostream> obj(cout, "symlink ", " to ", "");
@@ -154,7 +154,7 @@ Rdutil::makesymlinks(bool dryrun)
 }
 
 int
-Rdutil::makehardlinks(bool dryrun)
+Rdutil::makehardlinks(bool dryrun) const
 {
   if (dryrun) {
     dryrun_helper<std::ostream> obj(cout, "hardlink ", " to ", "");
@@ -294,7 +294,7 @@ byteprefix(int range)
 }
 }
 std::ostream&
-Rdutil::totalsize(std::ostream& out, int opmode)
+Rdutil::totalsize(std::ostream& out, int opmode) const
 {
   unsigned long long int size;
   size = totalsizeinbytes(opmode);
@@ -309,7 +309,7 @@ Rdutil::totalsize(std::ostream& out, int opmode)
 }
 
 std::ostream&
-Rdutil::saveablespace(std::ostream& out)
+Rdutil::saveablespace(std::ostream& out) const
 {
   unsigned long long int size = totalsizeinbytes(0) - totalsizeinbytes(1);
   int range = littlehelper::calcrange(size);

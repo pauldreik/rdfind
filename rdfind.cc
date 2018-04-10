@@ -16,16 +16,7 @@
 #include "RdfindDebug.hh" //debug macro
 #include "Rdutil.hh"      //to do some work
 #include "config.h"       //header file from autoconf
-// function to print things from a vector
-template<class T>
-struct print : public std::unary_function<T, void>
-{
-  print(std::ostream& out)
-    : os(out)
-  {}
-  inline void operator()(T x) { x.printinfo(os) << std::endl; }
-  std::ostream& os;
-};
+
 
 // global variables
 
@@ -36,7 +27,7 @@ std::vector<Fileinfo> filelist1;
 int currentpriority = 0;
 
 // function to add items to the list of all files
-int
+static int
 report(const std::string& path, const std::string& name, int depth)
 {
 
@@ -62,7 +53,7 @@ report(const std::string& path, const std::string& name, int depth)
   return 0;
 }
 
-void
+static void
 usage()
 {
   using std::cout;
@@ -164,7 +155,6 @@ main(int narg, char* argv[])
       return -1;
     }
 
-    //   cout<<"read argument \""<<arg<<"\""<<endl;
     if (arg.at(0) == '-') {
       if (arg == "-makesymlinks" && n < (narg - 1)) {
         string nextarg(argv[1 + n]);

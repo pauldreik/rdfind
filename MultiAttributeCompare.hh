@@ -7,7 +7,7 @@
 #ifndef MultiAttributeCompare_hh
 #define MultiAttributeCompare_hh
 
-#include <iostream> //for cerr etc
+#include <iostream>
 
 // an object that can compare objects T based on multiple attributes
 // second template parameter is the maximum number of attributes, which can
@@ -26,8 +26,8 @@ public:
   {
     // initialize all functions to NULL
     for (int i = 0; i < m_nfcnsmax; i++) {
-      m_lessthan[i] = NULL; //&alwaysfalse;
-      m_equal[i] = NULL;    //&alwaysfalse;
+      m_lessthan[i] = NULL;
+      m_equal[i] = NULL;
     }
     m_nfcns = 0;
     m_mode = OPMODE_NOTSELECTED;
@@ -98,8 +98,8 @@ public:
   }
 
 public:
-  static inline bool alwaysfalse(const T&, const T&) { return false; }
-  static inline bool alwaystrue(const T&, const T&) { return true; }
+  static bool alwaysfalse(const T&, const T&) { return false; }
+  static bool alwaystrue(const T&, const T&) { return true; }
 
 private:
   // works like operator <

@@ -14,10 +14,6 @@
 // os specific headers
 #include <sys/types.h> //for off_t and others.
 
-/// yikes, remove these from the header file!
-using std::cout;
-using std::endl;
-
 /**
  holds information about a file.
  */
@@ -25,7 +21,7 @@ class Fileinfo
 {
 public:
   // constructor
-  Fileinfo(const std::string& name, int priority = 0)
+  explicit Fileinfo(const std::string& name, int priority = 0)
     : m_magicnumber(771114)
     , m_filename(name)
     , m_delete(false)
@@ -179,37 +175,37 @@ public:
   // returns true if a is smaller than b.
   static bool compareonsize(const Fileinfo& a, const Fileinfo& b)
   {
-    return (a.size() < b.size());
+    return a.size() < b.size();
   }
 
   // returns true if a has lower inode than b
   static bool compareoninode(const Fileinfo& a, const Fileinfo& b)
   {
-    return (a.inode() < b.inode());
+    return a.inode() < b.inode();
   }
 
   // returns true if a has lower device than b
   static bool compareondevice(const Fileinfo& a, const Fileinfo& b)
   {
-    return (a.device() < b.device());
+    return a.device() < b.device();
   }
 
   // returns true if a has lower priority number than b
   static bool compareonpriority(const Fileinfo& a, const Fileinfo& b)
   {
-    return (a.priority() < b.priority());
+    return a.priority() < b.priority();
   }
 
   // returns true if a has lower identity number than b)
   static bool compareonidentity(const Fileinfo& a, const Fileinfo& b)
   {
-    return (a.identity() < b.identity());
+    return a.identity() < b.identity();
   }
 
   // returns true if a has lower depth than b)
   static bool compareondepth(const Fileinfo& a, const Fileinfo& b)
   {
-    return (a.depth() < b.depth());
+    return a.depth() < b.depth();
   }
 
   // fills with bytes from the file. if lasttype is supplied,
@@ -223,7 +219,7 @@ public:
   // null terminator?
   void displaybytes() const
   {
-    cout << "bytes are \"" << m_somebytes.data() << "\"" << endl;
+    std::cout << "bytes are \"" << m_somebytes.data() << "\"\n";
   }
 
   // get a pointer to the bytes read from the file
@@ -243,31 +239,31 @@ public:
   // returns true is inodes are equal
   static bool equalinode(const Fileinfo& a, const Fileinfo& b)
   {
-    return (a.inode() == b.inode());
+    return a.inode() == b.inode();
   }
 
   // returns true if devices are equal
   static bool equaldevice(const Fileinfo& a, const Fileinfo& b)
   {
-    return (a.device() == b.device());
+    return a.device() == b.device();
   }
 
   // returns true is priorities are equal
   static bool equalpriority(const Fileinfo& a, const Fileinfo& b)
   {
-    return (a.priority() == b.priority());
+    return a.priority() == b.priority();
   }
 
   // returns true if identities are equal
   static bool equalidentity(const Fileinfo& a, const Fileinfo& b)
   {
-    return (a.identity() == b.identity());
+    return a.identity() == b.identity();
   }
 
   // returns true if detphs are equal
   static bool equaldepth(const Fileinfo& a, const Fileinfo& b)
   {
-    return (a.depth() == b.depth());
+    return a.depth() == b.depth();
   }
 
   // returns true if file is a regular file. call readfileinfo first!
