@@ -6,7 +6,7 @@
 #include "Fileinfo.hh"
 #include "config.h"
 
-#include <errno.h>    //for errno
+#include <cerrno>    //for errno
 #include <fstream>    //for file reading
 #include <iostream>   //for cout etc
 #include <sys/stat.h> //for file info
@@ -64,7 +64,7 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
       Checksum chk;
       if (chk.init(checksumtype))
         std::cerr << "error in checksum init" << std::endl;
-      char buffer[1024];
+      char buffer[4096];
       while (f1) {
         f1.read(buffer, sizeof(buffer));
         chk.update(f1.gcount(), buffer);
