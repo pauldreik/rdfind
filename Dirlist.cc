@@ -6,7 +6,7 @@
 #include "Dirlist.hh"
 #include "config.h"
 #include <dirent.h>
-#include <errno.h> //for errno
+#include <cerrno>
 #include <iostream>
 #include <string>
 #include <sys/stat.h>
@@ -18,7 +18,6 @@
 int
 Dirlist::walk(const std::string& dir, const int recursionlevel)
 {
-  using namespace std;
   struct stat info;
 
   RDDEBUG("Now in walk with dir=" << dir.c_str() << " and recursionlevel="
@@ -49,7 +48,7 @@ Dirlist::walk(const std::string& dir, const int recursionlevel)
               if (S_ISLNK(info.st_mode)) {
                 // cout<<"encountered symbolic link "<<dir<<"/"
                 //<<dp->d_name<<endl;
-                (*m_report_symlink)(dir, string(dp->d_name), recursionlevel);
+                (*m_report_symlink)(dir, std::string(dp->d_name), recursionlevel);
                 if (m_followsymlinks)
                   dowalk = true;
               }
@@ -57,7 +56,7 @@ Dirlist::walk(const std::string& dir, const int recursionlevel)
               if (S_ISDIR(info.st_mode)) {
                 // cout<<"it is a directory!"<<dir<<"/"
                 //<<dp->d_name<<endl;
-                (*m_report_directory)(dir, string(dp->d_name), recursionlevel);
+                (*m_report_directory)(dir, std::string(dp->d_name), recursionlevel);
                 dowalk = true;
               }
 
@@ -65,7 +64,7 @@ Dirlist::walk(const std::string& dir, const int recursionlevel)
                 // cout<<"it is a regular file!"<<dir<<"/"
                 //<<dp->d_name<<endl;
                 (*m_report_regular_file)(
-                  dir, string(dp->d_name), recursionlevel);
+                  dir, std::string(dp->d_name), recursionlevel);
               }
 
               // try to open directory
@@ -74,7 +73,7 @@ Dirlist::walk(const std::string& dir, const int recursionlevel)
             } else {
               // failed to do stat
               (*m_report_failed_on_stat)(
-                dir, string(dp->d_name), recursionlevel);
+                dir, std::string(dp->d_name), recursionlevel);
             }
           }
         }
@@ -91,7 +90,7 @@ Dirlist::walk(const std::string& dir, const int recursionlevel)
     }
     return 0; // recusion limit exceeded
   } else {
-    cerr << "recursion limit exceeded" << endl;
+    std::cerr << "recursion limit exceeded\n";
     return -1;
   }
 }

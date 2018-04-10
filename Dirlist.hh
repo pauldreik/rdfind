@@ -15,7 +15,7 @@ class Dirlist
 {
 public:
   // constructor
-  Dirlist(bool followsymlinks, int depth = 50)
+  explicit Dirlist(bool followsymlinks, int depth = 50)
     : m_maxdepth(depth)
     , m_followsymlinks(followsymlinks)
   {
