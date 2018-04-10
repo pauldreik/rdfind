@@ -9,7 +9,7 @@
 
 #include <array>
 #include <cstring>
-#include <iostream> //for cout etc.
+#include <iostream>
 
 // os specific headers
 #include <sys/types.h> //for off_t and others.
@@ -120,7 +120,7 @@ public:
 
   int getduptype() const { return m_duptype; };
 
-  static const std::string getduptypestring(const Fileinfo& A);
+  static std::string getduptypestring(const Fileinfo& A);
 
   // makes a symlink of "this" that points to A.
   int makesymlink(const Fileinfo& A);

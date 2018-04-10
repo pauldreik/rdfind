@@ -119,7 +119,7 @@ Fileinfo::readfileinfo()
   return true;
 }
 
-const std::string
+std::string
 Fileinfo::getduptypestring(const Fileinfo& A)
 {
 
@@ -165,8 +165,8 @@ simplifyPath(std::string& path)
       path.replace(pos, 3, "/");
     }
   } while (pos != std::string::npos);
-  // we should get rid of /../ also, but that is more difficult.
-  // future work...
+  // getting rid of /../ is difficult to get correct because of symlinks.
+  // do not do it.
   return 0;
 }
 
@@ -184,10 +184,8 @@ makeReadyForLink(std::string& target, const std::string& location_)
   // if target is not absolute, let us make it absolute
   if (target.length() > 0 && target.at(0) == '/') {
     // absolute. do nothing.
-    //    std::cout<<"absolute"<<std::endl;
   } else {
     // not absolute. make it absolute.
-    //    std::cout<<"not absolute"<<std::endl;
 
     // yes, this is possible to do with dynamically allocated memory,
     // but it is not portable then (and more work).
@@ -198,7 +196,6 @@ makeReadyForLink(std::string& target, const std::string& location_)
       return -1;
     }
     target = std::string(buf) + std::string("/") + target;
-    //    std::cout<<"target is now "<<target<<std::endl;
   }
   return 0;
 }
@@ -259,44 +256,33 @@ Fileinfo::makehardlink(const Fileinfo& A)
 int
 Fileinfo::static_deletefile(Fileinfo& A, const Fileinfo& /*B*/)
 {
-  // delete A.
-
-  //  cout<<"wants to delete file "<<A.name()<<endl;
-  //  return 0;
-
   return A.deletefile();
 }
 
 int
 Fileinfo::static_makesymlink(Fileinfo& A, const Fileinfo& B)
 {
-  //  cout<<"wants to make symlink from file "<<A.name()<<" to
-  //  "<<B.name()<<endl;
-  //  return 0;
   return A.makesymlink(B);
 }
 
 int
 Fileinfo::static_makehardlink(Fileinfo& A, const Fileinfo& B)
 {
-  //  cout<<"wants to make hardlink from file "<<A.name()<<" to
-  //  "<<B.name()<<endl;
-  //  return 0;
   return A.makehardlink(B);
 }
 
 bool
 Fileinfo::compareonbytes(const Fileinfo& a, const Fileinfo& b)
 {
-  int retval = memcmp(a.getbyteptr(), b.getbyteptr(), a.m_somebytes.size());
-  return (retval < 0);
+  const int retval = std::memcmp(a.getbyteptr(), b.getbyteptr(), a.m_somebytes.size());
+  return retval < 0;
 }
 
 bool
 Fileinfo::equalbytes(const Fileinfo& a, const Fileinfo& b)
 {
-  int retval = memcmp(a.getbyteptr(), b.getbyteptr(), a.m_somebytes.size());
-  return (retval == 0);
+  const int retval = std::memcmp(a.getbyteptr(), b.getbyteptr(), a.m_somebytes.size());
+  return retval == 0;
 }
 
 bool
@@ -313,8 +299,5 @@ Fileinfo::compareonsizeandfirstbytes(const Fileinfo& a, const Fileinfo& b)
 bool
 Fileinfo::equalsize(const Fileinfo& a, const Fileinfo& b)
 {
-  if (a.size() == b.size())
-    return true;
-  else
-    return false;
+  return a.size() == b.size() ;
 }
