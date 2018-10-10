@@ -75,8 +75,11 @@ AC_ARG_ENABLE(cppstandardcheck,
 	[ ENABLECPPSTANDARDCHECK=$enableval ],
 	[ ENABLECPPSTANDARDCHECK=yes] )
 if test "$ENABLECPPSTANDARDCHECK" = "yes"; then
+   AC_MSG_NOTICE([checking for c++ 11, disable with --disable-cppstandardcheck])
    dnl AX_CXX_COMPILE_STDCXX_11([noext], [mandatory])
    AX_CXX_COMPILE_STDCXX([11],[noext],[mandatory])
+else
+   AC_MSG_NOTICE([not checking for c++11 support.])
 fi
 
 
