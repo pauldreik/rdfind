@@ -376,14 +376,16 @@ Fileinfo::static_makehardlink(Fileinfo& A, const Fileinfo& B)
 bool
 Fileinfo::compareonbytes(const Fileinfo& a, const Fileinfo& b)
 {
-  const int retval = std::memcmp(a.getbyteptr(), b.getbyteptr(), a.m_somebytes.size());
+  const int retval =
+    std::memcmp(a.getbyteptr(), b.getbyteptr(), a.m_somebytes.size());
   return retval < 0;
 }
 
 bool
 Fileinfo::equalbytes(const Fileinfo& a, const Fileinfo& b)
 {
-  const int retval = std::memcmp(a.getbyteptr(), b.getbyteptr(), a.m_somebytes.size());
+  const int retval =
+    std::memcmp(a.getbyteptr(), b.getbyteptr(), a.m_somebytes.size());
   return retval == 0;
 }
 
@@ -401,5 +403,5 @@ Fileinfo::compareonsizeandfirstbytes(const Fileinfo& a, const Fileinfo& b)
 bool
 Fileinfo::equalsize(const Fileinfo& a, const Fileinfo& b)
 {
-  return a.size() == b.size() ;
+  return a.size() == b.size();
 }

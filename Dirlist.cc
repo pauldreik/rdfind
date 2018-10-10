@@ -5,8 +5,8 @@
 */
 #include "Dirlist.hh"
 #include "config.h"
-#include <dirent.h>
 #include <cerrno>
+#include <dirent.h>
 #include <iostream>
 #include <string>
 #include <sys/stat.h>
@@ -48,7 +48,8 @@ Dirlist::walk(const std::string& dir, const int recursionlevel)
               if (S_ISLNK(info.st_mode)) {
                 // cout<<"encountered symbolic link "<<dir<<"/"
                 //<<dp->d_name<<endl;
-                (*m_report_symlink)(dir, std::string(dp->d_name), recursionlevel);
+                (*m_report_symlink)(
+                  dir, std::string(dp->d_name), recursionlevel);
                 if (m_followsymlinks)
                   dowalk = true;
               }
@@ -56,7 +57,8 @@ Dirlist::walk(const std::string& dir, const int recursionlevel)
               if (S_ISDIR(info.st_mode)) {
                 // cout<<"it is a directory!"<<dir<<"/"
                 //<<dp->d_name<<endl;
-                (*m_report_directory)(dir, std::string(dp->d_name), recursionlevel);
+                (*m_report_directory)(
+                  dir, std::string(dp->d_name), recursionlevel);
                 dowalk = true;
               }
 

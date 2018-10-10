@@ -17,7 +17,6 @@
 #include "Rdutil.hh"      //to do some work
 #include "config.h"       //header file from autoconf
 
-
 // global variables
 
 // these vectors hold the information about all files found
