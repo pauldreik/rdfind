@@ -17,6 +17,7 @@ matrix:
     env: COMPILER=clang++
 
 script:
+  - ./bootstrap.sh
   - if [ x"$COMPILER" != "x" ] ; then export CXX=$COMPILER ; fi
   - ./configure --enable-warnings --prefix $(pwd)/prefix
   - make
