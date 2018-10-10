@@ -20,6 +20,7 @@ script:
   - ./bootstrap.sh
   - if [ x"$COMPILER" != "x" ] ; then export CXX=$COMPILER ; fi
   - export CXXFLAGS=-std=c++0x
+  - grep -v AX_CXX_COMPILE_STDCXX <configure.ac >tmp && mv tmp configure.ac
   - ./configure --enable-warnings --prefix $(pwd)/prefix --disable-cppstandardcheck
   - make
   - make check # runs unit tests
