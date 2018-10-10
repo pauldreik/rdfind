@@ -28,4 +28,29 @@ for n in $files ; do
 	exit 1
     fi
 done
+dbgecho passed the happy path
+
+#now try to make a hardlink to somewhere that fails.
+#ideally, we want to partitions so it is not possible to hardlink,
+#but it is difficult to fix that unless the test environment
+#is setup that way. therefore, make the hardlinking fail by
+#trying to hardlink something we do not have access to.
+#unless run as root which would be horrible.
+if [ "$(id -u)" -eq 0 ]; then
+    dbgecho "running as root or through sudo, dangerous! Will not proceed with this unit tests."
+    exit 1
+fi
+
+reset_teststate
+system_file=$(which ls)
+cp $system_file .
+$rdfind -makehardlinks true $system_file . 2>&1 |tee rdfind.out
+grep -iq "failed to make hardlink" rdfind.out
+
+#make sure that our own copy is still there
+if [ ! -e $(basename $system_file) ] ; then
+    dbgecho file is missing, rdfind should not have removed it!
+    exit 1
+fi
+
 dbgecho "all is good in this test!"
