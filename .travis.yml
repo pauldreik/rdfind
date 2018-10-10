@@ -1,0 +1,24 @@
+language: cpp
+
+addons:
+  apt:
+    packages:
+      - nettle-dev
+      - build-essential
+      - clang
+
+matrix:
+  include:
+  - os: linux
+    compiler: gcc
+    env: COMPILER=g++
+  - os: linux
+    compiler: clang
+    env: COMPILER=clang++
+
+script:
+  - if [ x"$COMPILER" != "x" ] ; then export CXX=$COMPILER ; fi
+  - ./configure --enable-warnings --prefix $(pwd)/prefix
+  - make
+  - make check # runs unit tests
+  - make install
