@@ -75,7 +75,8 @@ AC_ARG_ENABLE(cppstandardcheck,
 	[ ENABLECPPSTANDARDCHECK=$enableval ],
 	[ ENABLECPPSTANDARDCHECK=yes] )
 if test "$ENABLECPPSTANDARDCHECK" = "yes"; then
-   AX_CXX_COMPILE_STDCXX_11([noext], [mandatory])
+   dnl AX_CXX_COMPILE_STDCXX_11([noext], [mandatory])
+   AX_CXX_COMPILE_STDCXX([11],[noext],[mandatory])
 fi
 
 
