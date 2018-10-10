@@ -13,7 +13,7 @@
 #include <unistd.h>   //for unlink etc.
 
 #include "Checksum.hh" //checksum calculation
-#include "EasyRandom.hh"
+#include "UndoableUnlink.hh"
 
 using std::cerr;
 using std::endl;
@@ -232,82 +232,13 @@ Fileinfo::makesymlink(const Fileinfo& A)
   return retval;
 }
 
-namespace {
-
-/**
- * This is a class that makes an undoable delete. It will move the given
- * file to a temporary filename on construction. If you wish to proceed
- * to actually delete the file (through the temporary file name), call
- * unlink(). The destructor will undo the file, unless you already have called
- * undo() or unlink().
- */
-struct UndoableDelete
-{
-  UndoableDelete(const std::string& filename)
-    : m_filename(filename)
-  {
-    // make a random filename, to avoid getting ENAMETOOLONG
-    // we try to replace the existing filename, instead of appending to it.
-    // this will fail if the directory name is really long, but there is not
-    // much to do about that without going into parsing mount points etc.
-    const auto last_sep = m_filename.find_last_of('/');
-    if (last_sep == std::string::npos) {
-      // not found. must be a bare filename.
-      m_tempfilename = EasyRandom().makeRandomFileString();
-    } else {
-      // found. replace the filename.
-      m_tempfilename = m_filename.substr(0, last_sep + 1) +
-                       EasyRandom().makeRandomFileString();
-    }
-
-    // move the file to a temporary name
-    if (0 != rename(m_filename.c_str(), m_tempfilename.c_str())) {
-      // failed rename. what should we do?
-      m_tempfilename.resize(0);
-    }
-  }
-
-  void undo()
-  {
-    if (m_tempfilename.empty()) {
-      return;
-    }
-    // move the file back again.
-    if (0 != rename(m_tempfilename.c_str(), m_filename.c_str())) {
-      // fail.
-    }
-    m_tempfilename.resize(0);
-  }
-
-  int unlink()
-  {
-    int ret = 0;
-    if (m_tempfilename.empty()) {
-      return ret;
-    }
-    ret = ::unlink(m_tempfilename.c_str());
-    m_tempfilename.resize(0);
-    return ret;
-  }
-
-  ~UndoableDelete()
-  {
-    if (!m_tempfilename.empty()) {
-      undo();
-    }
-  }
-  const std::string& m_filename;
-  std::string m_tempfilename;
-};
-}
-
 // makes a hard link that points to A
 int
 Fileinfo::makehardlink(const Fileinfo& A)
 {
 
   // step 1: move the file to a temporary name
-  UndoableDelete restorer(name());
+  UndoableUnlink restorer(name());
 
   // step 2: make a hardlink.
   int retval = link(A.name().c_str(), name().c_str());

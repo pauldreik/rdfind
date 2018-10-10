@@ -20,7 +20,7 @@
 class EasyRandom
 {
 public:
-  struct GlobalRandom;
+  class GlobalRandom;
   EasyRandom();
   std::string makeRandomFileString(std::size_t N = 16);
 
