@@ -240,7 +240,7 @@ namespace {
 struct GlobalRandom
 {
   friend struct EasyRandom;
-  char randomChar() { return m_dist(m_gen); }
+  char randomChar() { return getChar(m_dist(m_gen)); }
 
 private:
   static GlobalRandom s_random;
@@ -260,7 +260,18 @@ private:
     m_gen.seed(seq);
   }
   std::mt19937 m_gen{};
-  std::uniform_int_distribution<char> m_dist{ 'a', 'z' };
+  static const int nchars = 64;
+  static char getChar(int i)
+  {
+    const char acceptable_filename_chars[] = "abcdefghijklmnopqrstuvwxyz"
+                                             "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                             "0123456789"
+                                             "_-";
+    static_assert(nchars + 1 == sizeof(acceptable_filename_chars),
+                  "mismatch in size");
+    return acceptable_filename_chars[i];
+  }
+  std::uniform_int_distribution<int> m_dist{ 0, nchars - 1 };
 };
 GlobalRandom GlobalRandom::s_random{};
 // not thread safe.
@@ -294,13 +305,27 @@ struct UndoableDelete
   UndoableDelete(const std::string& filename)
     : m_filename(filename)
   {
-    // move filename to a temporary place
-    m_tempfilename = m_filename + EasyRandom().makeRandomString();
+    // make a random filename, to avoid getting ENAMETOOLONG
+    // we try to replace the existing filename, instead of appending to it.
+    // this will fail if the directory name is really long, but there is not
+    // much to do about that without going into parsing mount points etc.
+    const auto last_sep = m_filename.find_last_of('/');
+    if (last_sep == std::string::npos) {
+      // not found. must be a bare filename.
+      m_tempfilename = EasyRandom().makeRandomString();
+    } else {
+      // found. replace the filename.
+      m_tempfilename =
+        m_filename.substr(0, last_sep + 1) + EasyRandom().makeRandomString();
+    }
+
+    // move the file to a temporary name
     if (0 != rename(m_filename.c_str(), m_tempfilename.c_str())) {
       // failed rename. what should we do?
       m_tempfilename.resize(0);
     }
   }
+
   void undo()
   {
     if (m_tempfilename.empty()) {
@@ -312,6 +337,7 @@ struct UndoableDelete
     }
     m_tempfilename.resize(0);
   }
+
   int unlink()
   {
     int ret = 0;
@@ -322,6 +348,7 @@ struct UndoableDelete
     m_tempfilename.resize(0);
     return ret;
   }
+
   ~UndoableDelete()
   {
     if (!m_tempfilename.empty()) {
