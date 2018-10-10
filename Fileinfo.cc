@@ -6,15 +6,14 @@
 #include "Fileinfo.hh"
 #include "config.h"
 
-#include <algorithm>
-#include <cerrno>   //for errno
-#include <fstream>  //for file reading
-#include <iostream> //for cout etc
-#include <random>
+#include <cerrno>     //for errno
+#include <fstream>    //for file reading
+#include <iostream>   //for cout etc
 #include <sys/stat.h> //for file info
 #include <unistd.h>   //for unlink etc.
 
 #include "Checksum.hh" //checksum calculation
+#include "EasyRandom.hh"
 
 using std::cerr;
 using std::endl;
@@ -234,64 +233,6 @@ Fileinfo::makesymlink(const Fileinfo& A)
 }
 
 namespace {
-/**
- * Helper objects to provide a replacement of std::rand()
- */
-struct GlobalRandom
-{
-  friend struct EasyRandom;
-  char randomChar() { return getChar(m_dist(m_gen)); }
-
-private:
-  static GlobalRandom s_random;
-  GlobalRandom(const GlobalRandom&) = delete;
-  GlobalRandom()
-  {
-
-    // there are pitfalls of random device - may be nondeterministic.
-    // for now, use this here, but move to a separate file.
-    std::random_device rd;
-    const std::size_t state_size_in_bytes =
-      std::mt19937::state_size * sizeof(std::mt19937::default_seed);
-    using array_element = std::random_device::result_type;
-    std::array<array_element, state_size_in_bytes / sizeof(array_element)> seed;
-    std::generate_n(seed.data(), seed.size(), [&]() { return rd(); });
-    std::seed_seq seq(seed.cbegin(), seed.cend());
-    m_gen.seed(seq);
-  }
-  std::mt19937 m_gen{};
-  static const int nchars = 64;
-  static char getChar(int i)
-  {
-    const char acceptable_filename_chars[] = "abcdefghijklmnopqrstuvwxyz"
-                                             "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                             "0123456789"
-                                             "_-";
-    static_assert(nchars + 1 == sizeof(acceptable_filename_chars),
-                  "mismatch in size");
-    return acceptable_filename_chars[i];
-  }
-  std::uniform_int_distribution<int> m_dist{ 0, nchars - 1 };
-};
-GlobalRandom GlobalRandom::s_random{};
-// not thread safe.
-struct EasyRandom
-{
-  EasyRandom()
-    : m_rand(GlobalRandom::s_random)
-  {}
-  std::string makeRandomString(std::size_t N = 16)
-  {
-    std::string ret(N, '\0');
-    for (auto& c : ret) {
-      c = m_rand.randomChar();
-    }
-    return ret;
-  }
-
-private:
-  GlobalRandom& m_rand;
-};
 
 /**
  * This is a class that makes an undoable delete. It will move the given
@@ -312,11 +253,11 @@ struct UndoableDelete
     const auto last_sep = m_filename.find_last_of('/');
     if (last_sep == std::string::npos) {
       // not found. must be a bare filename.
-      m_tempfilename = EasyRandom().makeRandomString();
+      m_tempfilename = EasyRandom().makeRandomFileString();
     } else {
       // found. replace the filename.
-      m_tempfilename =
-        m_filename.substr(0, last_sep + 1) + EasyRandom().makeRandomString();
+      m_tempfilename = m_filename.substr(0, last_sep + 1) +
+                       EasyRandom().makeRandomFileString();
     }
 
     // move the file to a temporary name

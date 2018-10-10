@@ -3,7 +3,8 @@
 # See LICENSE for further details.
 AUTOMAKE_OPTIONS = gnu # I would like dist-bzip2 here, but automake complains
 bin_PROGRAMS = rdfind
-rdfind_SOURCES = rdfind.cc Checksum.cc  Dirlist.cc  Fileinfo.cc  Rdutil.cc
+rdfind_SOURCES = rdfind.cc Checksum.cc  Dirlist.cc  Fileinfo.cc  Rdutil.cc \
+                 EasyRandom.cc
 
 #these are the test scripts to execute - I do not know how to glob here,
 #feedback welcome.
@@ -14,7 +15,7 @@ TESTS=testcases/largefilesupport.sh \
 
 EXTRA_DIST = \
   algos.hh Dirlist.hh MultiAttributeCompare.hh Checksum.hh  Fileinfo.hh \
-  Rdutil.hh bootstrap.sh RdfindDebug.hh \
+  Rdutil.hh bootstrap.sh RdfindDebug.hh EasyRandom.hh \
   $(TESTS) \
   rdfind.1 LICENSE \
   ./do_clang_format.sh .clang-format
