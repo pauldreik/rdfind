@@ -19,7 +19,8 @@ matrix:
 script:
   - ./bootstrap.sh
   - if [ x"$COMPILER" != "x" ] ; then export CXX=$COMPILER ; fi
-  - ./configure --enable-warnings --prefix $(pwd)/prefix
+  - export CXXFLAGS=-std=c++0x
+  - ./configure --enable-warnings --prefix $(pwd)/prefix --disable-cppstandardcheck
   - make
   - make check # runs unit tests
   - make install

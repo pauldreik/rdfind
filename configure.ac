@@ -12,7 +12,6 @@ AM_INIT_AUTOMAKE
 
 
 dnl find and test the C compiler
-AC_PROG_CC
 AC_PROG_CXX
 AC_LANG_CPLUSPLUS
         
@@ -69,8 +68,16 @@ AC_CHECK_HEADERS(time.h,,AC_MSG_WARN(nanosleep header time.h missing?))
 dnl check for 64 bit support
 AC_SYS_LARGEFILE
 
-dnl make sure we have c++11 or better
-AX_CXX_COMPILE_STDCXX_11([noext], [mandatory])
+dnl make sure we have c++11 or better,
+dnl allow for disabling this check on older systems like Ubuntu 14.04
+AC_ARG_ENABLE(cppstandardcheck,
+	[AS_HELP_STRING([--disable-cppstandardcheck], [disable checking for C++11 and trust CXX and CXXFLAGS instead ])],
+	[ ENABLECPPSTANDARDCHECK=$enableval ],
+	[ ENABLECPPSTANDARDCHECK=yes] )
+if test "$ENABLECPPSTANDARDCHECK" = "yes"; then
+   AX_CXX_COMPILE_STDCXX_11([noext], [mandatory])
+fi
+
 
 
 AC_SUBST(VERSION)
