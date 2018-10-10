@@ -2,6 +2,8 @@
 
 Rdfind is a command line tool that finds duplicate files. It is useful for compressing backup directories or just finding duplicate files. It compares files based on their content, NOT on their file names. 
 
+[![Build Status](https://travis-ci.org/pauldreik/rdfind.svg?branch=master)](https://travis-ci.org/pauldreik/rdfind)
+
 ## Install
 
 ### Debian/Ubuntu:
@@ -14,7 +16,7 @@ Rdfind is a command line tool that finds duplicate files. It is useful for compr
 
 ### Mac
 
-If you are on Mac, you can install through MacPorts. If you want to compile the source yourself, that is fine. Rdfind is written in c++ and should compile under any \*nix.
+If you are on Mac, you can install through MacPorts. If you want to compile the source yourself, that is fine. Rdfind is written in C++11 and should compile under any \*nix.
 
 ### Windows
 
@@ -155,6 +157,6 @@ Everything is as expected.
     name=b1 inode=58931 nhardlinks=2
     name=b2 inode=58931 nhardlinks=2
 
-a, a1 and a2 got collapsed into a single entry. b, b1 and b2 got collapased into a single entry. So rdinfd is left with a and b (depending on which of them is received first by the * expansion). It replaces b with a hardlink to a. b1 and b2 are untouched.
+a, a1 and a2 got collapsed into a single entry. b, b1 and b2 got collapased into a single entry. So rdfind is left with a and b (depending on which of them is received first by the * expansion). It replaces b with a hardlink to a. b1 and b2 are untouched.
 
 If one runs rdfind repeatedly, the issue is resolved, one file being corrected every run.
