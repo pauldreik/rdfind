@@ -6,9 +6,11 @@
 #include "Fileinfo.hh"
 #include "config.h"
 
-#include <cerrno>    //for errno
-#include <fstream>    //for file reading
-#include <iostream>   //for cout etc
+#include <algorithm>
+#include <cerrno>   //for errno
+#include <fstream>  //for file reading
+#include <iostream> //for cout etc
+#include <random>
 #include <sys/stat.h> //for file info
 #include <unistd.h>   //for unlink etc.
 
@@ -231,26 +233,126 @@ Fileinfo::makesymlink(const Fileinfo& A)
   return retval;
 }
 
+namespace {
+/**
+ * Helper objects to provide a replacement of std::rand()
+ */
+struct GlobalRandom
+{
+  friend struct EasyRandom;
+  char randomChar() { return m_dist(m_gen); }
+
+private:
+  static GlobalRandom s_random;
+  GlobalRandom(const GlobalRandom&) = delete;
+  GlobalRandom()
+  {
+
+    // there are pitfalls of random device - may be nondeterministic.
+    // for now, use this here, but move to a separate file.
+    std::random_device rd;
+    const std::size_t state_size_in_bytes =
+      std::mt19937::state_size * sizeof(std::mt19937::default_seed);
+    using array_element = std::random_device::result_type;
+    std::array<array_element, state_size_in_bytes / sizeof(array_element)> seed;
+    std::generate_n(seed.data(), seed.size(), [&]() { return rd(); });
+    std::seed_seq seq(seed.cbegin(), seed.cend());
+    m_gen.seed(seq);
+  }
+  std::mt19937 m_gen{};
+  std::uniform_int_distribution<char> m_dist{ 'a', 'z' };
+};
+GlobalRandom GlobalRandom::s_random{};
+// not thread safe.
+struct EasyRandom
+{
+  EasyRandom()
+    : m_rand(GlobalRandom::s_random)
+  {}
+  std::string makeRandomString(std::size_t N = 16)
+  {
+    std::string ret(N, '\0');
+    for (auto& c : ret) {
+      c = m_rand.randomChar();
+    }
+    return ret;
+  }
+
+private:
+  GlobalRandom& m_rand;
+};
+
+/**
+ * This is a class that makes an undoable delete. It will move the given
+ * file to a temporary filename on construction. If you wish to proceed
+ * to actually delete the file (through the temporary file name), call
+ * unlink(). The destructor will undo the file, unless you already have called
+ * undo() or unlink().
+ */
+struct UndoableDelete
+{
+  UndoableDelete(const std::string& filename)
+    : m_filename(filename)
+  {
+    // move filename to a temporary place
+    m_tempfilename = m_filename + EasyRandom().makeRandomString();
+    if (0 != rename(m_filename.c_str(), m_tempfilename.c_str())) {
+      // failed rename. what should we do?
+      m_tempfilename.resize(0);
+    }
+  }
+  void undo()
+  {
+    if (m_tempfilename.empty()) {
+      return;
+    }
+    // move the file back again.
+    if (0 != rename(m_tempfilename.c_str(), m_filename.c_str())) {
+      // fail.
+    }
+    m_tempfilename.resize(0);
+  }
+  int unlink()
+  {
+    int ret = 0;
+    if (m_tempfilename.empty()) {
+      return ret;
+    }
+    ret = ::unlink(m_tempfilename.c_str());
+    m_tempfilename.resize(0);
+    return ret;
+  }
+  ~UndoableDelete()
+  {
+    if (!m_tempfilename.empty()) {
+      undo();
+    }
+  }
+  const std::string& m_filename;
+  std::string m_tempfilename;
+};
+}
+
 // makes a hard link that points to A
 int
 Fileinfo::makehardlink(const Fileinfo& A)
 {
-  int retval = 0;
-  // step 1: remove the file
-  retval = unlink(name().c_str());
-  if (retval) {
-    cerr << "failed to unlink file " << name() << endl;
-    return retval;
-  }
+
+  // step 1: move the file to a temporary name
+  UndoableDelete restorer(name());
 
   // step 2: make a hardlink.
-  retval = link(A.name().c_str(), name().c_str());
+  int retval = link(A.name().c_str(), name().c_str());
   if (retval) {
     cerr << "failed to make hardlink " << name() << " to " << A.name() << endl;
     return retval;
   }
 
-  return retval;
+  // success! now actually delete the file, otherwise restorer will undo it
+  // in it's destructor.
+  restorer.unlink();
+
+  return 0;
 }
 
 int
