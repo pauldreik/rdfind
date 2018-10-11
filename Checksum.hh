@@ -4,6 +4,9 @@
    See LICENSE for further details.
 */
 
+#ifndef RDFIND_CHECKSUM_HH
+#define RDFIND_CHECKSUM_HH
+
 #include <cstddef>
 
 #include <nettle/md5.h>
@@ -51,3 +54,6 @@ private:
     md5_ctx md5;
   } m_state;
 };
+
+#endif // RDFIND_CHECKSUM_HH
+
