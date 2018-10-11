@@ -25,8 +25,7 @@ Dirlist::walk(const std::string& dir, const int recursionlevel)
 
   if (recursionlevel < m_maxdepth) {
     // open the directory
-    DIR* dirp = NULL;
-    dirp = opendir(dir.c_str());
+    DIR* dirp = opendir(dir.c_str());
     if (dirp) {
       // we opened the directory. let us read the content.
       RDDEBUG("opened directory" << std::endl);
@@ -41,9 +40,9 @@ Dirlist::walk(const std::string& dir, const int recursionlevel)
             // when doing this (lstat instead of stat).
             int statval =
               lstat((dir + "/" + std::string(dp->d_name)).c_str(), &info);
-            bool dowalk = false;
             if (statval == 0) {
               // investigate what kind of item it was.
+              bool dowalk = false;
 
               if (S_ISLNK(info.st_mode)) {
                 // cout<<"encountered symbolic link "<<dir<<"/"
@@ -70,8 +69,9 @@ Dirlist::walk(const std::string& dir, const int recursionlevel)
               }
 
               // try to open directory
-              if (dowalk)
+              if (dowalk) {
                 walk(dir + "/" + dp->d_name, recursionlevel + 1);
+              }
             } else {
               // failed to do stat
               (*m_report_failed_on_stat)(

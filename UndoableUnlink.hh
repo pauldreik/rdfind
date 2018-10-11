@@ -22,7 +22,7 @@ public:
    * Renames the file to a random name.
    * @param filename
    */
-  UndoableUnlink(const std::string& filename);
+  explicit UndoableUnlink(const std::string& filename);
 
   /**
    * moves the file back from the random name into the original filename
