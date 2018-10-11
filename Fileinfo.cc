@@ -155,6 +155,7 @@ Fileinfo::deletefile()
   return unlink(name().c_str());
 }
 
+namespace {
 int
 simplifyPath(std::string& path)
 {
@@ -201,7 +202,6 @@ makeReadyForLink(std::string& target, const std::string& location_)
   return 0;
 }
 
-namespace {
 /**
  * helper for transactional operation on a file. It will move the file to a
  * temporary, then invoke f with the filename as argument, then delete the
@@ -244,30 +244,22 @@ transactional_operation(const std::string& filename, const Func& f)
 int
 Fileinfo::makesymlink(const Fileinfo& A)
 {
-  int retval = 0;
-  // step 1: remove the file
-  retval = unlink(name().c_str());
-  if (retval) {
-    cerr << "failed to unlink file " << name() << endl;
-    return retval;
-  }
+  const int retval =
+    transactional_operation(name(), [&](const std::string& filename) {
+      // the tricky thing is that the path must be correct, as seen from
+      // the directory where *this is.
 
-  // step 2: make a symlink.
-  // the tricky thing is that the path must be correct, as seen from
-  // the directory where *this is.
+      // simplify A and *this, so that asdf/../asdfdf are removed
 
-  // simplifiy A and *this, so that asdf/../asdfdf are removed
+      std::string target = A.name();
+      makeReadyForLink(target, filename);
 
-  std::string target = A.name();
-  makeReadyForLink(target, name());
+      return symlink(target.c_str(), filename.c_str());
+    });
 
-  //  std::cout<<"will call symlink("<<target<<","<<name()<<")"<<std::endl;
-  retval = symlink(target.c_str(), name().c_str());
   if (retval) {
     cerr << "failed to make symlink " << name() << " to " << A.name() << endl;
-    return retval;
   }
-
   return retval;
 }
 
