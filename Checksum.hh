@@ -56,4 +56,3 @@ private:
 };
 
 #endif // RDFIND_CHECKSUM_HH
-

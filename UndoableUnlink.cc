@@ -6,6 +6,7 @@
 
 #include "UndoableUnlink.hh"
 #include "EasyRandom.hh"
+#include <iostream>
 #include <unistd.h> //for unlink etc.
 
 UndoableUnlink::UndoableUnlink(const std::string& filename)
@@ -17,49 +18,64 @@ UndoableUnlink::UndoableUnlink(const std::string& filename)
   // much to do about that without going into parsing mount points etc.
   const auto last_sep = m_filename.find_last_of('/');
   if (last_sep == std::string::npos) {
-    // not found. must be a bare filename.
+    // bare filename - replace it.
     m_tempfilename = EasyRandom().makeRandomFileString();
   } else {
-    // found. replace the filename.
+    // found. keep the directory, switch out the filename.
     m_tempfilename =
       m_filename.substr(0, last_sep + 1) + EasyRandom().makeRandomFileString();
   }
 
   // move the file to a temporary name
   if (0 != rename(m_filename.c_str(), m_tempfilename.c_str())) {
-    // failed rename. what should we do?
-    m_tempfilename.resize(0);
+    // failed rename.
+    std::cerr << "failed moving file " + m_filename + " to a temporary\n";
+    m_state = state::FAILED_MOVE_TO_TEMPORARY;
+  } else {
+    m_state = state::MOVED_TO_TEMPORARY;
   }
 }
 
-void
+int
 UndoableUnlink::undo()
 {
-  if (m_tempfilename.empty()) {
-    return;
+  if (m_state != state::MOVED_TO_TEMPORARY) {
+    throw std::runtime_error(
+      "api misuse - calling undo() now is a programming error");
   }
-  // move the file back again.
+
   if (0 != rename(m_tempfilename.c_str(), m_filename.c_str())) {
-    // fail.
+    // failed rename.
+    m_state = state::FAILED_UNDO;
+    std::cerr << "failed moving file from temporary back to " + m_filename +
+                   '\n';
+    return 1;
   }
-  m_tempfilename.resize(0);
+
+  m_state = state::UNDONE;
+  return 0;
 }
 
 int
 UndoableUnlink::unlink()
 {
-  int ret = 0;
-  if (m_tempfilename.empty()) {
-    return ret;
+  if (m_state != state::MOVED_TO_TEMPORARY) {
+    throw std::runtime_error(
+      "api misuse - calling unlink() now is a programming error");
   }
-  ret = ::unlink(m_tempfilename.c_str());
-  m_tempfilename.resize(0);
-  return ret;
+  if (0 != ::unlink(m_tempfilename.c_str())) {
+    std::cerr << "failed unlinking temporary file made from " + m_filename +
+                   '\n';
+    m_state = state::FAILED_UNLINK;
+    return 1;
+  }
+  m_state = state::UNLINKED;
+  return 0;
 }
 
 UndoableUnlink::~UndoableUnlink()
 {
-  if (!m_tempfilename.empty()) {
+  if (m_state == state::MOVED_TO_TEMPORARY) {
     undo();
   }
 }

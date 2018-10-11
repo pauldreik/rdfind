@@ -201,6 +201,45 @@ makeReadyForLink(std::string& target, const std::string& location_)
   return 0;
 }
 
+namespace {
+/**
+ * helper for transactional operation on a file. It will move the file to a
+ * temporary, then invoke f with the filename as argument, then delete the
+ * temporary. In case of failure at any point, it will do it's best to restore
+ * the temporary back to the filename.
+ * @param filename
+ * @param f
+ * @return zero on success.
+ */
+template<typename Func>
+int
+transactional_operation(const std::string& filename, const Func& f)
+{
+  // move the file to a temporary.
+  UndoableUnlink restorer(filename);
+
+  // did the move to a temporary go ok?
+  if (!restorer.file_is_moved()) {
+    return 1;
+  }
+
+  // yes, apply whatever the caller wanted.
+  const int ret = f(filename);
+
+  if (0 != ret) {
+    // operation failed! rollback time (made by restorer at scope exit)
+    return ret;
+  }
+
+  // operation succeeded, go ahead and unlink the temporary.
+  if (0 != restorer.unlink()) {
+    return 1;
+  }
+
+  return 0;
+}
+} // anon. namespace
+
 // makes a symlink that points to A
 int
 Fileinfo::makesymlink(const Fileinfo& A)
@@ -236,22 +275,15 @@ Fileinfo::makesymlink(const Fileinfo& A)
 int
 Fileinfo::makehardlink(const Fileinfo& A)
 {
-
-  // step 1: move the file to a temporary name
-  UndoableUnlink restorer(name());
-
-  // step 2: make a hardlink.
-  int retval = link(A.name().c_str(), name().c_str());
-  if (retval) {
-    cerr << "failed to make hardlink " << name() << " to " << A.name() << endl;
+  return transactional_operation(name(), [&](const std::string& filename) {
+    // make a hardlink.
+    const int retval = link(A.name().c_str(), filename.c_str());
+    if (retval) {
+      cerr << "failed to make hardlink " << filename << " to " << A.name()
+           << endl;
+    }
     return retval;
-  }
-
-  // success! now actually delete the file, otherwise restorer will undo it
-  // in it's destructor.
-  restorer.unlink();
-
-  return 0;
+  });
 }
 
 int
