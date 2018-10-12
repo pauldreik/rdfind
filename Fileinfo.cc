@@ -159,14 +159,24 @@ namespace {
 int
 simplifyPath(std::string& path)
 {
-  // replace a/./b to a/b
-  std::string::size_type pos = std::string::npos;
+  // replace a/./b with a/b
   do {
-    pos = path.find("/./");
-    if (pos != std::string::npos) {
-      path.replace(pos, 3, "/");
+    const auto pos = path.find("/./");
+    if (pos == std::string::npos) {
+      break;
     }
-  } while (pos != std::string::npos);
+    path.replace(pos, 3, "/");
+  } while (true);
+
+  // replace repeated slashes
+  do {
+    const auto pos = path.find("//");
+    if (pos == std::string::npos) {
+      break;
+    }
+    path.replace(pos, 2, "/");
+  } while (true);
+
   // getting rid of /../ is difficult to get correct because of symlinks.
   // do not do it.
   return 0;
@@ -175,14 +185,8 @@ simplifyPath(std::string& path)
 // prepares target, so that location can point to target in
 // the best way possible
 int
-makeReadyForLink(std::string& target, const std::string& location_)
+makeAbsolute(std::string& target)
 {
-  std::string location(location_);
-
-  // simplify target and location
-  simplifyPath(location);
-  simplifyPath(target);
-
   // if target is not absolute, let us make it absolute
   if (target.length() > 0 && target.at(0) == '/') {
     // absolute. do nothing.
@@ -246,14 +250,14 @@ Fileinfo::makesymlink(const Fileinfo& A)
 {
   const int retval =
     transactional_operation(name(), [&](const std::string& filename) {
-      // the tricky thing is that the path must be correct, as seen from
-      // the directory where *this is.
-
-      // simplify A and *this, so that asdf/../asdfdf are removed
-
+      // The tricky thing is that the path must be correct, as seen from
+      // the directory where *this is. Making the path absolute solves this
+      // problem. Doing string manipulations to find how to make the path
+      // relative is prone to error because directories can be symlinks.
       std::string target = A.name();
-      makeReadyForLink(target, filename);
-
+      makeAbsolute(target);
+      // clean up the path, so it does not contain sequences "/./" or "//"
+      simplifyPath(target);
       return symlink(target.c_str(), filename.c_str());
     });
 

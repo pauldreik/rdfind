@@ -114,6 +114,7 @@ pathsimplification subdir/a b
 pathsimplification subdir1/a subdir2/b
 pathsimplification subdir1/../a subdir2/b
 pathsimplification subdir1/../a subdir2/./././b
+pathsimplification subdir2/./././b subdir1/../a 
 pathsimplification a subdir2/./././b
 pathsimplification $(pwd)/a b
 pathsimplification a $(pwd)/b
@@ -123,6 +124,15 @@ pathsimplification ./a b
 pathsimplification ./a ./b
 pathsimplification a ./b
 pathsimplification a .//////////b
+
+pathsimplification ./a b
+pathsimplification .//a b
+pathsimplification .///a b
+pathsimplification a ./b
+pathsimplification a .//b
+pathsimplification a .///b
+
+pathsimplification subdir/////a subdir2///./b
 
 dbgecho passed the test with variants of paths
 
