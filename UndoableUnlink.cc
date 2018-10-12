@@ -7,6 +7,7 @@
 #include "UndoableUnlink.hh"
 #include "EasyRandom.hh"
 #include <iostream>
+#include <stdexcept>
 #include <unistd.h> //for unlink etc.
 
 UndoableUnlink::UndoableUnlink(const std::string& filename)
