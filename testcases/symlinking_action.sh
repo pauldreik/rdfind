@@ -68,5 +68,63 @@ dbgecho passed the test with trying to write to a system directory
 
 
 
+#This test tries to provoke errors in relative paths, path simplification
+# etc.
+# argument 1 is path to file 1. argument 2 is path to file 2.
+pathsimplification() {
+reset_teststate
+mkdir -p $(dirname $1) && echo "simplification test" >$1
+mkdir -p $(dirname $2) && echo "simplification test" >$2
 
-dbgecho "all is good in this test!"
+#dbgecho "state before (args  $1 $2)"
+#tree
+
+$rdfind -makesymlinks true $1 $2 2>&1 |tee rdfind.out
+# $2 should be a symlink to $1
+if [ x"$(stat -c %F "$1")" != x"regular file" ] ; then
+  dbgecho "expected file $1 to be a regular file"
+  exit 1
+fi
+if [ x"$(stat -c %F "$2")" != x"symbolic link" ] ; then
+  dbgecho "expected file $1 to be a symbolic link"
+  exit 1
+fi
+inodefor1=$(stat -c %i "$1")
+inodefor2=$(stat --dereference -c %i "$2")
+if [ $inodefor1 != $inodefor2 ] ; then
+  dbgecho "inode mismatch $inodefor1 vs $inodefor2"
+  exit 1
+fi
+#switching directory should still give the correct answer
+cd $(dirname $2)
+inodefor2=$(stat --dereference -c %i $(basename "$2"))
+if [ $inodefor1 != $inodefor2 ] ; then
+  dbgecho "inode mismatch $inodefor1 vs $inodefor2"
+  exit 1
+fi
+#dbgecho "state after $1 $2"
+#sync
+#tree
+echo -----------------------------------------------------------
+}
+
+pathsimplification a b
+pathsimplification a subdir/b
+pathsimplification subdir/a b
+pathsimplification subdir1/a subdir2/b
+pathsimplification subdir1/../a subdir2/b
+pathsimplification subdir1/../a subdir2/./././b
+pathsimplification a subdir2/./././b
+pathsimplification $(pwd)/a b
+pathsimplification a $(pwd)/b
+pathsimplification $(pwd)/a $(pwd)/b
+pathsimplification $(pwd)/subdir/../a $(pwd)/b
+pathsimplification ./a b
+pathsimplification ./a ./b
+pathsimplification a ./b
+pathsimplification a .//////////b
+
+dbgecho passed the test with variants of paths
+
+dbgecho "all is good for the symlinks test!"
+

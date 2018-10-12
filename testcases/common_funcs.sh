@@ -3,7 +3,7 @@
 
 
 
-rdfind=$(pwd)/rdfind
+rdfind=$(readlink -f $(dirname $0)/../rdfind)
 
 #bail out on the first error
 set -e
