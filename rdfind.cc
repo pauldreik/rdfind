@@ -55,62 +55,47 @@ report(const std::string& path, const std::string& name, int depth)
 static void
 usage()
 {
-  using std::cout;
-  using std::endl;
-  //..<<"..............................80 chars
-  // output......................................................."
-  cout << endl << "usage:" << endl;
-  cout << "rdfind [options] directory1 directory2 ..." << endl;
-  cout << endl
-       << " Finds duplicate files in directories, and takes appropriate actions"
-       << endl;
-  cout << "Directories listed first are ranked higher, meaning that if a"
-       << endl;
-  cout << "file is found on several places, the file found in the directory "
-          "first"
-       << endl;
-  cout << " encountered on the command line is kept, and the others are "
-          "considered duplicate."
-       << endl;
-  cout << " options are (default choice within parentheses) " << endl << endl;
-  cout << " -makesymlinks      true |(false) replace duplicate files with "
-          "symbolic links"
-       << endl;
-  cout << " -makehardlinks     true |(false) replace duplicate files with "
-          "hard links"
-       << endl;
-  cout << " -deleteduplicates  true |(false) delete duplicate files" << endl;
-  cout << " -ignoreempty      (true)| false  ignore empty files" << endl;
-  cout << " -removeidentinode (true)| false  ignore files with nonunique "
-          "device and inode"
-       << endl;
-  cout << " -makeresultsfile  (true)| false  makes a results file" << endl;
-  cout << " -outputname  name  sets the results file name to \"name\" "
-          "(default results.txt)"
-       << endl;
-  cout << " -followsymlinks    true |(false) follow symlinks" << endl;
-  cout << " -dryrun|-n         true |(false) print to stdout instead of "
-          "changing anything"
-       << endl;
-  cout << " -checksum          (md5)| sha1   checksum type" << endl;
-  cout << " -sleep              Xms          sleep for X milliseconds between "
-          "file reads."
-       << endl;
-  cout << "                                  Default is 0. Currently, only a "
-          "few values"
-       << endl;
-  cout << "                                  are supported; 0,1-5,10,25,50,100"
-       << endl;
-  cout << endl;
-  cout << "If properly installed, a man page should be available as man rdfind."
-       << endl;
-  cout << endl;
-  cout << endl
-       << "rdfind is written by Paul Dreik 2006 onwards. License: GPL v2 or "
-          "later (at your option)."
-       << endl;
-  cout << "version is " << VERSION << endl;
-  cout << endl;
+  std::cout
+    << "Usage: "
+    << "rdfind [options] FILE ...\n"
+    << '\n'
+    << "Finds duplicate files recursively in the given FILEs (directories),\n"
+    << "and takes appropriate action (default nothing).\n"
+    << "Directories listed first are ranked higher, meaning that if a\n"
+    << "file is found on several places, the file found in the directory "
+       "first\n"
+    << "encountered on the command line is kept, and the others are "
+       "considered duplicate.\n"
+    << '\n'
+    << "options are (default choice within parentheses)\n"
+    << '\n'
+    << " -ignoreempty      (true)| false  ignore empty files\n"
+    << " -followsymlinks    true |(false) follow symlinks\n"
+    << " -removeidentinode (true)| false  ignore files with nonunique "
+       "device and inode\n"
+    << " -checksum          (md5)| sha1   checksum type\n"
+    << " -makesymlinks      true |(false) replace duplicate files with "
+       "symbolic links\n"
+    << " -makehardlinks     true |(false) replace duplicate files with "
+       "hard links\n"
+    << " -makeresultsfile  (true)| false  makes a results file\n"
+    << " -outputname  name  sets the results file name to \"name\" "
+       "(default results.txt)\n"
+    << " -deleteduplicates  true |(false) delete duplicate files\n"
+    << " -sleep              Xms          sleep for X milliseconds between "
+       "file reads.\n"
+    << "                                  Default is 0. Only a few values\n"
+    << "                                  are supported; 0,1-5,10,25,50,100\n"
+    << " -dryrun|-n         true |(false) print to stdout instead of "
+       "changing anything\n"
+    << " -h|-help|--help                  show this help and exit\n"
+    << " -v|--version                     display version number and exit\n"
+    << '\n'
+    << "If properly installed, a man page should be available as man rdfind.\n"
+    << '\n'
+    << "rdfind is written by Paul Dreik 2006 onwards. License: GPL v2 or "
+       "later (at your option).\n"
+    << "version is " << VERSION << '\n';
 }
 
 int
