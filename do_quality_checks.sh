@@ -76,6 +76,24 @@ done
 }
 ###############################################################################
 
+run_with_sanitizer() {
+echo "running with sanitizer (options $2)"
+#find the latest clang compiler
+latestclang=$(ls $(which clang++)* |sort -g |tail -n1)
+if [ ! -x $latestclang ] ; then
+  echo could not find latest clang $latestclang
+  exit 1
+fi
+
+start_from_scratch
+./bootstrap.sh >bootstrap.log
+./configure CXX=$latestclang CXXFLAGS="-std=c++1y $1"   >configure.log
+make > make.log 2>&1
+export UBSAN_OPTIONS="halt_on_error=true exitcode=1"
+export ASAN_OPTIONS="halt_on_error=true exitcode=1"
+make check >make-check.log 2>&1
+}
+###############################################################################
 
 #keep track of which compilers have already been tested
 echo "">inodes_for_tested_compilers.txt
@@ -107,5 +125,9 @@ if which clang++ >/dev/null ; then
     fi
   done
 fi
+
+#run unit tests with sanitizers enabled
+run_with_sanitizer "-fsanitize=undefined -O3"
+run_with_sanitizer "-fsanitize=address -O0"
 
 
