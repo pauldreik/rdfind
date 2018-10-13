@@ -69,7 +69,10 @@ usage()
     << '\n'
     << "options are (default choice within parentheses)\n"
     << '\n'
-    << " -ignoreempty      (true)| false  ignore empty files\n"
+    << " -ignoreempty      (true)| false  ignore empty files (true implies "
+       "-minsize 1, false implies -minsize 0)\n"
+    << " -minsize N        (N=1)          ignores files with size less than N "
+       "bytes\n"
     << " -followsymlinks    true |(false) follow symlinks\n"
     << " -removeidentinode (true)| false  ignore files with nonunique "
        "device and inode\n"

@@ -55,7 +55,11 @@ system specific behaviour.
 .SH OPTIONS
 .B Searching options etc:
 .IP "-ignoreempty true|false"
-Ignore empty files. (default)
+Ignore empty files. Setting this to true (the default) is equivalent to
+-minsize 1, false is equivalent to -minsize 0.
+.IP "-minsize N"
+Ignores files with less than N bytes. Default is 1, meaning empty files
+are ignored.
 .IP "-followsymlinks true|false"
 Follow symlinks. Default is false.
 .IP "-removeidentinode true|false"

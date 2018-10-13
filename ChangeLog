@@ -6,6 +6,8 @@
 	  file, if pssible. See Github bug #5. 
 	* failure of making symlinks will not delete the deduplicated
 	  file, if possible. See Github bug #5.
+	* added option -minsize to optionally ignore files under a
+	  certain size. See Github bug #1
 2017-01-04 Paul Dreik <rdfind@pauldreik.se>
 	* release 1.3.5
 	* source cleanup like removing obsolete comments, formatting.
