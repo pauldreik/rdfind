@@ -189,6 +189,14 @@ main(int narg, char* argv[])
           cerr << "expected true or false, not \"" << nextarg << "\"" << endl;
           return -1;
         }
+      } else if (arg == "-minsize" && n < (narg - 1)) {
+        string nextarg(argv[1 + n]);
+        n++;
+        long long minsize = std::stoll(nextarg);
+        if (minsize < 0) {
+          throw std::runtime_error("negative value of minsize not allowed");
+        }
+        minimumfilesize = minsize;
       } else if (arg == "-deleteduplicates" && n < (narg - 1)) {
         string nextarg(argv[n + 1]);
         n++;
