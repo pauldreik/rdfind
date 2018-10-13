@@ -14,6 +14,10 @@ TESTS=testcases/largefilesupport.sh \
       testcases/symlinking_action.sh \
       testcases/verify_filesize_option.sh
 
+@VALGRIND_CHECK_RULES@
+ TEST_EXTENSIONS = .pl .sh
+LOG_COMPILER = $(VALGRIND)
+TESTS_ENVIRONMENT =  VALGRIND='$(VALGRIND)'
 
 EXTRA_DIST = \
   algos.hh Dirlist.hh MultiAttributeCompare.hh Checksum.hh  Fileinfo.hh \

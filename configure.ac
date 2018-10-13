@@ -154,6 +154,8 @@ if test "x$set_more_warnings" != xno; then
 	unset option
 fi
 
+dnl valgrind support
+AX_VALGRIND_CHECK 
 
 dnl read Makefile.in and write Makefile
 AC_OUTPUT(Makefile)

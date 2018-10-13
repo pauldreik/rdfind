@@ -3,10 +3,24 @@
 
 
 
-rdfind=$(readlink -f $(dirname $0)/../rdfind)
-
 #bail out on the first error
 set -e
+
+/bin/echo -n "checking for rdfind ..."
+rdfind=$(readlink -f $(dirname $0)/../rdfind)
+if [ ! -x "$rdfind" ]; then
+    echo "could not find $rdfind"
+fi
+echo " OK."
+
+/bin/echo -n "checking for valgrind ..."
+if [ -z $VALGRIND ] ; then
+  echo "not used."
+else
+  echo "active! here is the command: $VALGRIND"
+fi	
+
+rdfind="$VALGRIND $rdfind"
 
 #where is the test scripts dir?
 testscriptsdir=$(dirname $(readlink -f $0))
@@ -16,11 +30,6 @@ dbgecho() {
     echo "$0 debug: " "$@"
 }
 
-echo -n "checking for rdfind ..."
-if [ ! -x "$rdfind" ]; then
-    echo "could not find $rdfind"
-fi
-echo " OK."
 
 echo -n "checking for mktemp ..."
 which mktemp >/dev/null
