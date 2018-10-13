@@ -155,7 +155,10 @@ if test "x$set_more_warnings" != xno; then
 fi
 
 dnl valgrind support
-AX_VALGRIND_CHECK 
-
+dnl unfortunately it makes checking much slower
+dnl even if valgrind is not used, so leave it inactive.
+dnl AX_VALGRIND_CHECK 
+dnl
+dnl instead, just use "VALGRIND=valgrind make check" to test with valgrind
 dnl read Makefile.in and write Makefile
 AC_OUTPUT(Makefile)
