@@ -113,10 +113,11 @@ main(int narg, char* argv[])
   }
 
   // operation mode and default values
-  bool makesymlinks = false;          // turn duplicates into symbolic links
-  bool makehardlinks = false;         // turn duplicates into hard links
-  bool makeresultsfile = true;        // write a results file
-  bool ignoreempty = true;            // ignore empty files
+  bool makesymlinks = false;   // turn duplicates into symbolic links
+  bool makehardlinks = false;  // turn duplicates into hard links
+  bool makeresultsfile = true; // write a results file
+  Fileinfo::filesizetype minimumfilesize =
+    1; // minimum file size to be noticed (0 - include empty files)
   bool deleteduplicates = false;      // delete duplicate files
   bool followsymlinks = false;        // follow symlinks
   bool dryrun = false;                // only dryrun, dont destroy anything
@@ -180,11 +181,11 @@ main(int narg, char* argv[])
       } else if (arg == "-ignoreempty" && n < (narg - 1)) {
         string nextarg(argv[1 + n]);
         n++;
-        if (nextarg == "true")
-          ignoreempty = true;
-        else if (nextarg == "false")
-          ignoreempty = false;
-        else {
+        if (nextarg == "true") {
+          minimumfilesize = 1;
+        } else if (nextarg == "false") {
+          minimumfilesize = 0;
+        } else {
           cerr << "expected true or false, not \"" << nextarg << "\"" << endl;
           return -1;
         }
@@ -352,10 +353,12 @@ main(int narg, char* argv[])
          << " files due to nonunique device and inode." << endl;
   }
 
-  if (ignoreempty) {
-    cout << dryruntext << "Now removing files with zero size from list...";
+  if (minimumfilesize > 0) {
+    cout << dryruntext << "Now removing files with size >" << minimumfilesize
+         << " from the list...";
     cout.flush();
-    cout << "removed " << gswd.remove_if() << " files" << endl;
+    cout << "removed " << gswd.remove_small_files(minimumfilesize) << " files"
+         << endl;
   }
 
   cout << dryruntext << "Total size is " << gswd.totalsizeinbytes()

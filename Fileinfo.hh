@@ -153,6 +153,16 @@ public:
 
   // returns true if A has size zero
   static bool isempty(const Fileinfo& A) { return A.size() == 0; }
+  /**
+   * returns true if file A is smaller than minsize
+   * @param A
+   * @param minsize
+   * @return
+   */
+  static bool is_smaller_than(const Fileinfo& A, Fileinfo::filesizetype minsize)
+  {
+    return A.size() < minsize;
+  }
 
   // returns the inode number
   unsigned long inode() const { return m_info.stat_ino; }

@@ -212,14 +212,21 @@ Rdutil::cleanup()
   return size_before - size_after;
 }
 
-// removes items
 std::size_t
-Rdutil::remove_if()
+Rdutil::remove_small_files(Fileinfo::filesizetype minsize)
 {
-  //  remove_if_helper hlp(rem);
   const auto size_before = m_list.size();
-  auto it = std::remove_if(m_list.begin(), m_list.end(), &Fileinfo::isempty);
-  m_list.erase(it, m_list.end());
+  const auto begin = m_list.begin();
+  const auto end = m_list.end();
+  decltype(m_list.begin()) it;
+  if (minsize == 0) {
+    it = std::remove_if(begin, end, &Fileinfo::isempty);
+  } else {
+    it = std::remove_if(begin, end, [=](const Fileinfo& A) {
+      return Fileinfo::is_smaller_than(A, minsize);
+    });
+  }
+  m_list.erase(it, end);
   return size_before - m_list.size();
 }
 

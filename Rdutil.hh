@@ -69,9 +69,11 @@ public:
   int marksingle(std::vector<Fileinfo>::iterator start,
                  std::vector<Fileinfo>::iterator stop);
 
-  // removes items that rem returns true for.
-  // returns the number of removed elements.
-  std::size_t remove_if();
+  /**
+   * Removes items with file size less than minsize
+   * @return the number of removed elements.
+   */
+  std::size_t remove_small_files(Fileinfo::filesizetype minsize);
 
   // read some bytes. note! destroys the order of the list.
   // if lasttype is supplied, it does not reread files if they are shorter
