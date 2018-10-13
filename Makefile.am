@@ -11,7 +11,8 @@ rdfind_SOURCES = rdfind.cc Checksum.cc  Dirlist.cc  Fileinfo.cc  Rdutil.cc \
 TESTS=testcases/largefilesupport.sh \
       testcases/md5collisions.sh \
       testcases/hardlink_fails.sh \
-      testcases/symlinking_action.sh 
+      testcases/symlinking_action.sh \
+      testcases/verify_filesize_option.sh
 
 
 EXTRA_DIST = \
