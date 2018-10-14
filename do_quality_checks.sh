@@ -4,7 +4,27 @@
 # automatically. It counts compiler warnings,
 # builds in both debug/release mode, test multiple
 # compilers etc.
-
+#
+# To get the most out of it, install as many variants of gcc and clang
+# as you can. If g++ is found, it will look for g++-* in the same directory.
+# If clang++ is found, it will look for clang++-* in the same directory.
+# This means you need to have either system wide installs, or your PATH is
+# setup in such a way that g++/clang++ points to the same location as the compilers
+# you want to test.
+#
+# If clang is available, builds with address and undefined sanitizer will be made.
+#
+# If clang is available and possible to use with libc++, it will be built. On Ubuntu,
+# install libc++abi-dev and libc++-dev
+#
+# If valgrind is available, it will be added as one thing to test.
+#
+# If dpkg-buildflags is available, a test build will be added with the flags
+# coming from that tool.
+#
+# All compiles are checked to be warning free, all unit tests should pass.
+#
+# Stuff to test: debug iterators
 
 set -e
 
@@ -86,7 +106,7 @@ done
 run_with_sanitizer() {
 echo "running with sanitizer (options $1)"
 #find the latest clang compiler
-latestclang=$(ls $(which clang++)* |sort -g |tail -n1)
+latestclang=$(ls $(which clang++)* |grep -v libc |sort -g |tail -n1)
 if [ ! -x $latestclang ] ; then
   echo could not find latest clang $latestclang
   exit 1
@@ -125,9 +145,36 @@ for flag in $(dpkg-buildflags  |cut -f1 -d=) ; do
 done 
 }
 ###############################################################################
+run_with_libcpp() {
+latestclang=$(ls $(which clang++)* |grep -v libc|sort -g |tail -n1)
+if [ ! -x $latestclang ] ; then
+  echo could not find latest clang - skipping test with libc++
+  return 0
+fi
+#make a test program to make sure it works.
+echo "#include <iostream>
+int main() { std::cout<<\"libc++ works!\";}" >x.cpp
+if ! $latestclang -std=c++11 -stdlib=libc++ -lc++abi x.cpp && ./a.out ; then
+  echo "$latestclang could not compile with libc++"
+  return 0
+fi
+#echo using $latestclang with libc++
+compile_and_test_standard $latestclang c++11 "-stdlib=libc++"
+}
+###############################################################################
+
+#test run with clang/libc++
+run_with_libcpp
 
 #make sure release builds are all ok (provokes possible heisenbugs from assert misusage)
 compile_and_test_standard g++ c++11 "-DNDEBUG=1 -O3"
+
+#test build with running through valgrind, while we still have the release
+#binary available
+if which valgrind >/dev/null; then
+  echo running unit tests through valgrind
+  VALGRIND=valgrind make check >make-check.log
+fi
 
 #keep track of which compilers have already been tested
 echo "">inodes_for_tested_compilers.txt
@@ -148,7 +195,7 @@ fi
 
 #try all variants of clang
 if which clang++ >/dev/null ; then
-  for COMPILER in $(which clang++)* ; do
+  for COMPILER in $(ls $(which clang++)* |grep -v libc); do
     inode=$(stat --dereference --format=%i $COMPILER)
     if grep -q "^$inode\$" inodes_for_tested_compilers.txt ; then
        echo skipping this compiler $COMPILER - already tested
@@ -167,6 +214,7 @@ run_with_sanitizer "-fsanitize=address -O0"
 #build and test with all flags from debian, if available. this increases
 #the likelilihood rdfind will build when creating a deb package.
 run_with_debian_buildflags
+
 
 echo "$(basename $0): congratulations, all tests that were possible to run passed!"
 
