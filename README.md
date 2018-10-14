@@ -108,6 +108,22 @@ Here is how to get and install nettle from source. Please check for the current 
 
     ln -s nettle-1.14 nettle
 
+### Quality
+The following methods are used to maintain code quality:
+ - builds without warnings on gcc and clang, even with all the suggested warnings from [cppbestpractices](https://github.com/lefticus/cppbestpractices/blob/master/02-Use_the_Tools_Available.md) enabled. Pass --enable-warnings to configure to turn them on.
+ - builds with standards c++11, 14, 17 and 2a
+ - tests are written for newly found bugs, first to prove the bug and then to prove that it is fixed. Older bugs do not all have tests.
+ - tests are also run through valgrind
+ - tests are run on address sanitizer builds
+ - tests are run on undefined sanitizer builds
+ - tests are run with debug iterators enabled
+ - builds are made in default mode (debug) as well as release, and also with the flags suggested by debians hardening helper dpkg-buildflags
+ - builds are made with both libstdc++ (gcc) and libc++ (llvm)
+ - clang format is used, issue make format to execute it
+ - cppcheck has been run manually and relevant issues are fixed
+ 
+ There is a helper script that does the test build variants, see do_quality_checks.sh in the project root.
+ 
 ## Alternatives
 
 There are some interesting alternatives.
