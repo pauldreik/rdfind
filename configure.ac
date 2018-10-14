@@ -132,6 +132,7 @@ if test "x$set_more_warnings" != xno; then
 			 -Wuseless-cast \
 			 -Wdouble-promotion \
 			 -Wformat=2 \
+			 -Wlifetime \
 	                 -Wbiznafronck"	
 	for option in $warning_options ; do
 		SAVE_CXXFLAGS="$CXXFLAGS"
