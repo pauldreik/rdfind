@@ -22,9 +22,13 @@
 # If dpkg-buildflags is available, a test build will be added with the flags
 # coming from that tool.
 #
+# A build with debug iterators (https://gcc.gnu.org/onlinedocs/libstdc++/manual/debug_mode.html)
+# is made.
+#
 # All compiles are checked to be warning free, all unit tests should pass.
 #
-# Stuff to test: debug iterators
+# LICENSE: GPLv2 or later, at your option.
+# by Paul Dreik 20181014
 
 set -e
 
@@ -86,7 +90,7 @@ compile_and_test() {
 /bin/echo -e "#include <iostream>">x.cpp
 #does the compiler understand c++11? That is mandatory.
 if ! $1 -c x.cpp -std=c++11 >/dev/null 2>&1 ; then
-  echo this compiler does not understand c++11
+  echo this compiler $1 does not understand c++11
   exit 1
 fi
 compile_and_test_standard $1 c++11
@@ -163,25 +167,12 @@ compile_and_test_standard $latestclang c++11 "-stdlib=libc++"
 }
 ###############################################################################
 
-#test run with clang/libc++
-run_with_libcpp
-
-#make sure release builds are all ok (provokes possible heisenbugs from assert misusage)
-compile_and_test_standard g++ c++11 "-DNDEBUG=1 -O3"
-
-#test build with running through valgrind, while we still have the release
-#binary available
-if which valgrind >/dev/null; then
-  echo running unit tests through valgrind
-  VALGRIND=valgrind make check >make-check.log
-fi
-
 #keep track of which compilers have already been tested
 echo "">inodes_for_tested_compilers.txt
 
 #try all variants of g++
 if which g++ >/dev/null ; then
-  for COMPILER in $(which g++)* ; do
+  for COMPILER in $(ls $(which g++)* |grep -v libc); do
     inode=$(stat --dereference --format=%i $COMPILER)
     if grep -q "^$inode\$" inodes_for_tested_compilers.txt ; then
        echo skipping this compiler $COMPILER - already tested
@@ -214,6 +205,22 @@ run_with_sanitizer "-fsanitize=address -O0"
 #build and test with all flags from debian, if available. this increases
 #the likelilihood rdfind will build when creating a deb package.
 run_with_debian_buildflags
+
+#make a test build with debug iterators
+compile_and_test_standard g++ c++11 "-D_GLIBCXX_DEBUG"
+
+#test run with clang/libc++
+run_with_libcpp
+
+#make sure release builds are all ok (provokes possible heisenbugs from assert misusage)
+compile_and_test_standard g++ c++11 "-DNDEBUG=1 -O3"
+
+#test build with running through valgrind, while we still have the release
+#binary available
+if which valgrind >/dev/null; then
+  echo running unit tests through valgrind
+  VALGRIND=valgrind make check >make-check.log
+fi
 
 
 echo "$(basename $0): congratulations, all tests that were possible to run passed!"
