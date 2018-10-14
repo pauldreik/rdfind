@@ -77,7 +77,7 @@ done
 ###############################################################################
 
 run_with_sanitizer() {
-echo "running with sanitizer (options $2)"
+echo "running with sanitizer (options $1)"
 #find the latest clang compiler
 latestclang=$(ls $(which clang++)* |sort -g |tail -n1)
 if [ ! -x $latestclang ] ; then
@@ -92,6 +92,30 @@ make > make.log 2>&1
 export UBSAN_OPTIONS="halt_on_error=true exitcode=1"
 export ASAN_OPTIONS="halt_on_error=true exitcode=1"
 make check >make-check.log 2>&1
+}
+###############################################################################
+run_with_debian_buildflags() {
+echo "running with buildflags from debian dpkg-buildflags"
+if ! which dpkg-buildflags >/dev/null  ; then
+  echo dpkg-buildflags not found - skipping
+  return 0
+fi
+start_from_scratch
+./bootstrap.sh >bootstrap.log
+eval $(DEB_BUILD_MAINT_OPTIONS="hardening=+all qa=+all,-canary reproducible=+all" dpkg-buildflags --export=sh)
+./configure  >configure.log
+make > make.log 2>&1
+#check for warnings
+if grep -q "warning" make.log; then
+ echo "found warning(s) - see make.log"
+ exit 1
+fi
+make check >make-check.log 2>&1
+
+#restore the build environment
+for flag in $(dpkg-buildflags  |cut -f1 -d=) ; do
+  unset $flag
+done 
 }
 ###############################################################################
 
@@ -129,5 +153,11 @@ fi
 #run unit tests with sanitizers enabled
 run_with_sanitizer "-fsanitize=undefined -O3"
 run_with_sanitizer "-fsanitize=address -O0"
+
+#build and test with all flags from debian, if available. this increases
+#the likelilihood rdfind will build when creating a deb package.
+run_with_debian_buildflags
+
+echo "$(basename $0): congratulations, all tests that were possible to run passed!"
 
 
