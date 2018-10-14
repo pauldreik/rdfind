@@ -24,14 +24,21 @@ fi
 ###############################################################################
 #argument 1 is the compiler
 #argument 2 is the c++ standard
+#argument 3 (optional) is appended to CXXFLAGS
 compile_and_test_standard() {
 start_from_scratch
-echo using $(basename $1) with standard $2
+/bin/echo -n "using $(basename $1) with standard $2"
+if [ -n "$3" ] ; then
+  echo " (with additional CXXFLAGS $3)"
+else
+  echo ""
+fi
+
 if ! ./bootstrap.sh >bootstrap.log 2>&1; then
   echo failed bootstrap - see bootstrap.log
   exit 1
 fi
-if ! ./configure --enable-warnings CXX=$1 CXXFLAGS="-std=$2" >configure.log 2>&1 ; then
+if ! ./configure --enable-warnings CXX=$1 CXXFLAGS="-std=$2 $3" >configure.log 2>&1 ; then
   echo failed configure - see configure.log
   exit 1
 fi
@@ -118,6 +125,9 @@ for flag in $(dpkg-buildflags  |cut -f1 -d=) ; do
 done 
 }
 ###############################################################################
+
+#make sure release builds are all ok (provokes possible heisenbugs from assert misusage)
+compile_and_test_standard g++ c++11 "-DNDEBUG=1 -O3"
 
 #keep track of which compilers have already been tested
 echo "">inodes_for_tested_compilers.txt
