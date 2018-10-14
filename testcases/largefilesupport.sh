@@ -1,32 +1,10 @@
 #!/bin/sh
 #This makes sure we can handle files bigger than 2^32-1 bytes
 
-rdfind=$(pwd)/rdfind
-
-#bail out on the first error
 set -e
+. "$(dirname "$0")/common_funcs.sh"
 
-dbgecho() {
-    echo "$0 debug: " "$@"
-}
-
-echo -n "checking for rdfind ..." && [ -x $rdfind ] && echo " OK."
-echo -n "checking for mktemp ..." && [ -x mktemp ] && echo " OK."
-
-#create a temporary directory, which is automatically deleted
-#on exit
-datadir=$(mktemp -d -t rdfindtestcases.d.XXXXXXXXXXXX)
-dbgecho "temp dir is $datadir"
-
-cleanup () {
-cd /
-rm -rf $datadir
-}
-
-trap cleanup 0
-
-[ -d $datadir ]
-cd $datadir
+reset_teststate
 
 #create a large file, sparse.
 filesizem1=2147483647 #size, in bytes. This is no problem.

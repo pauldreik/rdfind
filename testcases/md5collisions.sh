@@ -1,37 +1,11 @@
 #!/bin/sh
 #This just tests basic operation
 
-rdfind=$(pwd)/rdfind
 
-
-#bail out on the first error
 set -e
+. "$(dirname "$0")/common_funcs.sh"
 
-#where is the test scripts dir?
-testscriptsdir=$(dirname $(readlink -f $0))
-
-
-dbgecho() {
-    echo "$0 debug: " "$@"
-}
-
-echo -n "checking for rdfind ..." && [ -x $rdfind ] && echo " OK."
-echo -n "checking for mktemp ..." && [ -x mktemp ] && echo " OK."
-
-#create a temporary directory, which is automatically deleted
-#on exit
-datadir=$(mktemp -d -t rdfindtestcases.d.XXXXXXXXXXXX)
-dbgecho "temp dir is $datadir"
-
-cleanup () {
-cd /
-rm -rf $datadir
-}
-
-trap cleanup 0
-
-[ -d $datadir ]
-cd $datadir
+reset_teststate
 
 
 #check md5 collision files
