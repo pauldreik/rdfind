@@ -76,7 +76,7 @@ usage()
     << " -followsymlinks    true |(false) follow symlinks\n"
     << " -removeidentinode (true)| false  ignore files with nonunique "
        "device and inode\n"
-    << " -checksum          (md5)| sha1 | sha256\n"
+    << " -checksum           md5 |(sha1)| sha256\n"
     << "                                  checksum type\n"
     << " -makesymlinks      true |(false) replace duplicate files with "
        "symbolic links\n"
@@ -306,9 +306,9 @@ main(int narg, char* argv[])
     }
   }
 
-  // decide what checksum to use - if no checksum is set, force md5!
+  // decide what checksum to use - if no checksum is set, force sha1!
   if (!usemd5 && !usesha1 && !usesha256) {
-    usemd5 = true;
+    usesha1 = true;
   }
 
   // command line parsing went OK to reach this point.
