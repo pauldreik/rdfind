@@ -369,7 +369,7 @@ main(int narg, char* argv[])
   }
 
   if (minimumfilesize > 0) {
-    cout << dryruntext << "Now removing files with size >" << minimumfilesize
+    cout << dryruntext << "Now removing files with size<" << minimumfilesize
          << " from the list...";
     cout.flush();
     cout << "removed " << gswd.remove_small_files(minimumfilesize) << " files"
