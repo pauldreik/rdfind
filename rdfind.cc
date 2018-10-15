@@ -101,8 +101,116 @@ usage()
     << "version is " << VERSION << '\n';
 }
 
+namespace {
+class Parser
+{
+public:
+  Parser(int argc, const char* argv[])
+    : m_argc(argc)
+    , m_argv(argv)
+    , m_index(1)
+  {}
+
+  /**
+   * tries to parse arg.
+   * @return true if argument could be parsed. get it with get().
+   */
+  bool try_parse_bool(const char* arg)
+  {
+    if (m_index >= m_argc) {
+      // out of bounds - programming error.
+      std::cerr << "out of bounds: m_index=" << m_index << " m_argc=" << m_argc
+                << '\n';
+      std::exit(EXIT_FAILURE);
+    }
+    if (0 == std::strcmp(arg, m_argv[m_index])) {
+      // yep - match!
+      if (1 + m_index >= m_argc) {
+        // out of bounds - user gave to few arguments.
+        std::cerr << "expected true or false after " << arg
+                  << ", not end of argument list.\n";
+        std::exit(EXIT_FAILURE);
+      }
+      auto value = m_argv[++m_index];
+      if (0 == std::strcmp(value, "true")) {
+        m_last_result = true;
+        return true;
+      }
+      if (0 == std::strcmp(value, "false")) {
+        m_last_result = false;
+        return true;
+      }
+      std::cerr << "expected true or false after " << arg << ", not \"" << value
+                << "\"\n";
+      std::exit(EXIT_FAILURE);
+    } else {
+      // no match. keep searching.
+      return false;
+    }
+  }
+
+  bool try_parse_string(const char* arg)
+  {
+    if (m_index >= m_argc) {
+      // out of bounds - programming error.
+      std::cerr << "out of bounds: m_index=" << m_index << " m_argc=" << m_argc
+                << '\n';
+      std::exit(EXIT_FAILURE);
+    }
+    if (0 == std::strcmp(arg, m_argv[m_index])) {
+      // yep - match!
+      if (1 + m_index >= m_argc) {
+        // out of bounds. user supplied to few arguments.
+        std::cerr << "expected string after " << arg
+                  << ", not end of argument list.\n";
+        std::exit(EXIT_FAILURE);
+      }
+      m_last_str_result = m_argv[++m_index];
+      return true;
+    } else {
+      // no match. keep searching.
+      return false;
+    }
+  }
+  bool get_parsed_bool() const { return m_last_result; }
+  const char* get_parsed_string() const { return m_last_str_result; }
+  bool parsed_string_is(const char* value) const
+  {
+    return 0 == std::strcmp(m_last_str_result, value);
+  }
+  /**
+   * advances to the next argument
+   * @return
+   */
+  int advance() { return ++m_index; }
+  bool has_args_left() const { return m_index < m_argc; }
+  int get_current_index() const { return m_index; }
+  const char* get_current_arg() const
+  {
+    if (m_index >= m_argc) {
+      // out of bounds.
+      std::cerr << "out of bounds: m_index=" << m_index << " m_argc=" << m_argc
+                << '\n';
+      std::exit(EXIT_FAILURE);
+    }
+    return m_argv[m_index];
+  }
+  bool current_arg_is(const char* what) const
+  {
+    return 0 == std::strcmp(get_current_arg(), what);
+  }
+
+private:
+  const int m_argc;
+  const char** m_argv;
+  int m_index = 1;
+  bool m_last_result{};
+  const char* m_last_str_result{};
+};
+}
+
 int
-main(int narg, char* argv[])
+main(int narg, const char* argv[])
 {
   using std::cerr;
   using std::cout;
@@ -132,190 +240,112 @@ main(int narg, char* argv[])
 
   string resultsfile = "results.txt"; // results file name.
 
-  // a list of where to search
-  std::vector<string> pathlist;
+  // parse the input arguments
+  Parser parser(narg, argv);
 
-  // parse the input args
-  for (int n = 1; n < narg; n++) {
-    // decide if this input arg is an option or a directory.
-    string arg(argv[n]);
-    if (arg.length() < 1) {
-      cerr << "bad argument " << n << '\n';
+  for (; parser.has_args_left(); parser.advance()) {
+    // empty strings are forbidden as input since they can not be file names or
+    // options
+    if (parser.get_current_arg()[0] == '\0') {
+      cerr << "bad argument " << parser.get_current_index() << '\n';
       return -1;
     }
 
-    if (arg.at(0) == '-') {
-      if (arg == "-makesymlinks" && n < (narg - 1)) {
-        string nextarg(argv[1 + n]);
-        n++;
-        if (nextarg == "true")
-          makesymlinks = true;
-        else if (nextarg == "false")
-          makesymlinks = false;
-        else {
-          cerr << "expected true or false, not \"" << nextarg << "\"\n";
-          return -1;
-        }
-      } else if (arg == "-makehardlinks" && n < (narg - 1)) {
-        string nextarg(argv[1 + n]);
-        n++;
-        if (nextarg == "true")
-          makehardlinks = true;
-        else if (nextarg == "false")
-          makehardlinks = false;
-        else {
-          cerr << "expected true or false, not \"" << nextarg << "\"\n";
-          return -1;
-        }
-      } else if (arg == "-makeresultsfile" && n < (narg - 1)) {
-        string nextarg(argv[1 + n]);
-        n++;
-        if (nextarg == "true")
-          makeresultsfile = true;
-        else if (nextarg == "false")
-          makeresultsfile = false;
-        else {
-          cerr << "expected true or false, not \"" << nextarg << "\"\n";
-          return -1;
-        }
-      } else if (arg == "-outputname" && n < (narg - 1)) {
-        string nextarg(argv[1 + n]);
-        n++;
-        resultsfile = nextarg;
-      } else if (arg == "-ignoreempty" && n < (narg - 1)) {
-        string nextarg(argv[1 + n]);
-        n++;
-        if (nextarg == "true") {
-          minimumfilesize = 1;
-        } else if (nextarg == "false") {
-          minimumfilesize = 0;
-        } else {
-          cerr << "expected true or false, not \"" << nextarg << "\"\n";
-          return -1;
-        }
-      } else if (arg == "-minsize" && n < (narg - 1)) {
-        string nextarg(argv[1 + n]);
-        n++;
-        long long minsize = std::stoll(nextarg);
-        if (minsize < 0) {
-          throw std::runtime_error("negative value of minsize not allowed");
-        }
-        minimumfilesize = minsize;
-      } else if (arg == "-deleteduplicates" && n < (narg - 1)) {
-        string nextarg(argv[n + 1]);
-        n++;
-        if (nextarg == "true")
-          deleteduplicates = true;
-        else if (nextarg == "false")
-          deleteduplicates = false;
-        else {
-          cerr << "expected true or false, not \"" << nextarg << "\"\n";
-          return -1;
-        }
-      } else if (arg == "-followsymlinks" && n < (narg - 1)) {
-        string nextarg(argv[n + 1]);
-        n++;
-        if (nextarg == "true")
-          followsymlinks = true;
-        else if (nextarg == "false")
-          followsymlinks = false;
-        else {
-          cerr << "expected true or false, not \"" << nextarg << "\"\n";
-          return -1;
-        }
-      } else if (arg == "-dryrun" || arg == "-n") {
-        if (n < (narg - 1)) {
-          string nextarg(argv[n + 1]);
-          n++;
-          if (nextarg == "true")
-            dryrun = true;
-          else if (nextarg == "false")
-            dryrun = false;
-          else {
-            cerr << "expected true or false after " << arg << ", not \""
-                 << nextarg << "\"\n";
-            return -1;
-          }
-        } else {
-          cerr << "expected true or false after " << arg
-               << ", not end of argument list.\n";
-          return -1;
-        }
-      } else if (arg == "-removeidentinode" && n < (narg - 1)) {
-        string nextarg(argv[n + 1]);
-        n++;
-        if (nextarg == "true")
-          remove_identical_inode = true;
-        else if (nextarg == "false")
-          remove_identical_inode = false;
-        else {
-          cerr << "expected true or false, not \"" << nextarg << "\"\n";
-          return -1;
-        }
-      } else if (arg == "-checksum" && n < (narg - 1)) {
-        string nextarg(argv[n + 1]);
-        n++;
-        if (nextarg == "md5")
-          usemd5 = true;
-        else if (nextarg == "sha1")
-          usesha1 = true;
-        else if (nextarg == "sha256")
-          usesha256 = true;
-        else {
-          cerr << "expected md5/sha1/sha256, not \"" << nextarg << "\"\n";
-          return -1;
-        }
-      } else if (arg == "-sleep" && n < (narg - 1)) {
-        string nextarg(argv[n + 1]);
-        n++;
-        if (nextarg == "1ms")
-          nsecsleep = 1000000;
-        else if (nextarg == "2ms")
-          nsecsleep = 2000000;
-        else if (nextarg == "3ms")
-          nsecsleep = 3000000;
-        else if (nextarg == "4ms")
-          nsecsleep = 4000000;
-        else if (nextarg == "5ms")
-          nsecsleep = 5000000;
-        else if (nextarg == "10ms")
-          nsecsleep = 10000000;
-        else if (nextarg == "25ms")
-          nsecsleep = 25000000;
-        else if (nextarg == "50ms")
-          nsecsleep = 50000000;
-        else if (nextarg == "100ms")
-          nsecsleep = 100000000;
-        else {
-          cerr << "sorry, can only understand a few sleep values for "
-                  "now.\n";
-          return -1;
-        }
-      } else if (arg == "-help" || arg == "-h" || arg == "--help") {
-        usage();
-        return 0;
-      } else if (arg == "-version" || arg == "--version" || arg == "-v") {
-        cout << "This is rdfind version " << VERSION << '\n';
-        return 0;
+    // if we reach the end of the argument list - exit the loop and proceed with
+    // the file list instead.
+    if (parser.get_current_arg()[0] != '-') {
+      // end of argument list - exit!
+      break;
+    }
+    if (parser.try_parse_bool("-makesymlinks")) {
+      makesymlinks = parser.get_parsed_bool();
+    } else if (parser.try_parse_bool("-makehardlinks")) {
+      makehardlinks = parser.get_parsed_bool();
+    } else if (parser.try_parse_bool("-makeresultsfile")) {
+      makeresultsfile = parser.get_parsed_bool();
+    } else if (parser.try_parse_string("-outputname")) {
+      resultsfile = parser.get_parsed_string();
+    } else if (parser.try_parse_bool("-ignoreempty")) {
+      if (parser.get_parsed_bool()) {
+        minimumfilesize = 1;
       } else {
-        cerr << "did not understand option " << n << ":\"" << arg << "\"\n";
+        minimumfilesize = 0;
+      }
+    } else if (parser.try_parse_string("-minsize")) {
+      const long long minsize = std::stoll(parser.get_parsed_string());
+      if (minsize < 0) {
+        throw std::runtime_error("negative value of minsize not allowed");
+      }
+      minimumfilesize = minsize;
+    } else if (parser.try_parse_bool("-deleteduplicates")) {
+      deleteduplicates = parser.get_parsed_bool();
+    } else if (parser.try_parse_bool("-followsymlinks")) {
+      followsymlinks = parser.get_parsed_bool();
+    } else if (parser.try_parse_bool("-dryrun")) {
+      dryrun = parser.get_parsed_bool();
+    } else if (parser.try_parse_bool("-n")) {
+      dryrun = parser.get_parsed_bool();
+    } else if (parser.try_parse_bool("-removeidentinode")) {
+      remove_identical_inode = parser.get_parsed_bool();
+    } else if (parser.try_parse_string("-checksum")) {
+      if (parser.parsed_string_is("md5")) {
+        usemd5 = true;
+      } else if (parser.parsed_string_is("sha1")) {
+        usesha1 = true;
+      } else if (parser.parsed_string_is("sha256")) {
+        usesha256 = true;
+      } else {
+        cerr << "expected md5/sha1/sha256, not \"" << parser.get_parsed_string()
+             << "\"\n";
         return -1;
       }
-    } else { // must be input directory
-      // remove trailing /
-      while (arg.at(arg.size() - 1) == '/' && arg.size() > 1) {
-        arg.erase(arg.size() - 1);
+    } else if (parser.try_parse_string("-sleep")) {
+      const auto nextarg = std::string(parser.get_parsed_string());
+      if (nextarg == "1ms")
+        nsecsleep = 1000000;
+      else if (nextarg == "2ms")
+        nsecsleep = 2000000;
+      else if (nextarg == "3ms")
+        nsecsleep = 3000000;
+      else if (nextarg == "4ms")
+        nsecsleep = 4000000;
+      else if (nextarg == "5ms")
+        nsecsleep = 5000000;
+      else if (nextarg == "10ms")
+        nsecsleep = 10000000;
+      else if (nextarg == "25ms")
+        nsecsleep = 25000000;
+      else if (nextarg == "50ms")
+        nsecsleep = 50000000;
+      else if (nextarg == "100ms")
+        nsecsleep = 100000000;
+      else {
+        cerr << "sorry, can only understand a few sleep values for "
+                "now. \""
+             << nextarg << "\" is not among them.\n";
+        return -1;
       }
-      pathlist.push_back(arg);
+    } else if (parser.current_arg_is("-help") || parser.current_arg_is("-h") ||
+               parser.current_arg_is("--help")) {
+      usage();
+      std::exit(EXIT_SUCCESS);
+    } else if (parser.current_arg_is("-version") ||
+               parser.current_arg_is("--version") ||
+               parser.current_arg_is("-v")) {
+      cout << "This is rdfind version " << VERSION << '\n';
+      std::exit(EXIT_SUCCESS);
+    } else {
+      cerr << "did not understand option " << parser.get_current_index()
+           << ":\"" << parser.get_current_arg() << "\"\n";
+      return -1;
     }
   }
+  // done with parsing of options. remaining arguments are files and dirs.
 
   // decide what checksum to use - if no checksum is set, force sha1!
   if (!usemd5 && !usesha1 && !usesha256) {
     usesha1 = true;
   }
-
-  // command line parsing went OK to reach this point.
 
   // set the dryrun string
   const std::string dryruntext(dryrun ? "(DRYRUN MODE) " : "");
@@ -331,18 +361,30 @@ main(int narg, char* argv[])
   dirlist.setreportfcn_regular_file(&report);
 
   // follow symlinks or not
-  if (followsymlinks)
+  if (followsymlinks) {
     dirlist.setreportfcn_symlink(&report);
+  }
 
   // now loop over path list and add the files
   currentpriority = 0;
-  for (vector<string>::iterator it = pathlist.begin(); it != pathlist.end();
-       ++it) {
+
+  // done with arguments. start parsing files and directories!
+  for (; parser.has_args_left(); parser.advance()) {
+    // get the next arg.
+    const std::string file_or_dir = [&]() {
+      std::string arg(parser.get_current_arg());
+      // remove trailing /
+      while (arg.back() == '/' && arg.size() > 1) {
+        arg.erase(arg.size() - 1);
+      }
+      return arg;
+    }();
+
     currentpriority++;
     auto lastsize = filelist1.size();
-    cout << dryruntext << "Now scanning \"" << (*it) << "\"";
+    cout << dryruntext << "Now scanning \"" << file_or_dir << "\"";
     cout.flush();
-    dirlist.walk(*it, 0);
+    dirlist.walk(file_or_dir, 0);
     cout << ", found " << filelist1.size() - lastsize << " files." << endl;
   }
 
