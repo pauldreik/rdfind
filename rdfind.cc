@@ -224,16 +224,22 @@ main(int narg, char* argv[])
           cerr << "expected true or false, not \"" << nextarg << "\"" << endl;
           return -1;
         }
-      } else if ((arg == "-dryrun" || arg == "-n") && n < (narg - 1)) {
-        string nextarg(argv[n + 1]);
-        n++;
-        if (nextarg == "true")
-          dryrun = true;
-        else if (nextarg == "false")
-          dryrun = false;
-        else {
-          cerr << "expected true or false after " << arg << ", not \""
-               << nextarg << "\"" << endl;
+      } else if (arg == "-dryrun" || arg == "-n") {
+        if (n < (narg - 1)) {
+          string nextarg(argv[n + 1]);
+          n++;
+          if (nextarg == "true")
+            dryrun = true;
+          else if (nextarg == "false")
+            dryrun = false;
+          else {
+            cerr << "expected true or false after " << arg << ", not \""
+                 << nextarg << "\"\n";
+            return -1;
+          }
+        } else {
+          cerr << "expected true or false after " << arg
+               << ", not end of argument list.\n";
           return -1;
         }
       } else if (arg == "-removeidentinode" && n < (narg - 1)) {
