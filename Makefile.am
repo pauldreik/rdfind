@@ -13,6 +13,7 @@ TESTS=testcases/largefilesupport.sh \
       testcases/symlinking_action.sh \
       testcases/verify_filesize_option.sh \
       testcases/verify_dryrun_option.sh \
+      testcases/verify_ranking.sh \
       testcases/checksum_options.sh \
       testcases/md5collisions.sh \
       testcases/sha1collisions.sh

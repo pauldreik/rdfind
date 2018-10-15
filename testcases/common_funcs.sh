@@ -45,8 +45,8 @@ cd /
 rm -rf "$datadir"
 }
 
-if [ ! -z $KEEPTEMPDIR ] ; then
-   trap cleanup 0
+if [ -z $KEEPTEMPDIR ] ; then
+   trap cleanup INT QUIT EXIT
 fi
 
 [ -d $datadir ]
