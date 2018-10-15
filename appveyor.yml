@@ -1,0 +1,26 @@
+version: appveyor.{build}
+
+image: Ubuntu1804
+
+init:
+- sh: sudo apt install nettle-dev autoconf-archive
+
+build_script:
+ - sh: >-
+    if ./do_quality_checks.sh ; then
+      echo all good!
+    else
+      echo failed.
+      for f in *.log; do
+        echo ===========================================
+        echo file $f:
+        cat $f
+        echo ===========================================
+      done
+      exit 1
+    fi
+
+# artifacts are not save on failure, so no point in saving them
+# for trouble shooting purposes.
+artifacts:
+- path: '**/*.log'
