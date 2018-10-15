@@ -232,7 +232,7 @@ main(int narg, char* argv[])
         else if (nextarg == "false")
           dryrun = false;
         else {
-          cerr << "expected true or false, not \"" << nextarg << "\"" << endl;
+          cerr << "expected true or false after "<<arg<<", not \"" << nextarg << "\"" << endl;
           return -1;
         }
       } else if (arg == "-removeidentinode" && n < (narg - 1)) {
