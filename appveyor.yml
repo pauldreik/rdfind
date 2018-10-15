@@ -3,7 +3,7 @@ version: appveyor.{build}
 image: Ubuntu1804
 
 init:
-- sh: sudo apt install nettle-dev autoconf-archive
+- sh: sudo apt install nettle-dev autoconf-archive clang g++ valgrind libc++abi-dev libc++-dev
 
 build_script:
  - sh: >-

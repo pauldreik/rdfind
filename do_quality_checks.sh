@@ -91,7 +91,7 @@ compile_and_test() {
 #does the compiler understand c++11? That is mandatory.
 if ! $1 -c x.cpp -std=c++11 >/dev/null 2>&1 ; then
   echo this compiler $1 does not understand c++11
-  exit 1
+  return 0
 fi
 compile_and_test_standard $1 c++11
 
@@ -113,7 +113,7 @@ echo "running with sanitizer (options $1)"
 latestclang=$(ls $(which clang++)* |grep -v libc |sort -g |tail -n1)
 if [ ! -x $latestclang ] ; then
   echo could not find latest clang $latestclang
-  exit 1
+  return 0
 fi
 
 start_from_scratch
