@@ -63,8 +63,35 @@ if $rdfind $dryrunopt a b >rdfind.out 2>&1 ; then
   dbgecho "this should have failed, but did not!"
   exit 1
 fi
-dbgecho rdfind exited with error status after bad option, good.
+dbgecho "rdfind exited with error status after \"rdfind $dryrunopt a b\", good."
 grep -iq "^expected true or false after $dryrunopt" rdfind.out
+
+#dryrun on it's own: "rdfind -dryrun"
+local_reset
+if $rdfind $dryrunopt >rdfind.out 2>&1 ; then
+  dbgecho "this should have failed, but did not!"
+  exit 1
+fi
+dbgecho "rdfind exited with error status after \"rdfind $dryrunopt\", good."
+if grep -iq "^did not understand option 1:" rdfind.out ; then
+  dbgecho "got the old non-helpful answer:"
+  tail rdfind.out
+  exit 1
+fi
+
+#dryrun with single argument: "rdfind -dryrun ."
+local_reset
+if $rdfind $dryrunopt a >rdfind.out 2>&1 ; then
+  dbgecho "this should have failed, but did not!"
+  exit 1
+fi
+dbgecho "rdfind exited with error status after \"rdfind $dryrunopt\", good."
+if grep -iq "^did not understand option 1:" rdfind.out ; then
+  dbgecho "got the old non-helpful answer:"
+  tail rdfind.out
+  exit 1
+fi
+
 
 done
 
