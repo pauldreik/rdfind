@@ -45,8 +45,7 @@ report(const std::string& path, const std::string& name, int depth)
       filelist1.push_back(tmp);
     }
   } else {
-    std::cerr << "failed to read file info on file \"" << tmp.name()
-              << std::endl;
+    std::cerr << "failed to read file info on file \"" << tmp.name() << '\n';
     return -1;
   }
   return 0;
@@ -141,7 +140,7 @@ main(int narg, char* argv[])
     // decide if this input arg is an option or a directory.
     string arg(argv[n]);
     if (arg.length() < 1) {
-      cerr << "bad argument " << n << endl;
+      cerr << "bad argument " << n << '\n';
       return -1;
     }
 
@@ -154,7 +153,7 @@ main(int narg, char* argv[])
         else if (nextarg == "false")
           makesymlinks = false;
         else {
-          cerr << "expected true or false, not \"" << nextarg << "\"" << endl;
+          cerr << "expected true or false, not \"" << nextarg << "\"\n";
           return -1;
         }
       } else if (arg == "-makehardlinks" && n < (narg - 1)) {
@@ -165,7 +164,7 @@ main(int narg, char* argv[])
         else if (nextarg == "false")
           makehardlinks = false;
         else {
-          cerr << "expected true or false, not \"" << nextarg << "\"" << endl;
+          cerr << "expected true or false, not \"" << nextarg << "\"\n";
           return -1;
         }
       } else if (arg == "-makeresultsfile" && n < (narg - 1)) {
@@ -176,7 +175,7 @@ main(int narg, char* argv[])
         else if (nextarg == "false")
           makeresultsfile = false;
         else {
-          cerr << "expected true or false, not \"" << nextarg << "\"" << endl;
+          cerr << "expected true or false, not \"" << nextarg << "\"\n";
           return -1;
         }
       } else if (arg == "-outputname" && n < (narg - 1)) {
@@ -191,7 +190,7 @@ main(int narg, char* argv[])
         } else if (nextarg == "false") {
           minimumfilesize = 0;
         } else {
-          cerr << "expected true or false, not \"" << nextarg << "\"" << endl;
+          cerr << "expected true or false, not \"" << nextarg << "\"\n";
           return -1;
         }
       } else if (arg == "-minsize" && n < (narg - 1)) {
@@ -210,7 +209,7 @@ main(int narg, char* argv[])
         else if (nextarg == "false")
           deleteduplicates = false;
         else {
-          cerr << "expected true or false, not \"" << nextarg << "\"" << endl;
+          cerr << "expected true or false, not \"" << nextarg << "\"\n";
           return -1;
         }
       } else if (arg == "-followsymlinks" && n < (narg - 1)) {
@@ -221,7 +220,7 @@ main(int narg, char* argv[])
         else if (nextarg == "false")
           followsymlinks = false;
         else {
-          cerr << "expected true or false, not \"" << nextarg << "\"" << endl;
+          cerr << "expected true or false, not \"" << nextarg << "\"\n";
           return -1;
         }
       } else if (arg == "-dryrun" || arg == "-n") {
@@ -250,7 +249,7 @@ main(int narg, char* argv[])
         else if (nextarg == "false")
           remove_identical_inode = false;
         else {
-          cerr << "expected true or false, not \"" << nextarg << "\"" << endl;
+          cerr << "expected true or false, not \"" << nextarg << "\"\n";
           return -1;
         }
       } else if (arg == "-checksum" && n < (narg - 1)) {
@@ -263,7 +262,7 @@ main(int narg, char* argv[])
         else if (nextarg == "sha256")
           usesha256 = true;
         else {
-          cerr << "expected md5/sha1/sha256, not \"" << nextarg << "\"" << endl;
+          cerr << "expected md5/sha1/sha256, not \"" << nextarg << "\"\n";
           return -1;
         }
       } else if (arg == "-sleep" && n < (narg - 1)) {
@@ -289,19 +288,17 @@ main(int narg, char* argv[])
           nsecsleep = 100000000;
         else {
           cerr << "sorry, can only understand a few sleep values for "
-                  "now."
-               << endl;
+                  "now.\n";
           return -1;
         }
       } else if (arg == "-help" || arg == "-h" || arg == "--help") {
         usage();
         return 0;
       } else if (arg == "-version" || arg == "--version" || arg == "-v") {
-        cout << "This is rdfind version " << VERSION << endl;
+        cout << "This is rdfind version " << VERSION << '\n';
         return 0;
       } else {
-        cerr << "did not understand option " << n << ":\"" << arg << "\""
-             << endl;
+        cerr << "did not understand option " << n << ":\"" << arg << "\"\n";
         return -1;
       }
     } else { // must be input directory
@@ -478,7 +475,8 @@ main(int narg, char* argv[])
   gswd.markduplicates(&Fileinfo::equalsize, &Fileinfo::equalbytes);
 
   cout << dryruntext << "It seems like you have " << filelist1.size()
-       << " files that are not unique" << endl;
+       << " files that are not unique\n"
+       << endl;
 
   cout << dryruntext << "Totally, ";
   gswd.saveablespace(cout) << " can be reduced." << endl;
