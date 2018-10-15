@@ -34,9 +34,13 @@ while [ $# -gt 0 ] ; do
 done
 }
 local_reset() {
-unmount_disordered
-reset_teststate
-mount_disordered
+if which disorderfs >/dev/null ; then
+  unmount_disordered
+  reset_teststate
+  mount_disordered
+else
+  reset_teststate
+fi
 cr8 $@
 }
 
