@@ -12,7 +12,9 @@ TESTS=testcases/largefilesupport.sh \
       testcases/md5collisions.sh \
       testcases/hardlink_fails.sh \
       testcases/symlinking_action.sh \
-      testcases/verify_filesize_option.sh
+      testcases/verify_filesize_option.sh \
+      testcases/sha1collisions.sh
+
 
 #valgrind support. unfortunately it makes checking much slower
 #even if valgrind is not used, so leave it inactive.

@@ -58,30 +58,39 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
       f1.seekg(-SomeByteSize, std::ios_base::end);
       f1.read(m_somebytes.data(), SomeByteSize);
       break;
-    case CREATE_MD5_CHECKSUM:    // note: fall through is on purpose
-    case CREATE_SHA1_CHECKSUM: { // checksum calculation
-      checksumtype =
-        (filltype == CREATE_MD5_CHECKSUM ? Checksum::MD5 : Checksum::SHA1);
-      Checksum chk;
-      if (chk.init(checksumtype))
-        std::cerr << "error in checksum init" << std::endl;
-      char buffer[4096];
-      while (f1) {
-        f1.read(buffer, sizeof(buffer));
-        chk.update(f1.gcount(), buffer);
-      }
-
-      // store the result of the checksum calculation in somebytes
-      int digestlength = chk.getDigestLength();
-      if (digestlength <= 0 ||
-          digestlength >= static_cast<int>(m_somebytes.size()))
-        std::cerr << "wrong answer from getDigestLength! FIXME" << std::endl;
-      if (chk.printToBuffer(m_somebytes.data(), m_somebytes.size()))
-        std::cerr << "failed writing digest to buffer!!" << std::endl;
-    } break;
+    case CREATE_MD5_CHECKSUM:
+      checksumtype = Checksum::MD5;
+      break;
+    case CREATE_SHA1_CHECKSUM:
+      checksumtype = Checksum::SHA1;
+      break;
+    case CREATE_SHA256_CHECKSUM:
+      checksumtype = Checksum::SHA256;
+      break;
     default:
       std::cerr << "does not know how to do that filltype:" << filltype
                 << std::endl;
+  }
+
+  if (checksumtype != Checksum::NOTSET) {
+    Checksum chk;
+    if (chk.init(checksumtype))
+      std::cerr << "error in checksum init" << std::endl;
+    char buffer[4096];
+    while (f1) {
+      f1.read(buffer, sizeof(buffer));
+      chk.update(f1.gcount(), buffer);
+    }
+
+    // store the result of the checksum calculation in somebytes
+    int digestlength = chk.getDigestLength();
+    if (digestlength <= 0 ||
+        digestlength >= static_cast<int>(m_somebytes.size())) {
+      std::cerr << "wrong answer from getDigestLength! FIXME" << std::endl;
+    }
+    if (chk.printToBuffer(m_somebytes.data(), m_somebytes.size())) {
+      std::cerr << "failed writing digest to buffer!!" << std::endl;
+    }
   }
 
   f1.close();

@@ -24,6 +24,7 @@ public:
     NOTSET = 0,
     MD5,
     SHA1,
+    SHA256,
   };
 
   // init the object
@@ -51,6 +52,7 @@ private:
   union ChecksumStruct
   {
     sha1_ctx sha1;
+    sha256_ctx sha256;
     md5_ctx md5;
   } m_state;
 };

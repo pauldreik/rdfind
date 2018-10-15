@@ -63,6 +63,7 @@ public:
     READ_LAST_BYTES = 1,
     CREATE_MD5_CHECKSUM = 2,
     CREATE_SHA1_CHECKSUM,
+    CREATE_SHA256_CHECKSUM,
   };
 
   // to store info about the file

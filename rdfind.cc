@@ -76,7 +76,8 @@ usage()
     << " -followsymlinks    true |(false) follow symlinks\n"
     << " -removeidentinode (true)| false  ignore files with nonunique "
        "device and inode\n"
-    << " -checksum          (md5)| sha1   checksum type\n"
+    << " -checksum          (md5)| sha1 | sha256\n"
+    << "                                  checksum type\n"
     << " -makesymlinks      true |(false) replace duplicate files with "
        "symbolic links\n"
     << " -makehardlinks     true |(false) replace duplicate files with "
@@ -125,8 +126,9 @@ main(int narg, char* argv[])
   bool followsymlinks = false;        // follow symlinks
   bool dryrun = false;                // only dryrun, dont destroy anything
   bool remove_identical_inode = true; // remove files with identical inodes
-  bool usemd5 = false;  // use md5 checksum to check for similarity
-  bool usesha1 = false; // use sha1 checksum to check for similarity
+  bool usemd5 = false;    // use md5 checksum to check for similarity
+  bool usesha1 = false;   // use sha1 checksum to check for similarity
+  bool usesha256 = false; // use sha256 checksum to check for similarity
   long nsecsleep = 0; // number of nanoseconds to sleep between each file read.
 
   string resultsfile = "results.txt"; // results file name.
@@ -251,8 +253,10 @@ main(int narg, char* argv[])
           usemd5 = true;
         else if (nextarg == "sha1")
           usesha1 = true;
+        else if (nextarg == "sha256")
+          usesha256 = true;
         else {
-          cerr << "expected md5 or sha1, not \"" << nextarg << "\"" << endl;
+          cerr << "expected md5/sha1/sha256, not \"" << nextarg << "\"" << endl;
           return -1;
         }
       } else if (arg == "-sleep" && n < (narg - 1)) {
@@ -303,7 +307,7 @@ main(int narg, char* argv[])
   }
 
   // decide what checksum to use - if no checksum is set, force md5!
-  if (!usemd5 && !usesha1) {
+  if (!usemd5 && !usesha1 && !usesha256) {
     usemd5 = true;
   }
 
@@ -389,13 +393,15 @@ main(int narg, char* argv[])
   cout << filelist1.size() << " files left." << endl;
 
   // ok. we now need to do something stronger. read a few bytes.
-  const int nreadtobuffermodes = 4;
+  const int nreadtobuffermodes = 5;
   Fileinfo::readtobuffermode lasttype = Fileinfo::NOT_DEFINED;
   Fileinfo::readtobuffermode type[nreadtobuffermodes];
   type[0] = Fileinfo::READ_FIRST_BYTES;
   type[1] = Fileinfo::READ_LAST_BYTES;
   type[2] = (usemd5 ? Fileinfo::CREATE_MD5_CHECKSUM : Fileinfo::NOT_DEFINED);
   type[3] = (usesha1 ? Fileinfo::CREATE_SHA1_CHECKSUM : Fileinfo::NOT_DEFINED);
+  type[4] =
+    (usesha256 ? Fileinfo::CREATE_SHA256_CHECKSUM : Fileinfo::NOT_DEFINED);
 
   for (int i = 0; i < nreadtobuffermodes; i++) {
     if (type[i] != Fileinfo::NOT_DEFINED) {
@@ -413,6 +419,9 @@ main(int narg, char* argv[])
           break;
         case Fileinfo::CREATE_SHA1_CHECKSUM:
           description = "sha1 checksum";
+          break;
+        case Fileinfo::CREATE_SHA256_CHECKSUM:
+          description = "sha256 checksum";
           break;
         default:
           description = "--program error!!!---";
