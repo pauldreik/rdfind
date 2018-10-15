@@ -9,10 +9,11 @@ rdfind_SOURCES = rdfind.cc Checksum.cc  Dirlist.cc  Fileinfo.cc  Rdutil.cc \
 #these are the test scripts to execute - I do not know how to glob here,
 #feedback welcome.
 TESTS=testcases/largefilesupport.sh \
-      testcases/md5collisions.sh \
       testcases/hardlink_fails.sh \
       testcases/symlinking_action.sh \
       testcases/verify_filesize_option.sh \
+      testcases/checksum_options.sh \
+      testcases/md5collisions.sh \
       testcases/sha1collisions.sh
 
 
