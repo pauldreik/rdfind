@@ -64,7 +64,11 @@ if $rdfind $dryrunopt a b >rdfind.out 2>&1 ; then
   exit 1
 fi
 dbgecho "rdfind exited with error status after \"rdfind $dryrunopt a b\", good."
-grep -iq "^expected true or false after $dryrunopt" rdfind.out
+if ! grep -iq "^expected true or false after $dryrunopt" rdfind.out ; then
+ dbgecho "got unexpected response after \"rdfind $dryrunopt a b\":"
+ tail rdfind.out
+ exit 1
+fi
 
 #dryrun on it's own: "rdfind -dryrun"
 local_reset
