@@ -12,12 +12,12 @@
 // an object that can compare objects T based on multiple attributes
 // second template parameter is the maximum number of attributes, which can
 // be set to a high value for convenience.
-template<class T, int nfcnsmax>
+template<class T, std::size_t nfcnsmax>
 class MultiAttributeCompare
 {
 
 public:
-  static const int m_nfcnsmax = nfcnsmax; // number of compare functions
+  static const std::size_t m_nfcnsmax = nfcnsmax; // number of compare functions
   // compare function type
   typedef bool (*comparefcntype)(const T&, const T&);
 
@@ -25,7 +25,7 @@ public:
   MultiAttributeCompare()
   {
     // initialize all functions to NULL
-    for (int i = 0; i < m_nfcnsmax; i++) {
+    for (std::size_t i = 0; i < m_nfcnsmax; i++) {
       m_lessthan[i] = NULL;
       m_equal[i] = NULL;
     }
@@ -51,7 +51,7 @@ private:
 
 private:
   // number of attributes to compare on
-  int m_nfcns;
+  std::size_t m_nfcns;
 
 public:
   // to add an attribute to compare on
@@ -103,7 +103,7 @@ public:
 
 private:
   // works like operator <
-  bool compare_recurse(const T& A, const T& B, const int level) const
+  bool compare_recurse(const T& A, const T& B, const std::size_t level) const
   {
     using std::cerr;
     using std::endl;
@@ -125,7 +125,7 @@ private:
   }
 
   // works like operator ==
-  bool equal_recurse(const T& A, const T& B, const int level) const
+  bool equal_recurse(const T& A, const T& B, const std::size_t level) const
   {
     if (level >= m_nfcns) {
       return true; // all attribs must have been equal to reach this.
