@@ -21,18 +21,19 @@ class Fileinfo
 {
 public:
   // constructor
-  Fileinfo(std::string name, int cmdline_index)
+  Fileinfo(std::string name, int cmdline_index, int depth)
     : m_filename(std::move(name))
     , m_delete(false)
     , m_duptype(DUPTYPE_UNKNOWN)
     , m_cmdline_index(cmdline_index)
+    , m_depth(depth)
     , m_identity(0)
-    , m_depth(0)
   {
     m_somebytes.fill('\0');
   }
+
   // to store info about the file
-  typedef off_t filesizetype; // defined in sys/types.h
+  using filesizetype = off_t; // defined in sys/types.h
   struct Fileinfostat
   {
     filesizetype stat_size; // size
@@ -74,14 +75,6 @@ private:
 
   struct Fileinfostat m_info;
 
-  // some bytes of the file, good for comparison.
-  enum ByteSize
-  {
-    SomeByteSize = 64
-  };
-  std::array<char, SomeByteSize> m_somebytes;
-
-  // This is a number that ranks this particular file on how important it is.
   // If two files are found to be identical, the one with highest ranking is
   // chosen. The rules are listed in the man page.
   // lowest cmdlineindex wins, followed by the lowest depth, then first found.
@@ -95,14 +88,21 @@ private:
   int m_cmdline_index;
 
   /**
+   * the directory depth at which this file was found.
+   */
+  int m_depth;
+
+  /**
    * a number to identify this individual file. used for ranking.
    */
   std::int64_t m_identity;
 
-  /**
-   * the directory depth at which this file was found.
-   */
-  int m_depth;
+  enum ByteSize
+  {
+    SomeByteSize = 64
+  };
+  /// a buffer that will be filled with some bytes of the file or a hash
+  std::array<char, SomeByteSize> m_somebytes;
 
 public:
   std::int64_t getidentity() const { return m_identity; }
@@ -185,9 +185,6 @@ public:
 
   // gets the depth
   int depth() const { return m_depth; }
-
-  // sets the depth
-  void setdepth(int depth) { m_depth = depth; }
 
   // returns true if a is smaller than b.
   static bool compareonsize(const Fileinfo& a, const Fileinfo& b)

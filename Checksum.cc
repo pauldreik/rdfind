@@ -12,10 +12,10 @@
 
 // this is a small function to print the checksum to stdout
 static void
-display_hex(unsigned length, const void* data_)
+display_hex(std::size_t length, const void* data_)
 {
   const char* data = static_cast<const char*>(data_);
-  for (unsigned i = 0; i < length; i++)
+  for (std::size_t i = 0; i < length; i++)
     std::printf("%02x", data[i]);
   std::printf("\n");
 }

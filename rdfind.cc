@@ -40,8 +40,7 @@ report(const std::string& path, const std::string& name, int depth)
   // expand the name if the path is nonempty
   std::string expandedname = path.empty() ? name : (path + "/" + name);
 
-  Fileinfo tmp(std::move(expandedname), current_cmdline_index);
-  tmp.setdepth(depth);
+  Fileinfo tmp(std::move(expandedname), current_cmdline_index, depth);
   if (tmp.readfileinfo()) {
     if (tmp.isRegularFile()) {
       filelist1.push_back(tmp);
