@@ -16,9 +16,6 @@
 #include "Checksum.hh" //checksum calculation
 #include "UndoableUnlink.hh"
 
-using std::cerr;
-using std::endl;
-
 int
 Fileinfo::fillwithbytes(enum readtobuffermode filltype,
                         enum readtobuffermode lasttype)
@@ -129,8 +126,6 @@ Fileinfo::readfileinfo()
   m_info.is_directory = S_ISDIR(info.st_mode) ? true : false;
   return true;
 }
-
-
 
 std::string
 Fileinfo::getduptypestring(const Fileinfo& A)
@@ -274,7 +269,8 @@ Fileinfo::makesymlink(const Fileinfo& A)
     });
 
   if (retval) {
-    cerr << "failed to make symlink " << name() << " to " << A.name() << endl;
+    std::cerr << "failed to make symlink " << name() << " to " << A.name()
+              << '\n';
   }
   return retval;
 }
@@ -287,8 +283,8 @@ Fileinfo::makehardlink(const Fileinfo& A)
     // make a hardlink.
     const int retval = link(A.name().c_str(), filename.c_str());
     if (retval) {
-      cerr << "failed to make hardlink " << filename << " to " << A.name()
-           << endl;
+      std::cerr << "failed to make hardlink " << filename << " to " << A.name()
+                << '\n';
     }
     return retval;
   });

@@ -9,18 +9,12 @@
 #include "MultiAttributeCompare.hh" //for sorting on multiple attributes
 #include "Rdutil.hh"
 #include "algos.hh" //to find duplicates in a vector
-#include <cassert>
 #include <algorithm>
+#include <cassert>
 #include <fstream> //for file writing
 #include <ostream> //for output
 #include <string>  //for easier passing of string arguments
 #include <time.h>  //to be able to call nanosleep properly.
-
-// its ok to use these declarations, since this is a cc file.
-using std::cerr;
-using std::cout;
-using std::endl;
-using std::string;
 
 int
 Rdutil::printtofile(const std::string& filename) const
@@ -29,7 +23,7 @@ Rdutil::printtofile(const std::string& filename) const
   std::ofstream f1;
   f1.open(filename.c_str(), std::ios_base::out);
   if (!f1.is_open()) {
-    cerr << "could not open file \"" << filename << "\"" << endl;
+    std::cerr << "could not open file \"" << filename << "\"\n";
     return -1;
   }
 
@@ -38,17 +32,17 @@ Rdutil::printtofile(const std::string& filename) const
 
   // This uses "priority" instead of "cmdlineindex". Change this the day
   // a change in output format is allowed (for backwards compatibility).
-  output << "# Automatically generated" << endl;
-  output << "# duptype id depth size device inode priority name" << endl;
+  output << "# Automatically generated\n";
+  output << "# duptype id depth size device inode priority name\n";
 
   std::vector<Fileinfo>::iterator it;
   for (it = m_list.begin(); it != m_list.end(); ++it) {
     output << Fileinfo::getduptypestring(*it) << " " << it->getidentity() << " "
            << it->depth() << " " << it->size() << " " << it->device() << " "
            << it->inode() << " " << it->get_cmdline_index() << " " << it->name()
-           << endl;
+           << '\n';
   }
-  output << "# end of file" << endl;
+  output << "# end of file\n";
   f1.close();
   return 0;
 }
@@ -71,19 +65,21 @@ applyactiononfile(std::vector<Fileinfo>& m_list, Function f)
     if (it->getduptype() == Fileinfo::DUPTYPE_FIRST_OCCURRENCE) {
       src = it;
 
-      if (src->getidentity() <= 0)
-        cerr << "hmm. this file should have positive identity." << endl;
+      if (src->getidentity() <= 0) {
+        std::cerr << "hmm. this file should have positive identity.\n";
+      }
     } else if (it->getduptype() == Fileinfo::DUPTYPE_OUTSIDE_TREE ||
                it->getduptype() == Fileinfo::DUPTYPE_WITHIN_SAME_TREE) {
       // double check that "it" shall be ~linked to "src"
       if (it->getidentity() == -src->getidentity()) {
         // everything is in order. we may now ~link it to src.
-        if (f(*it, *src))
-          cerr << "Rdutil.cc: Failed to apply function f on it." << endl;
-        else
+        if (f(*it, *src)) {
+          std::cerr << "Rdutil.cc: Failed to apply function f on it.\n";
+        } else {
           ntimesapplied++;
+        }
       } else
-        cerr << "hmm. is list badly sorted?" << endl;
+        std::cerr << "hmm. is list badly sorted?\n";
     }
   }
 
@@ -96,9 +92,9 @@ class dryrun_helper
 {
 public:
   dryrun_helper(Outputobject& out,
-                string m1,
-                string m2,
-                string m3,
+                std::string m1,
+                std::string m2,
+                std::string m3,
                 int retval = 0)
     : m_m1(m1)
     , m_m2(m2)
@@ -108,7 +104,7 @@ public:
     , m_outputAname(true)
     , m_outputBname(true){};
 
-  string m_m1, m_m2, m_m3;
+  std::string m_m1, m_m2, m_m3;
   int m_retval;
   Outputobject& m_out;
   bool m_outputAname;
@@ -119,7 +115,7 @@ public:
 
   bool operator()(const Fileinfo& A, const Fileinfo& B)
   {
-    string retstring = m_m1;
+    std::string retstring = m_m1;
     if (m_outputAname)
       retstring += A.name();
 
@@ -130,7 +126,7 @@ public:
 
     retstring += m_m3;
 
-    m_out << retstring << endl;
+    m_out << retstring << '\n';
 
     return m_retval;
   }
@@ -140,29 +136,37 @@ int
 Rdutil::deleteduplicates(bool dryrun) const
 {
   if (dryrun) {
-    dryrun_helper<std::ostream> obj(cout, "delete ", "", "");
+    dryrun_helper<std::ostream> obj(std::cout, "delete ", "", "");
     obj.disableBname();
-    return applyactiononfile(m_list, obj);
-  } else
+    auto ret = applyactiononfile(m_list, obj);
+    std::cout.flush();
+    return ret;
+  } else {
     return applyactiononfile(m_list, &Fileinfo::static_deletefile);
+  }
 }
 
 int
 Rdutil::makesymlinks(bool dryrun) const
 {
   if (dryrun) {
-    dryrun_helper<std::ostream> obj(cout, "symlink ", " to ", "");
-    return applyactiononfile(m_list, obj);
-  } else
+    dryrun_helper<std::ostream> obj(std::cout, "symlink ", " to ", "");
+    auto ret = applyactiononfile(m_list, obj);
+    std::cout.flush();
+    return ret;
+  } else {
     return applyactiononfile(m_list, &Fileinfo::static_makesymlink);
+  }
 }
 
 int
 Rdutil::makehardlinks(bool dryrun) const
 {
   if (dryrun) {
-    dryrun_helper<std::ostream> obj(cout, "hardlink ", " to ", "");
-    return applyactiononfile(m_list, obj);
+    dryrun_helper<std::ostream> obj(std::cout, "hardlink ", " to ", "");
+    const auto ret = applyactiononfile(m_list, obj);
+    std::cout.flush();
+    return ret;
   } else
     return applyactiononfile(m_list, &Fileinfo::static_makehardlink);
 }
@@ -296,7 +300,7 @@ byteprefix(int range)
     case 5:
       return "PiB"; // Pebibyte
     case 6:
-      return "EiB"; // exbibyte
+      return "EiB"; // Exbibyte
     default:
       return "!way too much!";
   }
@@ -305,14 +309,8 @@ byteprefix(int range)
 std::ostream&
 Rdutil::totalsize(std::ostream& out, int opmode) const
 {
-  unsigned long long int size;
-  size = totalsizeinbytes(opmode);
-  //  out<<"original size is "<<size<<endl;
-  int range = littlehelper::calcrange(size);
-  //    out<<"then size is "<<size<<endl;
-
-  // print size
-  //  out<<" range is "<<range<<" and size is "<<size<<endl;
+  auto size = totalsizeinbytes(opmode);
+  const int range = littlehelper::calcrange(size);
   out << size << " " << littlehelper::byteprefix(range);
   return out;
 }

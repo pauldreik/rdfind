@@ -96,17 +96,16 @@ splitfilename(std::string& path,
               std::string& filename,
               const std::string& inputstring)
 {
-  using std::string;
 
-  string::size_type pos = inputstring.rfind('/');
-  if (pos == string::npos) {
+  const auto pos = inputstring.rfind('/');
+  if (pos == std::string::npos) {
     path = "";
     filename = inputstring;
     return -1;
   }
 
   path = inputstring.substr(0, pos + 1);
-  filename = inputstring.substr(pos + 1, string::npos);
+  filename = inputstring.substr(pos + 1, std::string::npos);
   return 0;
 }
 
@@ -115,7 +114,6 @@ splitfilename(std::string& path,
 int
 Dirlist::handlepossiblefile(const std::string& possiblefile, int recursionlevel)
 {
-  using namespace std;
   struct stat info;
 
   RDDEBUG("Now in handlepossiblefile with name "
@@ -123,7 +121,7 @@ Dirlist::handlepossiblefile(const std::string& possiblefile, int recursionlevel)
           << std::endl);
 
   // split filename into path and filename
-  string path, filename;
+  std::string path, filename;
   splitfilename(path, filename, possiblefile);
 
   RDDEBUG("split filename is path=" << path.c_str() << " filename="
@@ -158,17 +156,16 @@ Dirlist::handlepossiblefile(const std::string& possiblefile, int recursionlevel)
   }
 
   if (S_ISDIR(info.st_mode)) {
-    cerr << "Dirlist.cc::handlepossiblefile: This should never happen. "
-            "FIXME! details on the next row:"
-         << endl;
-    cerr << "possiblefile=\"" << possiblefile << "\"" << endl;
+    std::cerr << "Dirlist.cc::handlepossiblefile: This should never happen. "
+                 "FIXME! details on the next row:\n";
+    std::cerr << "possiblefile=\"" << possiblefile << "\"\n";
     // this should never happen, because this function is only to be called
     // for items that can not be opened with opendir.
     // maybe it happens if someone else is changing the file while we
     // are reading it?
     return -2;
   } else {
-    RDDEBUG("not a dir" << std::endl);
+    RDDEBUG("not a dir\n");
   }
 
   if (S_ISREG(info.st_mode)) {
@@ -179,8 +176,9 @@ Dirlist::handlepossiblefile(const std::string& possiblefile, int recursionlevel)
   } else {
     RDDEBUG("not a regular file" << std::endl);
   }
-  cout << "Dirlist.cc::handlepossiblefile: found something else than a dir or "
-          "a regular file."
-       << endl;
+  std::cout
+    << "Dirlist.cc::handlepossiblefile: found something else than a dir or "
+       "a regular file."
+    << std::endl;
   return -1;
 }

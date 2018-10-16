@@ -106,12 +106,6 @@ usage()
 int
 main(int narg, const char* argv[])
 {
-  using std::cerr;
-  using std::cout;
-  using std::endl;
-  using std::string;
-  using std::vector;
-
   if (narg == 1) {
     usage();
     return 0;
@@ -132,7 +126,7 @@ main(int narg, const char* argv[])
   bool usesha256 = false; // use sha256 checksum to check for similarity
   long nsecsleep = 0; // number of nanoseconds to sleep between each file read.
 
-  string resultsfile = "results.txt"; // results file name.
+  std::string resultsfile = "results.txt"; // results file name.
 
   // parse the input arguments
   Parser parser(narg, argv);
@@ -141,7 +135,7 @@ main(int narg, const char* argv[])
     // empty strings are forbidden as input since they can not be file names or
     // options
     if (parser.get_current_arg()[0] == '\0') {
-      cerr << "bad argument " << parser.get_current_index() << '\n';
+      std::cerr << "bad argument " << parser.get_current_index() << '\n';
       return -1;
     }
 
@@ -189,8 +183,8 @@ main(int narg, const char* argv[])
       } else if (parser.parsed_string_is("sha256")) {
         usesha256 = true;
       } else {
-        cerr << "expected md5/sha1/sha256, not \"" << parser.get_parsed_string()
-             << "\"\n";
+        std::cerr << "expected md5/sha1/sha256, not \""
+                  << parser.get_parsed_string() << "\"\n";
         return -1;
       }
     } else if (parser.try_parse_string("-sleep")) {
@@ -214,9 +208,9 @@ main(int narg, const char* argv[])
       else if (nextarg == "100ms")
         nsecsleep = 100000000;
       else {
-        cerr << "sorry, can only understand a few sleep values for "
-                "now. \""
-             << nextarg << "\" is not among them.\n";
+        std::cerr << "sorry, can only understand a few sleep values for "
+                     "now. \""
+                  << nextarg << "\" is not among them.\n";
         return -1;
       }
     } else if (parser.current_arg_is("-help") || parser.current_arg_is("-h") ||
@@ -226,11 +220,11 @@ main(int narg, const char* argv[])
     } else if (parser.current_arg_is("-version") ||
                parser.current_arg_is("--version") ||
                parser.current_arg_is("-v")) {
-      cout << "This is rdfind version " << VERSION << '\n';
+      std::cout << "This is rdfind version " << VERSION << '\n';
       std::exit(EXIT_SUCCESS);
     } else {
-      cerr << "did not understand option " << parser.get_current_index()
-           << ":\"" << parser.get_current_arg() << "\"\n";
+      std::cerr << "did not understand option " << parser.get_current_index()
+                << ":\"" << parser.get_current_arg() << "\"\n";
       return -1;
     }
   }
@@ -274,15 +268,16 @@ main(int narg, const char* argv[])
     }();
 
     auto lastsize = filelist1.size();
-    cout << dryruntext << "Now scanning \"" << file_or_dir << "\"";
-    cout.flush();
+    std::cout << dryruntext << "Now scanning \"" << file_or_dir << "\"";
+    std::cout.flush();
     current_cmdline_index = parser.get_current_index();
     dirlist.walk(file_or_dir, 0);
-    cout << ", found " << filelist1.size() - lastsize << " files." << endl;
+    std::cout << ", found " << filelist1.size() - lastsize << " files."
+              << std::endl;
   }
 
-  cout << dryruntext << "Now have " << filelist1.size() << " files in total."
-       << endl;
+  std::cout << dryruntext << "Now have " << filelist1.size()
+            << " files in total." << std::endl;
 
   // mark files with a number for correct ranking
   gswd.markitems();
@@ -303,23 +298,23 @@ main(int narg, const char* argv[])
     gswd.marknonuniq(&Fileinfo::equalinode, &Fileinfo::equaldevice);
 
     // remove non-duplicates
-    cout << dryruntext << "Removed " << gswd.cleanup()
-         << " files due to nonunique device and inode." << endl;
+    std::cout << dryruntext << "Removed " << gswd.cleanup()
+              << " files due to nonunique device and inode." << std::endl;
   }
 
   if (minimumfilesize > 0) {
-    cout << dryruntext << "Now removing files with size<" << minimumfilesize
-         << " from the list...";
-    cout.flush();
-    cout << "removed " << gswd.remove_small_files(minimumfilesize) << " files"
-         << endl;
+    std::cout << dryruntext << "Now removing files with size<"
+              << minimumfilesize << " from the list...";
+    std::cout.flush();
+    std::cout << "removed " << gswd.remove_small_files(minimumfilesize)
+              << " files" << std::endl;
   }
 
-  cout << dryruntext << "Total size is " << gswd.totalsizeinbytes()
-       << " bytes or ";
-  gswd.totalsize(cout) << endl;
+  std::cout << dryruntext << "Total size is " << gswd.totalsizeinbytes()
+            << " bytes or ";
+  gswd.totalsize(std::cout) << std::endl;
 
-  cout << dryruntext << "Now sorting on size:";
+  std::cout << dryruntext << "Now sorting on size:";
 
   std::sort(filelist1.begin(), filelist1.end(), Fileinfo::compareonsize);
 
@@ -327,9 +322,9 @@ main(int narg, const char* argv[])
   gswd.markuniq(&Fileinfo::equalsize);
 
   // remove non-duplicates
-  cout << "removed " << gswd.cleanup()
-       << " files due to unique sizes from list.";
-  cout << filelist1.size() << " files left." << endl;
+  std::cout << "removed " << gswd.cleanup()
+            << " files due to unique sizes from list.";
+  std::cout << filelist1.size() << " files left." << std::endl;
 
   // ok. we now need to do something stronger. read a few bytes.
   const int nreadtobuffermodes = 5;
@@ -346,7 +341,7 @@ main(int narg, const char* argv[])
 
   for (int i = 0; i < nreadtobuffermodes; i++) {
     if (type[i] != Fileinfo::readtobuffermode::NOT_DEFINED) {
-      string description;
+      std::string description;
 
       switch (type[i]) {
         case Fileinfo::readtobuffermode::READ_FIRST_BYTES:
@@ -368,10 +363,10 @@ main(int narg, const char* argv[])
           description = "--program error!!!---";
           break;
       }
-      cout << dryruntext << "Now eliminating candidates based on "
-           << description << ":";
+      std::cout << dryruntext << "Now eliminating candidates based on "
+                << description << ":";
 
-      cout.flush();
+      std::cout.flush();
 
       // read bytes (destroys the sorting, for efficiency)
       gswd.fillwithbytes(type[i], lasttype, nsecsleep);
@@ -386,8 +381,8 @@ main(int narg, const char* argv[])
       gswd.markuniq(&Fileinfo::equalsize, &Fileinfo::equalbytes);
 
       // remove non-duplicates
-      cout << "removed " << gswd.cleanup() << " files from list.";
-      cout << filelist1.size() << " files left." << endl;
+      std::cout << "removed " << gswd.cleanup() << " files from list.";
+      std::cout << filelist1.size() << " files left." << std::endl;
 
       lasttype = type[i];
     }
@@ -411,40 +406,42 @@ main(int narg, const char* argv[])
   // internally on command line index)
   gswd.markduplicates(&Fileinfo::equalsize, &Fileinfo::equalbytes);
 
-  cout << dryruntext << "It seems like you have " << filelist1.size()
-       << " files that are not unique\n"
-       << endl;
+  std::cout << dryruntext << "It seems like you have " << filelist1.size()
+            << " files that are not unique\n"
+            << std::endl;
 
-  cout << dryruntext << "Totally, ";
-  gswd.saveablespace(cout) << " can be reduced." << endl;
+  std::cout << dryruntext << "Totally, ";
+  gswd.saveablespace(std::cout) << " can be reduced." << std::endl;
 
   // traverse the list and make a nice file with the results
   if (makeresultsfile) {
-    cout << dryruntext << "Now making results file " << resultsfile << endl;
+    std::cout << dryruntext << "Now making results file " << resultsfile
+              << std::endl;
     gswd.printtofile(resultsfile);
   }
 
   // traverse the list and replace with symlinks
   if (makesymlinks) {
-    cout << dryruntext << "Now making symbolic links. creating " << endl;
+    std::cout << dryruntext << "Now making symbolic links. creating "
+              << std::endl;
     int tmp = gswd.makesymlinks(dryrun);
-    cout << "Making " << tmp << " links." << endl;
+    std::cout << "Making " << tmp << " links." << std::endl;
     return 0;
   }
 
   // traverse the list and replace with hard links
   if (makehardlinks) {
-    cout << dryruntext << "Now making hard links." << endl;
+    std::cout << dryruntext << "Now making hard links." << std::endl;
     int tmp = gswd.makehardlinks(dryrun);
-    cout << "Making " << tmp << " links." << endl;
+    std::cout << "Making " << tmp << " links." << std::endl;
     return 0;
   }
 
   // traverse the list and delete files
   if (deleteduplicates) {
-    cout << dryruntext << "Now deleting duplicates:" << endl;
+    std::cout << dryruntext << "Now deleting duplicates:" << std::endl;
     int tmp = gswd.deleteduplicates(dryrun);
-    cout << "Deleted " << tmp << " files." << endl;
+    std::cout << "Deleted " << tmp << " files." << std::endl;
     return 0;
   }
   return 0;

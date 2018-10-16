@@ -9,7 +9,6 @@
 #ifndef rdutil_hh
 #define rdutil_hh
 
-
 #include "Fileinfo.hh" //file container
 #include <vector>
 
