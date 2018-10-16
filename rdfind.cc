@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 
+#include "CmdlineParser.hh"
 #include "Dirlist.hh"     //to find files
 #include "Fileinfo.hh"    //file container
 #include "RdfindDebug.hh" //debug macro
@@ -100,114 +101,6 @@ usage()
     << "rdfind is written by Paul Dreik 2006 onwards. License: GPL v2 or "
        "later (at your option).\n"
     << "version is " << VERSION << '\n';
-}
-
-namespace {
-class Parser
-{
-public:
-  Parser(int argc, const char* argv[])
-    : m_argc(argc)
-    , m_argv(argv)
-    , m_index(1)
-  {}
-
-  /**
-   * tries to parse arg.
-   * @return true if argument could be parsed. get it with get().
-   */
-  bool try_parse_bool(const char* arg)
-  {
-    if (m_index >= m_argc) {
-      // out of bounds - programming error.
-      std::cerr << "out of bounds: m_index=" << m_index << " m_argc=" << m_argc
-                << '\n';
-      std::exit(EXIT_FAILURE);
-    }
-    if (0 == std::strcmp(arg, m_argv[m_index])) {
-      // yep - match!
-      if (1 + m_index >= m_argc) {
-        // out of bounds - user gave to few arguments.
-        std::cerr << "expected true or false after " << arg
-                  << ", not end of argument list.\n";
-        std::exit(EXIT_FAILURE);
-      }
-      auto value = m_argv[++m_index];
-      if (0 == std::strcmp(value, "true")) {
-        m_last_result = true;
-        return true;
-      }
-      if (0 == std::strcmp(value, "false")) {
-        m_last_result = false;
-        return true;
-      }
-      std::cerr << "expected true or false after " << arg << ", not \"" << value
-                << "\"\n";
-      std::exit(EXIT_FAILURE);
-    } else {
-      // no match. keep searching.
-      return false;
-    }
-  }
-
-  bool try_parse_string(const char* arg)
-  {
-    if (m_index >= m_argc) {
-      // out of bounds - programming error.
-      std::cerr << "out of bounds: m_index=" << m_index << " m_argc=" << m_argc
-                << '\n';
-      std::exit(EXIT_FAILURE);
-    }
-    if (0 == std::strcmp(arg, m_argv[m_index])) {
-      // yep - match!
-      if (1 + m_index >= m_argc) {
-        // out of bounds. user supplied to few arguments.
-        std::cerr << "expected string after " << arg
-                  << ", not end of argument list.\n";
-        std::exit(EXIT_FAILURE);
-      }
-      m_last_str_result = m_argv[++m_index];
-      return true;
-    } else {
-      // no match. keep searching.
-      return false;
-    }
-  }
-  bool get_parsed_bool() const { return m_last_result; }
-  const char* get_parsed_string() const { return m_last_str_result; }
-  bool parsed_string_is(const char* value) const
-  {
-    return 0 == std::strcmp(m_last_str_result, value);
-  }
-  /**
-   * advances to the next argument
-   * @return
-   */
-  int advance() { return ++m_index; }
-  bool has_args_left() const { return m_index < m_argc; }
-  int get_current_index() const { return m_index; }
-  const char* get_current_arg() const
-  {
-    if (m_index >= m_argc) {
-      // out of bounds.
-      std::cerr << "out of bounds: m_index=" << m_index << " m_argc=" << m_argc
-                << '\n';
-      std::exit(EXIT_FAILURE);
-    }
-    return m_argv[m_index];
-  }
-  bool current_arg_is(const char* what) const
-  {
-    return 0 == std::strcmp(get_current_arg(), what);
-  }
-
-private:
-  const int m_argc{};
-  const char** m_argv{};
-  int m_index = 1;
-  bool m_last_result{};
-  const char* m_last_str_result{};
-};
 }
 
 int
