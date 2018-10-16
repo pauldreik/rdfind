@@ -24,6 +24,19 @@ public:
   // mark files with a unique number
   void markitems();
 
+  /**
+   * sorts the list on device and inode. not guaranteed to be stable.
+   * @return
+   */
+  int sortOnDeviceAndInode();
+
+  /**
+   * for each group of identical inodes, only keep the one with the highest
+   * rank.
+   * @return number of elements removed
+   */
+  std::size_t removeIdenticalInodes();
+
   // sort list on multiple attributes.
   int sortlist(bool (*lessthan1)(const Fileinfo&, const Fileinfo&),
                bool (*equal1)(const Fileinfo&, const Fileinfo&),
@@ -34,7 +47,7 @@ public:
                bool (*lessthan4)(const Fileinfo&, const Fileinfo&) = NULL,
                bool (*equal4)(const Fileinfo&, const Fileinfo&) = NULL);
 
-  // cleans up, by removing all items that have the deleteflag set to true.
+  /// removes all items from the list, that have the deleteflag set to true.
   std::size_t cleanup();
 
   // marks non unique elements for deletion. list must be sorted first.

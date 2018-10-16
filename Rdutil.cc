@@ -15,6 +15,7 @@
 #include <ostream> //for output
 #include <string>  //for easier passing of string arguments
 #include <time.h>  //to be able to call nanosleep properly.
+#include <tuple>
 
 int
 Rdutil::printtofile(const std::string& filename) const
@@ -181,7 +182,83 @@ Rdutil::markitems()
   }
 }
 
-// sort list
+namespace {
+bool
+cmpDeviceInode(const Fileinfo& a, const Fileinfo& b)
+{
+  return std::make_tuple(a.device(), a.inode()) <
+         std::make_tuple(b.device(), b.inode());
+}
+// compares rank as described in RANKING on man page.
+bool
+cmpRank(const Fileinfo& a, const Fileinfo& b)
+{
+  return std::make_tuple(a.get_cmdline_index(), a.depth(), a.getidentity()) <
+         std::make_tuple(b.get_cmdline_index(), b.depth(), b.getidentity());
+}
+
+/**
+ * goes through first to last, finds ranges of equal elements (determined by
+ * cmp) and invokes callback on each subrange.
+ * @param first
+ * @param last
+ * @param cmp
+ * @param callback invoked as callback(subrangefirst,subrangelast)
+ */
+template<class Iterator, class Cmp, class Callback>
+void
+apply_on_range(Iterator first, Iterator last, Cmp cmp, Callback callback)
+{
+  assert(std::is_sorted(first, last, cmp));
+
+  while (first != last) {
+    auto p = std::equal_range(first, last, *first, cmp);
+    // p.first will point to first. p.second will point to first+1 if no
+    // duplicate is found
+    assert(p.first == first);
+
+    // a duplicate range with respect to cmp
+    callback(p.first, p.second);
+
+    // keep searching.
+    first = p.second;
+  }
+}
+} // anon. namespace
+int
+Rdutil::sortOnDeviceAndInode()
+{
+
+  std::sort(m_list.begin(), m_list.end(), cmpDeviceInode);
+  return 0;
+}
+
+std::size_t
+Rdutil::removeIdenticalInodes()
+{
+  // mark all elements as worth to keep
+  for (auto& e : m_list) {
+    e.setdeleteflag(false);
+  }
+
+  // sort list on device and inode.
+  auto cmp = cmpDeviceInode;
+  std::sort(m_list.begin(), m_list.end(), cmp);
+
+  // loop over ranges of adjacent elements
+  using Iterator = decltype(m_list.begin());
+  apply_on_range(
+    m_list.begin(), m_list.end(), cmp, [](Iterator first, Iterator last) {
+      // let the highest-ranking element not be deleted. do this in order, to be
+      // cache friendly.
+      auto best = std::min_element(first, last, cmpRank);
+      std::for_each(first, best, [](Fileinfo& f) { f.setdeleteflag(true); });
+      best->setdeleteflag(false);
+      std::for_each(best + 1, last, [](Fileinfo& f) { f.setdeleteflag(true); });
+    });
+  return cleanup();
+}
+
 int
 Rdutil::sortlist(bool (*lessthan1)(const Fileinfo&, const Fileinfo&),
                  bool (*equal1)(const Fileinfo&, const Fileinfo&),

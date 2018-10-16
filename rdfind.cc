@@ -18,10 +18,14 @@
 #include "Rdutil.hh"      //to do some work
 #include "config.h"       //header file from autoconf
 
+#define REFACTOR 1
+
 // global variables
 
-// these vectors hold the information about all files found
+// this vector holds the information about all files found
 std::vector<Fileinfo> filelist1;
+struct Options;
+const Options* global_options{};
 
 /**
  * this contains the command line index for the path currently
@@ -29,29 +33,6 @@ std::vector<Fileinfo> filelist1;
  * are being used.
  */
 int current_cmdline_index = 0;
-
-// function to add items to the list of all files
-static int
-report(const std::string& path, const std::string& name, int depth)
-{
-
-  RDDEBUG("report(" << path.c_str() << "," << name.c_str() << "," << depth
-                    << ")" << std::endl);
-
-  // expand the name if the path is nonempty
-  std::string expandedname = path.empty() ? name : (path + "/" + name);
-
-  Fileinfo tmp(std::move(expandedname), current_cmdline_index, depth);
-  if (tmp.readfileinfo()) {
-    if (tmp.isRegularFile()) {
-      filelist1.push_back(tmp);
-    }
-  } else {
-    std::cerr << "failed to read file info on file \"" << tmp.name() << '\n';
-    return -1;
-  }
-  return 0;
-}
 
 static void
 usage()
@@ -232,6 +213,31 @@ parseOptions(Parser& parser)
   return o;
 }
 
+// function to add items to the list of all files
+static int
+report(const std::string& path, const std::string& name, int depth)
+{
+
+  RDDEBUG("report(" << path.c_str() << "," << name.c_str() << "," << depth
+                    << ")" << std::endl);
+
+  // expand the name if the path is nonempty
+  std::string expandedname = path.empty() ? name : (path + "/" + name);
+
+  Fileinfo tmp(std::move(expandedname), current_cmdline_index, depth);
+  if (tmp.readfileinfo()) {
+    if (tmp.isRegularFile()) {
+      if (tmp.size() >= global_options->minimumfilesize) {
+        filelist1.push_back(tmp);
+      }
+    }
+  } else {
+    std::cerr << "failed to read file info on file \"" << tmp.name() << '\n';
+    return -1;
+  }
+  return 0;
+}
+
 int
 main(int narg, const char* argv[])
 {
@@ -255,7 +261,9 @@ main(int narg, const char* argv[])
   Dirlist dirlist(o.followsymlinks);
 
   // this is what function is called when an object is found on
-  // the directory traversed by walk
+  // the directory traversed by walk. Make sure the pointer to the
+  // options is set as well.
+  global_options = &o;
   dirlist.setcallbackfcn(&report);
 
   // now loop over path list and add the files
@@ -284,11 +292,19 @@ main(int narg, const char* argv[])
   std::cout << dryruntext << "Now have " << filelist1.size()
             << " files in total." << std::endl;
 
-  // mark files with a number for correct ranking
+  // mark files with a number for correct ranking. The only ordering at this
+  // point is that files found on early command line index are earlier in the
+  // list.
   gswd.markitems();
 
   if (o.remove_identical_inode) {
-    // remove files with identical devices and inodes
+    // remove files with identical devices and inodes from the list
+#if REFACTOR
+    std::cout << dryruntext << "Removed " << gswd.removeIdenticalInodes()
+              << " files due to nonunique device and inode." << std::endl;
+#else
+    gswd.sortOnDeviceAndInode();
+
     gswd.sortlist(&Fileinfo::compareoninode,
                   &Fileinfo::equalinode,
                   &Fileinfo::compareondevice,
@@ -305,14 +321,7 @@ main(int narg, const char* argv[])
     // remove non-duplicates
     std::cout << dryruntext << "Removed " << gswd.cleanup()
               << " files due to nonunique device and inode." << std::endl;
-  }
-
-  if (o.minimumfilesize > 0) {
-    std::cout << dryruntext << "Now removing files with size<"
-              << o.minimumfilesize << " from the list...";
-    std::cout.flush();
-    std::cout << "removed " << gswd.remove_small_files(o.minimumfilesize)
-              << " files" << std::endl;
+#endif
   }
 
   std::cout << dryruntext << "Total size is " << gswd.totalsizeinbytes()

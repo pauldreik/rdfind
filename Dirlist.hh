@@ -30,12 +30,6 @@ private:
   // called when a regular file or a symlink is encountered
   reportfcntype m_callback;
 
-  // a function that does nothing
-  static int _do_nothing_(const std::string&, const std::string&, int)
-  {
-    return 0;
-  }
-
   // a function that is called from walk when a non-directory is encountered
   // for instance,if walk("/path/to/a/file.ext") is called instead of
   // walk("/path/to/a/")
