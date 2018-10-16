@@ -16,10 +16,8 @@ public:
   // constructor
   explicit Dirlist(bool followsymlinks)
     : m_followsymlinks(followsymlinks)
-  {
-    m_report_regular_file = &_do_nothing_;
-    m_report_symlink = &_do_nothing_;
-  }
+    , m_callback(nullptr)
+  {}
 
 private:
   // follow symlinks or not
@@ -29,11 +27,8 @@ private:
   // directories found by walk.
   typedef int (*reportfcntype)(const std::string&, const std::string&, int);
 
-  // called when a regular file is encountered
-  reportfcntype m_report_regular_file;
-
-  // called when a symbolic link is found (file or directory)
-  reportfcntype m_report_symlink;
+  // called when a regular file or a symlink is encountered
+  reportfcntype m_callback;
 
   // a function that does nothing
   static int _do_nothing_(const std::string&, const std::string&, int)
@@ -51,14 +46,7 @@ public:
   int walk(const std::string& dir, const int recursionlevel = 0);
 
   // to set the report functions
-  void setreportfcn_regular_file(reportfcntype reportfcn)
-  {
-    m_report_regular_file = reportfcn;
-  }
-  void setreportfcn_symlink(reportfcntype reportfcn)
-  {
-    m_report_symlink = reportfcn;
-  }
+  void setcallbackfcn(reportfcntype reportfcn) { m_callback = reportfcn; }
 };
 
 #endif

@@ -63,7 +63,9 @@ Dirlist::walk(const std::string& dir, const int recursionlevel)
 
     if (S_ISLNK(info.st_mode)) {
       // symlink
-      (*m_report_symlink)(dir, std::string(dp->d_name), recursionlevel);
+      if (m_followsymlinks) {
+        (*m_callback)(dir, std::string(dp->d_name), recursionlevel);
+      }
       if (m_followsymlinks) {
         dowalk = true;
       }
@@ -72,7 +74,7 @@ Dirlist::walk(const std::string& dir, const int recursionlevel)
       dowalk = true;
     } else if (S_ISREG(info.st_mode)) {
       // regular file
-      (*m_report_regular_file)(dir, std::string(dp->d_name), recursionlevel);
+      (*m_callback)(dir, std::string(dp->d_name), recursionlevel);
     }
 
     // try to open directory
@@ -142,7 +144,9 @@ Dirlist::handlepossiblefile(const std::string& possiblefile, int recursionlevel)
 
   if (S_ISLNK(info.st_mode)) {
     RDDEBUG("found symlink" << std::endl);
-    (*m_report_symlink)(path, filename, recursionlevel);
+    if (m_followsymlinks) {
+      (*m_callback)(path, filename, recursionlevel);
+    }
     return 0;
   } else {
     RDDEBUG("not a symlink" << std::endl);
@@ -164,7 +168,7 @@ Dirlist::handlepossiblefile(const std::string& possiblefile, int recursionlevel)
   if (S_ISREG(info.st_mode)) {
     //    cout<<"found regular file"<<endl;
     RDDEBUG("it is a regular file" << std::endl);
-    (*m_report_regular_file)(path, filename, recursionlevel);
+    (*m_callback)(path, filename, recursionlevel);
     return 0;
   } else {
     RDDEBUG("not a regular file" << std::endl);

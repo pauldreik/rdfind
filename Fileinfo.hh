@@ -8,6 +8,7 @@
 #define Fileinfo_hh
 
 #include <array>
+#include <string>
 
 // os specific headers
 #include <sys/types.h> //for off_t and others.

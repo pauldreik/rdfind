@@ -256,12 +256,7 @@ main(int narg, const char* argv[])
 
   // this is what function is called when an object is found on
   // the directory traversed by walk
-  dirlist.setreportfcn_regular_file(&report);
-
-  // follow symlinks or not
-  if (o.followsymlinks) {
-    dirlist.setreportfcn_symlink(&report);
-  }
+  dirlist.setcallbackfcn(&report);
 
   // now loop over path list and add the files
 
