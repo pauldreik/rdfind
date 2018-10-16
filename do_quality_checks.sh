@@ -67,9 +67,12 @@ if ! ./configure --enable-warnings CXX=$1 CXXFLAGS="-std=$2 $3" >configure.log 2
   exit 1
 fi
 #make sure it compiles
-if ! make >make.log 2>&1; then
+if ! /usr/bin/time --format=%e --output=time.log make >make.log 2>&1; then
 echo failed make
 exit 1
+fi
+if [ ! -z $MEASURE_COMPILE_TIME ] ; then
+  echo "  compile with $(basename $1) $2 took $(cat time.log) seconds"
 fi
 #check for warnings
 if grep -q "warning" make.log; then
