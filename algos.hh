@@ -7,6 +7,7 @@
 #ifndef algos_hh
 #define algos_hh
 
+#include <cassert>
 #include <vector>
 
 // finds duplicate regions, reported equal by function/functor f.
@@ -64,6 +65,7 @@ public:
   void operator()(typename std::vector<T>::iterator start,
                   typename std::vector<T>::iterator stop)
   {
+    assert(start != stop);
     typename std::vector<T>::iterator it = start;
     it->setdeleteflag(false);
     ++it;

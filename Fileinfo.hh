@@ -21,51 +21,16 @@ class Fileinfo
 {
 public:
   // constructor
-  explicit Fileinfo(const std::string& name, int priority = 0)
-    : m_magicnumber(771114)
-    , m_filename(name)
+  Fileinfo(std::string name, int cmdline_index)
+    : m_filename(std::move(name))
     , m_delete(false)
     , m_duptype(DUPTYPE_UNKNOWN)
-    , m_priority(priority)
+    , m_cmdline_index(cmdline_index)
     , m_identity(0)
     , m_depth(0)
   {
     m_somebytes.fill('\0');
   }
-
-  // for fault checking - has no meaning for other purposes than
-  // to detect mispointing references. you can ignore this one for the
-  // functionality of the class.
-  int m_magicnumber;
-
-  // to keep the name of the file, including path
-  std::string m_filename;
-
-  // to be deleted or not
-  bool m_delete;
-
-  // type of duplicate
-  enum duptype
-  {
-    DUPTYPE_UNKNOWN,
-    DUPTYPE_FIRST_OCCURRENCE,
-    DUPTYPE_WITHIN_SAME_TREE,
-    DUPTYPE_OUTSIDE_TREE
-  };
-
-  duptype m_duptype;
-
-  // enums used to tell how to read data into the buffer
-  enum readtobuffermode
-  {
-    NOT_DEFINED = -1,
-    READ_FIRST_BYTES = 0,
-    READ_LAST_BYTES = 1,
-    CREATE_MD5_CHECKSUM = 2,
-    CREATE_SHA1_CHECKSUM,
-    CREATE_SHA256_CHECKSUM,
-  };
-
   // to store info about the file
   typedef off_t filesizetype; // defined in sys/types.h
   struct Fileinfostat
@@ -77,9 +42,39 @@ public:
     bool is_directory;
     Fileinfostat();
   };
+  // enums used to tell how to read data into the buffer
+  enum class readtobuffermode
+  {
+    NOT_DEFINED = -1,
+    READ_FIRST_BYTES = 0,
+    READ_LAST_BYTES = 1,
+    CREATE_MD5_CHECKSUM = 2,
+    CREATE_SHA1_CHECKSUM,
+    CREATE_SHA256_CHECKSUM,
+  };
+
+  // type of duplicate
+  enum duptype
+  {
+    DUPTYPE_UNKNOWN,
+    DUPTYPE_FIRST_OCCURRENCE,
+    DUPTYPE_WITHIN_SAME_TREE,
+    DUPTYPE_OUTSIDE_TREE
+  };
+  void setduptype(enum duptype duptype) { m_duptype = duptype; }
+
+private:
+  // to keep the name of the file, including path
+  std::string m_filename;
+
+  // to be deleted or not
+  bool m_delete;
+
+  duptype m_duptype;
+
   struct Fileinfostat m_info;
 
-  // some bytes of the file, good for comparision.
+  // some bytes of the file, good for comparison.
   enum ByteSize
   {
     SomeByteSize = 64
@@ -87,32 +82,44 @@ public:
   std::array<char, SomeByteSize> m_somebytes;
 
   // This is a number that ranks this particular file on how important it is.
-  // If two files are found to be identical, the one with most positive
-  // priority
-  // will be kept.
-  int m_priority;
+  // If two files are found to be identical, the one with highest ranking is
+  // chosen. The rules are listed in the man page.
+  // lowest cmdlineindex wins, followed by the lowest depth, then first found.
 
-  // a number to identify this file.
+  /**
+   * in which order it appeared on the command line. can't be const, because
+   * that means the implicitly defined assignment needed by the stl will be
+   * illformed.
+   * This is fine to be an int, because that is what argc,argv use.
+   */
+  int m_cmdline_index;
+
+  /**
+   * a number to identify this individual file. used for ranking.
+   * FIXME refactor to int64
+   */
   int m_identity;
 
-  // the directory depth at which this file was found.
+  /**
+   * the directory depth at which this file was found.
+   */
   int m_depth;
 
-  int identity() const { return m_identity; }
-  static int identity(const Fileinfo& A) { return A.identity(); }
+public:
+  int getidentity() const { return m_identity; }
+  static int identity(const Fileinfo& A) { return A.getidentity(); }
   void setidentity(int id) { m_identity = id; };
 
-  // to set the priority of the file.
-  void setpriority(int pri) { m_priority = pri; }
-
-  // reads the info about the file.
-  // returns false if it was not possible to get the information.
+  /**
+   * reads info about the file, by querying the filesystem.
+   * @return false if it was not possible to get the information.
+   */
   bool readfileinfo();
 
   // prints some file info. most for debugging.
   std::ostream& printinfo(std::ostream& out) const
   {
-    out << "priority:" << m_priority;
+    out << "cmdline index:" << m_cmdline_index;
     out << " inode:" << inode();
     out << " size:" << size();
     out << " file:" << m_filename;
@@ -144,7 +151,7 @@ public:
   // sets the deleteflag
   void setdeleteflag(bool flag) { m_delete = flag; }
 
-  // to get the deletflag
+  // to get the deleteflag
   bool deleteflag() const { return m_delete; }
 
   static bool static_deleteflag(const Fileinfo& A) { return A.deleteflag(); }
@@ -174,8 +181,8 @@ public:
   // gets the filename
   const std::string& name() const { return m_filename; }
 
-  // gets the priority
-  int priority() const { return m_priority; }
+  // gets the command line index this item was found at
+  int get_cmdline_index() const { return m_cmdline_index; }
 
   // gets the depth
   int depth() const { return m_depth; }
@@ -201,16 +208,16 @@ public:
     return a.device() < b.device();
   }
 
-  // returns true if a has lower priority number than b
-  static bool compareonpriority(const Fileinfo& a, const Fileinfo& b)
+  // returns true if a has lower command line index than b
+  static bool compareoncmdlineindex(const Fileinfo& a, const Fileinfo& b)
   {
-    return a.priority() < b.priority();
+    return a.get_cmdline_index() < b.get_cmdline_index();
   }
 
   // returns true if a has lower identity number than b)
   static bool compareonidentity(const Fileinfo& a, const Fileinfo& b)
   {
-    return a.identity() < b.identity();
+    return a.getidentity() < b.getidentity();
   }
 
   // returns true if a has lower depth than b)
@@ -222,8 +229,9 @@ public:
   // fills with bytes from the file. if lasttype is supplied,
   // it is used to see if the file needs to be read again - useful if
   // file is shorter than the length of the bytes field.
-  int fillwithbytes(enum readtobuffermode filltype,
-                    enum readtobuffermode lasttype = NOT_DEFINED);
+  int fillwithbytes(
+    enum readtobuffermode filltype,
+    enum readtobuffermode lasttype = readtobuffermode::NOT_DEFINED);
 
   // display the bytes that are read from the file.
   // hmm, this looks suspicious. what about the case where it does not contain a
@@ -259,16 +267,16 @@ public:
     return a.device() == b.device();
   }
 
-  // returns true is priorities are equal
-  static bool equalpriority(const Fileinfo& a, const Fileinfo& b)
+  // returns true is command line indices are equal
+  static bool equalcmdlineindex(const Fileinfo& a, const Fileinfo& b)
   {
-    return a.priority() == b.priority();
+    return a.get_cmdline_index() == b.get_cmdline_index();
   }
 
   // returns true if identities are equal
   static bool equalidentity(const Fileinfo& a, const Fileinfo& b)
   {
-    return a.identity() == b.identity();
+    return a.getidentity() == b.getidentity();
   }
 
   // returns true if detphs are equal
@@ -278,10 +286,10 @@ public:
   }
 
   // returns true if file is a regular file. call readfileinfo first!
-  bool isRegularFile() { return m_info.is_file; }
+  bool isRegularFile() const { return m_info.is_file; }
 
   // returns true if file is a directory . call readfileinfo first!
-  bool isDirectory() { return m_info.is_directory; }
+  bool isDirectory() const { return m_info.is_directory; }
 };
 
 #endif

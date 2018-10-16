@@ -35,14 +35,17 @@ Rdutil::printtofile(const std::string& filename) const
   // exchange f1 for cout to write to terminal instead of file
   std::ostream& output(f1);
 
+  // This uses "priority" instead of "cmdlineindex". Change this the day
+  // a change in output format is allowed (for backwards compatibility).
   output << "# Automatically generated" << endl;
   output << "# duptype id depth size device inode priority name" << endl;
 
   std::vector<Fileinfo>::iterator it;
   for (it = m_list.begin(); it != m_list.end(); ++it) {
-    output << Fileinfo::getduptypestring(*it) << " " << it->identity() << " "
+    output << Fileinfo::getduptypestring(*it) << " " << it->getidentity() << " "
            << it->depth() << " " << it->size() << " " << it->device() << " "
-           << it->inode() << " " << it->priority() << " " << it->name() << endl;
+           << it->inode() << " " << it->get_cmdline_index() << " " << it->name()
+           << endl;
   }
   output << "# end of file" << endl;
   f1.close();
@@ -67,12 +70,12 @@ applyactiononfile(std::vector<Fileinfo>& m_list, Function f)
     if (it->getduptype() == Fileinfo::DUPTYPE_FIRST_OCCURRENCE) {
       src = it;
 
-      if (src->identity() <= 0)
+      if (src->getidentity() <= 0)
         cerr << "hmm. this file should have positive identity." << endl;
     } else if (it->getduptype() == Fileinfo::DUPTYPE_OUTSIDE_TREE ||
                it->getduptype() == Fileinfo::DUPTYPE_WITHIN_SAME_TREE) {
       // double check that "it" shall be ~linked to "src"
-      if (it->identity() == -src->identity()) {
+      if (it->getidentity() == -src->getidentity()) {
         // everything is in order. we may now ~link it to src.
         if (f(*it, *src))
           cerr << "Rdutil.cc: Failed to apply function f on it." << endl;
@@ -452,48 +455,28 @@ int
 Rdutil::marksingle(std::vector<Fileinfo>::iterator start,
                    std::vector<Fileinfo>::iterator stop)
 {
-  // sort on priority - keep the other ordering (stable_sort instead of sort)
-  stable_sort(start, stop, &Fileinfo::compareonpriority);
+  // sort on command line index - keep the other ordering (stable_sort instead
+  // of sort)
+  std::stable_sort(start, stop, &Fileinfo::compareoncmdlineindex);
 
   std::vector<Fileinfo>::iterator it;
-  int outputmode = 1;
-  switch (outputmode) {
-    case 0: // just informative, on the screen.
-      //    output<<"# duplicate: size, inode, priority, name"<<endl;
 
-      for (it = start; it != stop; ++it) {
+  // only considering a file belonging to a different command line index as a
+  // duplicate
 
-        // 	    <<it->inode()<<" "
-        // 	    <<it->priority()<<" "
-        // 	    <<it->name()
-        // 	    <<endl;
+  for (it = start; it != stop; ++it) {
+    if (it == start) {
+      it->setduptype(Fileinfo::DUPTYPE_FIRST_OCCURRENCE);
+    } else {
+      // point out the file that it is a copy of
+      it->setidentity(-Fileinfo::identity(*start));
+      if (it->get_cmdline_index() == start->get_cmdline_index() &&
+          it != start) {
+        it->setduptype(Fileinfo::DUPTYPE_WITHIN_SAME_TREE);
+      } else {
+        it->setduptype(Fileinfo::DUPTYPE_OUTSIDE_TREE);
       }
-      //   output<<endl;
-      break;
-    case 1:
-      // only considering a file belonging to a different priority as a
-      // duplicates
-
-      for (it = start; it != stop; ++it) {
-        if (it == start) {
-          //	output<<"#FILE:";
-          it->m_duptype = Fileinfo::DUPTYPE_FIRST_OCCURRENCE;
-        } else {
-          // point out the file that it is a copy of
-          it->setidentity(-Fileinfo::identity(*start));
-          if (it->priority() == start->priority() && it != start) {
-            // output<<"#WITHIN SAME TREE:";
-            it->m_duptype = Fileinfo::DUPTYPE_WITHIN_SAME_TREE;
-          } else {
-            // output<<"#DUPLICATE:";
-            it->m_duptype = Fileinfo::DUPTYPE_OUTSIDE_TREE;
-          }
-        }
-      }
-      //    output<<endl;
-      break;
-    default:
-      std::cerr << "does not know that one" << endl;
+    }
   }
 
   return 0;

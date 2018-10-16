@@ -81,10 +81,10 @@ public:
   // and file is read anyway.
   // if there is trouble with too much disk reading, sleeping for nsecsleep
   // nanoseconds can be made between each file.
-  int fillwithbytes(
-    enum Fileinfo::readtobuffermode type,
-    enum Fileinfo::readtobuffermode lasttype = Fileinfo::NOT_DEFINED,
-    long nsecsleep = 0);
+  int fillwithbytes(enum Fileinfo::readtobuffermode type,
+                    enum Fileinfo::readtobuffermode lasttype =
+                      Fileinfo::readtobuffermode::NOT_DEFINED,
+                    long nsecsleep = 0);
 
   // make symlinks of duplicates.
   int makesymlinks(bool dryrun) const;

@@ -22,8 +22,12 @@
 // these vectors hold the information about all files found
 std::vector<Fileinfo> filelist1;
 
-// this is the priority of the files that are currently added.
-int currentpriority = 0;
+/**
+ * this contains the command line index for the path currently
+ * being investigated. it has to be global, because function pointers
+ * are being used.
+ */
+int current_cmdline_index = 0;
 
 // function to add items to the list of all files
 static int
@@ -36,9 +40,7 @@ report(const std::string& path, const std::string& name, int depth)
   // expand the name if the path is nonempty
   std::string expandedname = path.empty() ? name : (path + "/" + name);
 
-  Fileinfo tmp(expandedname);
-
-  tmp.setpriority(currentpriority);
+  Fileinfo tmp(std::move(expandedname), current_cmdline_index);
   tmp.setdepth(depth);
   if (tmp.readfileinfo()) {
     if (tmp.isRegularFile()) {
@@ -366,7 +368,6 @@ main(int narg, const char* argv[])
   }
 
   // now loop over path list and add the files
-  currentpriority = 0;
 
   // done with arguments. start parsing files and directories!
   for (; parser.has_args_left(); parser.advance()) {
@@ -380,10 +381,10 @@ main(int narg, const char* argv[])
       return arg;
     }();
 
-    currentpriority++;
     auto lastsize = filelist1.size();
     cout << dryruntext << "Now scanning \"" << file_or_dir << "\"";
     cout.flush();
+    current_cmdline_index = parser.get_current_index();
     dirlist.walk(file_or_dir, 0);
     cout << ", found " << filelist1.size() - lastsize << " files." << endl;
   }
@@ -391,7 +392,7 @@ main(int narg, const char* argv[])
   cout << dryruntext << "Now have " << filelist1.size() << " files in total."
        << endl;
 
-  // mark files with a unique number
+  // mark files with a number for correct ranking
   gswd.markitems();
 
   if (remove_identical_inode) {
@@ -400,8 +401,8 @@ main(int narg, const char* argv[])
                   &Fileinfo::equalinode,
                   &Fileinfo::compareondevice,
                   &Fileinfo::equaldevice,
-                  &Fileinfo::compareonpriority,
-                  &Fileinfo::equalpriority,
+                  &Fileinfo::compareoncmdlineindex,
+                  &Fileinfo::equalcmdlineindex,
                   &Fileinfo::compareondepth,
                   &Fileinfo::equaldepth);
 
@@ -428,7 +429,7 @@ main(int narg, const char* argv[])
 
   cout << dryruntext << "Now sorting on size:";
 
-  sort(filelist1.begin(), filelist1.end(), Fileinfo::compareonsize);
+  std::sort(filelist1.begin(), filelist1.end(), Fileinfo::compareonsize);
 
   // mark non-duplicates
   gswd.markuniq(&Fileinfo::equalsize);
@@ -440,33 +441,35 @@ main(int narg, const char* argv[])
 
   // ok. we now need to do something stronger. read a few bytes.
   const int nreadtobuffermodes = 5;
-  Fileinfo::readtobuffermode lasttype = Fileinfo::NOT_DEFINED;
+  Fileinfo::readtobuffermode lasttype = Fileinfo::readtobuffermode::NOT_DEFINED;
   Fileinfo::readtobuffermode type[nreadtobuffermodes];
-  type[0] = Fileinfo::READ_FIRST_BYTES;
-  type[1] = Fileinfo::READ_LAST_BYTES;
-  type[2] = (usemd5 ? Fileinfo::CREATE_MD5_CHECKSUM : Fileinfo::NOT_DEFINED);
-  type[3] = (usesha1 ? Fileinfo::CREATE_SHA1_CHECKSUM : Fileinfo::NOT_DEFINED);
-  type[4] =
-    (usesha256 ? Fileinfo::CREATE_SHA256_CHECKSUM : Fileinfo::NOT_DEFINED);
+  type[0] = Fileinfo::readtobuffermode::READ_FIRST_BYTES;
+  type[1] = Fileinfo::readtobuffermode::READ_LAST_BYTES;
+  type[2] = (usemd5 ? Fileinfo::readtobuffermode::CREATE_MD5_CHECKSUM
+                    : Fileinfo::readtobuffermode::NOT_DEFINED);
+  type[3] = (usesha1 ? Fileinfo::readtobuffermode::CREATE_SHA1_CHECKSUM
+                     : Fileinfo::readtobuffermode::NOT_DEFINED);
+  type[4] = (usesha256 ? Fileinfo::readtobuffermode::CREATE_SHA256_CHECKSUM
+                       : Fileinfo::readtobuffermode::NOT_DEFINED);
 
   for (int i = 0; i < nreadtobuffermodes; i++) {
-    if (type[i] != Fileinfo::NOT_DEFINED) {
+    if (type[i] != Fileinfo::readtobuffermode::NOT_DEFINED) {
       string description;
 
       switch (type[i]) {
-        case Fileinfo::READ_FIRST_BYTES:
+        case Fileinfo::readtobuffermode::READ_FIRST_BYTES:
           description = "first bytes";
           break;
-        case Fileinfo::READ_LAST_BYTES:
+        case Fileinfo::readtobuffermode::READ_LAST_BYTES:
           description = "last bytes";
           break;
-        case Fileinfo::CREATE_MD5_CHECKSUM:
+        case Fileinfo::readtobuffermode::CREATE_MD5_CHECKSUM:
           description = "md5 checksum";
           break;
-        case Fileinfo::CREATE_SHA1_CHECKSUM:
+        case Fileinfo::readtobuffermode::CREATE_SHA1_CHECKSUM:
           description = "sha1 checksum";
           break;
-        case Fileinfo::CREATE_SHA256_CHECKSUM:
+        case Fileinfo::readtobuffermode::CREATE_SHA256_CHECKSUM:
           description = "sha256 checksum";
           break;
         default:
@@ -513,7 +516,7 @@ main(int narg, const char* argv[])
                 &Fileinfo::equalidentity);
 
   // mark duplicates with the right tag (will stable sort the list
-  // internally on priority)
+  // internally on command line index)
   gswd.markduplicates(&Fileinfo::equalsize, &Fileinfo::equalbytes);
 
   cout << dryruntext << "It seems like you have " << filelist1.size()
@@ -537,7 +540,7 @@ main(int narg, const char* argv[])
     return 0;
   }
 
-  // traverse the list and replace with symlinks
+  // traverse the list and replace with hard links
   if (makehardlinks) {
     cout << dryruntext << "Now making hard links." << endl;
     int tmp = gswd.makehardlinks(dryrun);

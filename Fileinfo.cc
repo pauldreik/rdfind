@@ -25,7 +25,7 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
 
   // Decide if we are going to read from file or not.
   // If file is short, first bytes might be ALL bytes!
-  if (lasttype != -1) {
+  if (lasttype != readtobuffermode::NOT_DEFINED) {
     if (this->size() <= static_cast<filesizetype>(m_somebytes.size())) {
       // pointless to read - all bytes in the file are in the field
       // m_somebytes, or checksum is calculated!
@@ -49,27 +49,27 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
   int checksumtype = Checksum::NOTSET;
   // read some bytes
   switch (filltype) {
-    case READ_FIRST_BYTES:
+    case readtobuffermode::READ_FIRST_BYTES:
       // read at start of file
       f1.read(m_somebytes.data(), SomeByteSize);
       break;
-    case READ_LAST_BYTES:
+    case readtobuffermode::READ_LAST_BYTES:
       // read at end of file
       f1.seekg(-SomeByteSize, std::ios_base::end);
       f1.read(m_somebytes.data(), SomeByteSize);
       break;
-    case CREATE_MD5_CHECKSUM:
+    case readtobuffermode::CREATE_MD5_CHECKSUM:
       checksumtype = Checksum::MD5;
       break;
-    case CREATE_SHA1_CHECKSUM:
+    case readtobuffermode::CREATE_SHA1_CHECKSUM:
       checksumtype = Checksum::SHA1;
       break;
-    case CREATE_SHA256_CHECKSUM:
+    case readtobuffermode::CREATE_SHA256_CHECKSUM:
       checksumtype = Checksum::SHA256;
       break;
     default:
-      std::cerr << "does not know how to do that filltype:" << filltype
-                << std::endl;
+      std::cerr << "does not know how to do that filltype:"
+                << static_cast<long>(filltype) << std::endl;
   }
 
   if (checksumtype != Checksum::NOTSET) {
