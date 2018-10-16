@@ -10,6 +10,7 @@
 #include "Rdutil.hh"
 #include "algos.hh" //to find duplicates in a vector
 #include <cassert>
+#include <algorithm>
 #include <fstream> //for file writing
 #include <ostream> //for output
 #include <string>  //for easier passing of string arguments

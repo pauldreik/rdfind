@@ -24,7 +24,7 @@ public:
 
   /**
    * tries to parse arg.
-      * @param arg
+   * @param arg
    * @return true if argument could be parsed. get it with get_parsed_bool().
    */
   bool try_parse_bool(const char* arg);

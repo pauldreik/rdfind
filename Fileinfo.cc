@@ -6,7 +6,8 @@
 #include "Fileinfo.hh"
 #include "config.h"
 
-#include <cerrno>     //for errno
+#include <cerrno> //for errno
+#include <cstring>
 #include <fstream>    //for file reading
 #include <iostream>   //for cout etc
 #include <sys/stat.h> //for file info
@@ -128,6 +129,8 @@ Fileinfo::readfileinfo()
   m_info.is_directory = S_ISDIR(info.st_mode) ? true : false;
   return true;
 }
+
+
 
 std::string
 Fileinfo::getduptypestring(const Fileinfo& A)

@@ -9,14 +9,9 @@
 #ifndef rdutil_hh
 #define rdutil_hh
 
-#include <algorithm>
-#include <fstream> //for file writing
-
-#include "MultiAttributeCompare.hh" //for sorting on multiple attributes
 
 #include "Fileinfo.hh" //file container
-
-#include "algos.hh" //to find duplicates in a vector
+#include <vector>
 
 class Rdutil
 {

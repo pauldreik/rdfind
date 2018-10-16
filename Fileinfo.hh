@@ -8,8 +8,6 @@
 #define Fileinfo_hh
 
 #include <array>
-#include <cstring>
-#include <iostream>
 
 // os specific headers
 #include <sys/types.h> //for off_t and others.
@@ -115,16 +113,6 @@ public:
    */
   bool readfileinfo();
 
-  // prints some file info. most for debugging.
-  std::ostream& printinfo(std::ostream& out) const
-  {
-    out << "cmdline index:" << m_cmdline_index;
-    out << " inode:" << inode();
-    out << " size:" << size();
-    out << " file:" << m_filename;
-    return out;
-  }
-
   int getduptype() const { return m_duptype; };
 
   static std::string getduptypestring(const Fileinfo& A);
@@ -228,14 +216,6 @@ public:
   int fillwithbytes(
     enum readtobuffermode filltype,
     enum readtobuffermode lasttype = readtobuffermode::NOT_DEFINED);
-
-  // display the bytes that are read from the file.
-  // hmm, this looks suspicious. what about the case where it does not contain a
-  // null terminator?
-  void displaybytes() const
-  {
-    std::cout << "bytes are \"" << m_somebytes.data() << "\"\n";
-  }
 
   // get a pointer to the bytes read from the file
   const char* getbyteptr() const { return m_somebytes.data(); }

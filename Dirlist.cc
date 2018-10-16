@@ -6,6 +6,7 @@
 #include "Dirlist.hh"
 #include "config.h"
 #include <cerrno>
+#include <cstring>
 #include <dirent.h>
 #include <iostream>
 #include <string>

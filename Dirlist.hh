@@ -7,7 +7,6 @@
 #ifndef Dirlist_hh
 #define Dirlist_hh
 
-#include <cstring>
 #include <string>
 
 /// class that traverses a directory

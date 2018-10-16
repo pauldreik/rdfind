@@ -6,9 +6,9 @@
  */
 
 #include "CmdlineParser.hh"
+#include <cstdlib>
 #include <cstring>
 #include <iostream>
-#include <cstdlib>
 
 bool
 Parser::try_parse_bool(const char* arg)
