@@ -103,14 +103,8 @@ usage()
     << "version is " << VERSION << '\n';
 }
 
-int
-main(int narg, const char* argv[])
+struct Options
 {
-  if (narg == 1) {
-    usage();
-    return 0;
-  }
-
   // operation mode and default values
   bool makesymlinks = false;   // turn duplicates into symbolic links
   bool makehardlinks = false;  // turn duplicates into hard links
@@ -125,18 +119,19 @@ main(int narg, const char* argv[])
   bool usesha1 = false;   // use sha1 checksum to check for similarity
   bool usesha256 = false; // use sha256 checksum to check for similarity
   long nsecsleep = 0; // number of nanoseconds to sleep between each file read.
-
   std::string resultsfile = "results.txt"; // results file name.
+};
 
-  // parse the input arguments
-  Parser parser(narg, argv);
-
+Options
+parseOptions(Parser& parser)
+{
+  Options o;
   for (; parser.has_args_left(); parser.advance()) {
     // empty strings are forbidden as input since they can not be file names or
     // options
     if (parser.get_current_arg()[0] == '\0') {
       std::cerr << "bad argument " << parser.get_current_index() << '\n';
-      return -1;
+      std::exit(EXIT_FAILURE);
     }
 
     // if we reach the end of the argument list - exit the loop and proceed with
@@ -146,72 +141,72 @@ main(int narg, const char* argv[])
       break;
     }
     if (parser.try_parse_bool("-makesymlinks")) {
-      makesymlinks = parser.get_parsed_bool();
+      o.makesymlinks = parser.get_parsed_bool();
     } else if (parser.try_parse_bool("-makehardlinks")) {
-      makehardlinks = parser.get_parsed_bool();
+      o.makehardlinks = parser.get_parsed_bool();
     } else if (parser.try_parse_bool("-makeresultsfile")) {
-      makeresultsfile = parser.get_parsed_bool();
+      o.makeresultsfile = parser.get_parsed_bool();
     } else if (parser.try_parse_string("-outputname")) {
-      resultsfile = parser.get_parsed_string();
+      o.resultsfile = parser.get_parsed_string();
     } else if (parser.try_parse_bool("-ignoreempty")) {
       if (parser.get_parsed_bool()) {
-        minimumfilesize = 1;
+        o.minimumfilesize = 1;
       } else {
-        minimumfilesize = 0;
+        o.minimumfilesize = 0;
       }
     } else if (parser.try_parse_string("-minsize")) {
       const long long minsize = std::stoll(parser.get_parsed_string());
       if (minsize < 0) {
         throw std::runtime_error("negative value of minsize not allowed");
       }
-      minimumfilesize = minsize;
+      o.minimumfilesize = minsize;
     } else if (parser.try_parse_bool("-deleteduplicates")) {
-      deleteduplicates = parser.get_parsed_bool();
+      o.deleteduplicates = parser.get_parsed_bool();
     } else if (parser.try_parse_bool("-followsymlinks")) {
-      followsymlinks = parser.get_parsed_bool();
+      o.followsymlinks = parser.get_parsed_bool();
     } else if (parser.try_parse_bool("-dryrun")) {
-      dryrun = parser.get_parsed_bool();
+      o.dryrun = parser.get_parsed_bool();
     } else if (parser.try_parse_bool("-n")) {
-      dryrun = parser.get_parsed_bool();
+      o.dryrun = parser.get_parsed_bool();
     } else if (parser.try_parse_bool("-removeidentinode")) {
-      remove_identical_inode = parser.get_parsed_bool();
+      o.remove_identical_inode = parser.get_parsed_bool();
     } else if (parser.try_parse_string("-checksum")) {
       if (parser.parsed_string_is("md5")) {
-        usemd5 = true;
+        o.usemd5 = true;
       } else if (parser.parsed_string_is("sha1")) {
-        usesha1 = true;
+        o.usesha1 = true;
       } else if (parser.parsed_string_is("sha256")) {
-        usesha256 = true;
+        o.usesha256 = true;
       } else {
         std::cerr << "expected md5/sha1/sha256, not \""
                   << parser.get_parsed_string() << "\"\n";
-        return -1;
+        std::exit(EXIT_FAILURE);
       }
     } else if (parser.try_parse_string("-sleep")) {
       const auto nextarg = std::string(parser.get_parsed_string());
       if (nextarg == "1ms")
-        nsecsleep = 1000000;
+        o.nsecsleep = 1000000;
       else if (nextarg == "2ms")
-        nsecsleep = 2000000;
+        o.nsecsleep = 2000000;
       else if (nextarg == "3ms")
-        nsecsleep = 3000000;
+        o.nsecsleep = 3000000;
       else if (nextarg == "4ms")
-        nsecsleep = 4000000;
+        o.nsecsleep = 4000000;
       else if (nextarg == "5ms")
-        nsecsleep = 5000000;
+        o.nsecsleep = 5000000;
       else if (nextarg == "10ms")
-        nsecsleep = 10000000;
+        o.nsecsleep = 10000000;
       else if (nextarg == "25ms")
-        nsecsleep = 25000000;
+        o.nsecsleep = 25000000;
       else if (nextarg == "50ms")
-        nsecsleep = 50000000;
+        o.nsecsleep = 50000000;
       else if (nextarg == "100ms")
-        nsecsleep = 100000000;
+        o.nsecsleep = 100000000;
       else {
         std::cerr << "sorry, can only understand a few sleep values for "
                      "now. \""
                   << nextarg << "\" is not among them.\n";
-        return -1;
+        std::exit(EXIT_FAILURE);
       }
     } else if (parser.current_arg_is("-help") || parser.current_arg_is("-h") ||
                parser.current_arg_is("--help")) {
@@ -225,31 +220,46 @@ main(int narg, const char* argv[])
     } else {
       std::cerr << "did not understand option " << parser.get_current_index()
                 << ":\"" << parser.get_current_arg() << "\"\n";
-      return -1;
+      std::exit(EXIT_FAILURE);
     }
   }
   // done with parsing of options. remaining arguments are files and dirs.
 
   // decide what checksum to use - if no checksum is set, force sha1!
-  if (!usemd5 && !usesha1 && !usesha256) {
-    usesha1 = true;
+  if (!o.usemd5 && !o.usesha1 && !o.usesha256) {
+    o.usesha1 = true;
+  }
+  return o;
+}
+
+int
+main(int narg, const char* argv[])
+{
+  if (narg == 1) {
+    usage();
+    return 0;
   }
 
+  // parse the input arguments
+  Parser parser(narg, argv);
+
+  const Options o = parseOptions(parser);
+
   // set the dryrun string
-  const std::string dryruntext(dryrun ? "(DRYRUN MODE) " : "");
+  const std::string dryruntext(o.dryrun ? "(DRYRUN MODE) " : "");
 
   // an object to do sorting and duplicate finding
   Rdutil gswd(filelist1);
 
   // an object to traverse the directory structure
-  Dirlist dirlist(followsymlinks);
+  Dirlist dirlist(o.followsymlinks);
 
   // this is what function is called when an object is found on
   // the directory traversed by walk
   dirlist.setreportfcn_regular_file(&report);
 
   // follow symlinks or not
-  if (followsymlinks) {
+  if (o.followsymlinks) {
     dirlist.setreportfcn_symlink(&report);
   }
 
@@ -282,7 +292,7 @@ main(int narg, const char* argv[])
   // mark files with a number for correct ranking
   gswd.markitems();
 
-  if (remove_identical_inode) {
+  if (o.remove_identical_inode) {
     // remove files with identical devices and inodes
     gswd.sortlist(&Fileinfo::compareoninode,
                   &Fileinfo::equalinode,
@@ -302,11 +312,11 @@ main(int narg, const char* argv[])
               << " files due to nonunique device and inode." << std::endl;
   }
 
-  if (minimumfilesize > 0) {
+  if (o.minimumfilesize > 0) {
     std::cout << dryruntext << "Now removing files with size<"
-              << minimumfilesize << " from the list...";
+              << o.minimumfilesize << " from the list...";
     std::cout.flush();
-    std::cout << "removed " << gswd.remove_small_files(minimumfilesize)
+    std::cout << "removed " << gswd.remove_small_files(o.minimumfilesize)
               << " files" << std::endl;
   }
 
@@ -332,12 +342,12 @@ main(int narg, const char* argv[])
   Fileinfo::readtobuffermode type[nreadtobuffermodes];
   type[0] = Fileinfo::readtobuffermode::READ_FIRST_BYTES;
   type[1] = Fileinfo::readtobuffermode::READ_LAST_BYTES;
-  type[2] = (usemd5 ? Fileinfo::readtobuffermode::CREATE_MD5_CHECKSUM
-                    : Fileinfo::readtobuffermode::NOT_DEFINED);
-  type[3] = (usesha1 ? Fileinfo::readtobuffermode::CREATE_SHA1_CHECKSUM
-                     : Fileinfo::readtobuffermode::NOT_DEFINED);
-  type[4] = (usesha256 ? Fileinfo::readtobuffermode::CREATE_SHA256_CHECKSUM
+  type[2] = (o.usemd5 ? Fileinfo::readtobuffermode::CREATE_MD5_CHECKSUM
+                      : Fileinfo::readtobuffermode::NOT_DEFINED);
+  type[3] = (o.usesha1 ? Fileinfo::readtobuffermode::CREATE_SHA1_CHECKSUM
                        : Fileinfo::readtobuffermode::NOT_DEFINED);
+  type[4] = (o.usesha256 ? Fileinfo::readtobuffermode::CREATE_SHA256_CHECKSUM
+                         : Fileinfo::readtobuffermode::NOT_DEFINED);
 
   for (int i = 0; i < nreadtobuffermodes; i++) {
     if (type[i] != Fileinfo::readtobuffermode::NOT_DEFINED) {
@@ -369,7 +379,7 @@ main(int narg, const char* argv[])
       std::cout.flush();
 
       // read bytes (destroys the sorting, for efficiency)
-      gswd.fillwithbytes(type[i], lasttype, nsecsleep);
+      gswd.fillwithbytes(type[i], lasttype, o.nsecsleep);
 
       // sort on size, bytes
       gswd.sortlist(&Fileinfo::compareonsize,
@@ -414,33 +424,33 @@ main(int narg, const char* argv[])
   gswd.saveablespace(std::cout) << " can be reduced." << std::endl;
 
   // traverse the list and make a nice file with the results
-  if (makeresultsfile) {
-    std::cout << dryruntext << "Now making results file " << resultsfile
+  if (o.makeresultsfile) {
+    std::cout << dryruntext << "Now making results file " << o.resultsfile
               << std::endl;
-    gswd.printtofile(resultsfile);
+    gswd.printtofile(o.resultsfile);
   }
 
   // traverse the list and replace with symlinks
-  if (makesymlinks) {
+  if (o.makesymlinks) {
     std::cout << dryruntext << "Now making symbolic links. creating "
               << std::endl;
-    int tmp = gswd.makesymlinks(dryrun);
+    int tmp = gswd.makesymlinks(o.dryrun);
     std::cout << "Making " << tmp << " links." << std::endl;
     return 0;
   }
 
   // traverse the list and replace with hard links
-  if (makehardlinks) {
+  if (o.makehardlinks) {
     std::cout << dryruntext << "Now making hard links." << std::endl;
-    int tmp = gswd.makehardlinks(dryrun);
+    int tmp = gswd.makehardlinks(o.dryrun);
     std::cout << "Making " << tmp << " links." << std::endl;
     return 0;
   }
 
   // traverse the list and delete files
-  if (deleteduplicates) {
+  if (o.deleteduplicates) {
     std::cout << dryruntext << "Now deleting duplicates:" << std::endl;
-    int tmp = gswd.deleteduplicates(dryrun);
+    int tmp = gswd.deleteduplicates(o.dryrun);
     std::cout << "Deleted " << tmp << " files." << std::endl;
     return 0;
   }
