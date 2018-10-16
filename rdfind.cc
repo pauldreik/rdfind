@@ -203,8 +203,8 @@ public:
   }
 
 private:
-  const int m_argc;
-  const char** m_argv;
+  const int m_argc{};
+  const char** m_argv{};
   int m_index = 1;
   bool m_last_result{};
   const char* m_last_str_result{};

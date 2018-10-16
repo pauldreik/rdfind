@@ -61,7 +61,7 @@ public:
     DUPTYPE_WITHIN_SAME_TREE,
     DUPTYPE_OUTSIDE_TREE
   };
-  void setduptype(enum duptype duptype) { m_duptype = duptype; }
+  void setduptype(enum duptype duptype_) { m_duptype = duptype_; }
 
 private:
   // to keep the name of the file, including path
@@ -96,9 +96,8 @@ private:
 
   /**
    * a number to identify this individual file. used for ranking.
-   * FIXME refactor to int64
    */
-  int m_identity;
+  std::int64_t m_identity;
 
   /**
    * the directory depth at which this file was found.
@@ -106,9 +105,9 @@ private:
   int m_depth;
 
 public:
-  int getidentity() const { return m_identity; }
-  static int identity(const Fileinfo& A) { return A.getidentity(); }
-  void setidentity(int id) { m_identity = id; };
+  std::int64_t getidentity() const { return m_identity; }
+  static std::int64_t identity(const Fileinfo& A) { return A.getidentity(); }
+  void setidentity(std::int64_t id) { m_identity = id; };
 
   /**
    * reads info about the file, by querying the filesystem.

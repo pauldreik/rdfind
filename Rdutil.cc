@@ -170,11 +170,9 @@ Rdutil::makehardlinks(bool dryrun) const
 void
 Rdutil::markitems()
 {
-  std::vector<Fileinfo>::iterator it;
-  int fileno = 1;
-  for (it = m_list.begin(); it != m_list.end(); ++it) {
-    it->setidentity(fileno);
-    fileno++;
+  std::int64_t fileno = 1;
+  for (auto& file : m_list) {
+    file.setidentity(fileno++);
   }
 }
 
