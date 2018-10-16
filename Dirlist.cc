@@ -15,86 +15,77 @@
 
 #include "RdfindDebug.hh" //debug macros
 
+static const int maxdepth = 50;
+
 int
 Dirlist::walk(const std::string& dir, const int recursionlevel)
 {
-  struct stat info;
 
   RDDEBUG("Now in walk with dir=" << dir.c_str() << " and recursionlevel="
                                   << recursionlevel << std::endl);
 
-  if (recursionlevel < m_maxdepth) {
-    // open the directory
-    DIR* dirp = opendir(dir.c_str());
-    if (dirp) {
-      // we opened the directory. let us read the content.
-      RDDEBUG("opened directory" << std::endl);
-      struct dirent* dp = NULL;
-      while (0 != (dp = readdir(dirp))) {
-        if (0 != strcmp(".", dp->d_name)) {
-          if (0 != strcmp("..", dp->d_name)) {
-            // take this item, and find out more about it.
-
-            // investigate what kind of file it is, dont follow any
-            // symlinks
-            // when doing this (lstat instead of stat).
-            int statval =
-              lstat((dir + "/" + std::string(dp->d_name)).c_str(), &info);
-            if (statval == 0) {
-              // investigate what kind of item it was.
-              bool dowalk = false;
-
-              if (S_ISLNK(info.st_mode)) {
-                // cout<<"encountered symbolic link "<<dir<<"/"
-                //<<dp->d_name<<endl;
-                (*m_report_symlink)(
-                  dir, std::string(dp->d_name), recursionlevel);
-                if (m_followsymlinks)
-                  dowalk = true;
-              }
-
-              if (S_ISDIR(info.st_mode)) {
-                // cout<<"it is a directory!"<<dir<<"/"
-                //<<dp->d_name<<endl;
-                (*m_report_directory)(
-                  dir, std::string(dp->d_name), recursionlevel);
-                dowalk = true;
-              }
-
-              if (S_ISREG(info.st_mode)) {
-                // cout<<"it is a regular file!"<<dir<<"/"
-                //<<dp->d_name<<endl;
-                (*m_report_regular_file)(
-                  dir, std::string(dp->d_name), recursionlevel);
-              }
-
-              // try to open directory
-              if (dowalk) {
-                walk(dir + "/" + dp->d_name, recursionlevel + 1);
-              }
-            } else {
-              // failed to do stat
-              (*m_report_failed_on_stat)(
-                dir, std::string(dp->d_name), recursionlevel);
-            }
-          }
-        }
-      }
-      // close the directory
-      (void)closedir(dirp);
-      return 2; // its a directory
-    } else {
-      // failed to open directory (dirp==NULL)
-      RDDEBUG("failed to open directory" << std::endl);
-      // this can be due to rights, or some other error.
-      handlepossiblefile(dir, recursionlevel);
-      return 1; // its a file (or something else)
-    }
-    return 0; // recusion limit exceeded
-  } else {
+  if (recursionlevel >= maxdepth) {
     std::cerr << "recursion limit exceeded\n";
     return -1;
   }
+
+  // open the directory
+  DIR* dirp = opendir(dir.c_str());
+  if (dirp == NULL) {
+    // failed to open directory
+    RDDEBUG("failed to open directory" << std::endl);
+    // this can be due to rights, or some other error.
+    handlepossiblefile(dir, recursionlevel);
+    return 1; // its a file (or something else)
+  }
+
+  // we opened the directory. let us read the content.
+  RDDEBUG("opened directory" << std::endl);
+  struct dirent* dp = NULL;
+  while (NULL != (dp = readdir(dirp))) {
+    // is the directory . or ..?
+    if (0 == strcmp(".", dp->d_name) || 0 == strcmp("..", dp->d_name)) {
+      continue;
+    }
+    // investigate what kind of file it is, dont follow any
+    // symlinks when doing this (lstat instead of stat).
+    struct stat info;
+    const int statval =
+      lstat((dir + "/" + std::string(dp->d_name)).c_str(), &info);
+    if (statval != 0) {
+      // failed to do stat
+      (*m_report_failed_on_stat)(dir, std::string(dp->d_name), recursionlevel);
+      continue;
+    }
+
+    // investigate what kind of item it was.
+    bool dowalk = false;
+
+    if (S_ISLNK(info.st_mode)) {
+      // symlink
+      (*m_report_symlink)(dir, std::string(dp->d_name), recursionlevel);
+      if (m_followsymlinks) {
+        dowalk = true;
+      }
+    } else if (S_ISDIR(info.st_mode)) {
+      // directory
+      (*m_report_directory)(dir, std::string(dp->d_name), recursionlevel);
+      dowalk = true;
+    } else if (S_ISREG(info.st_mode)) {
+      // regular file
+      (*m_report_regular_file)(dir, std::string(dp->d_name), recursionlevel);
+    }
+
+    // try to open directory
+    if (dowalk) {
+      walk(dir + "/" + dp->d_name, recursionlevel + 1);
+    }
+
+  } // while
+
+  // close the directory
+  (void)closedir(dirp);
+  return 2; // its a directory
 }
 
 // splits inputstring into path and filename. if no / character is found,

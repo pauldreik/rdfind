@@ -15,9 +15,8 @@ class Dirlist
 {
 public:
   // constructor
-  explicit Dirlist(bool followsymlinks, int depth = 50)
-    : m_maxdepth(depth)
-    , m_followsymlinks(followsymlinks)
+  explicit Dirlist(bool followsymlinks)
+    : m_followsymlinks(followsymlinks)
   {
     m_report_regular_file = &_do_nothing_;
     m_report_failed_on_stat = &_do_nothing_;
@@ -26,9 +25,6 @@ public:
   }
 
 private:
-  // the maximum search depth
-  int m_maxdepth;
-
   // follow symlinks or not
   bool m_followsymlinks;
 
