@@ -55,7 +55,6 @@ Dirlist::walk(const std::string& dir, const int recursionlevel)
       lstat((dir + "/" + std::string(dp->d_name)).c_str(), &info);
     if (statval != 0) {
       // failed to do stat
-      (*m_report_failed_on_stat)(dir, std::string(dp->d_name), recursionlevel);
       continue;
     }
 
@@ -70,7 +69,6 @@ Dirlist::walk(const std::string& dir, const int recursionlevel)
       }
     } else if (S_ISDIR(info.st_mode)) {
       // directory
-      (*m_report_directory)(dir, std::string(dp->d_name), recursionlevel);
       dowalk = true;
     } else if (S_ISREG(info.st_mode)) {
       // regular file
@@ -136,16 +134,11 @@ Dirlist::handlepossiblefile(const std::string& possiblefile, int recursionlevel)
   if (statval < 0) {
     // probably file does not exist, or trouble with rights.
     RDDEBUG("got negative statval " << statval << std::endl);
-    (*m_report_failed_on_stat)(path, filename, recursionlevel);
+    //(*m_report_failed_on_stat)(path, filename, recursionlevel);
     return -1;
   } else {
     RDDEBUG("got positive statval " << statval << std::endl);
   }
-
-  /*     cout<<"input="<<possiblefile<<endl;
-         cout<<"path="<<path<<endl;
-         cout<<"filename="<<filename<<endl;
-  */
 
   if (S_ISLNK(info.st_mode)) {
     RDDEBUG("found symlink" << std::endl);

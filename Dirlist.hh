@@ -18,8 +18,6 @@ public:
     : m_followsymlinks(followsymlinks)
   {
     m_report_regular_file = &_do_nothing_;
-    m_report_failed_on_stat = &_do_nothing_;
-    m_report_directory = &_do_nothing_;
     m_report_symlink = &_do_nothing_;
   }
 
@@ -33,12 +31,6 @@ private:
 
   // called when a regular file is encountered
   reportfcntype m_report_regular_file;
-
-  // called when stat fails
-  reportfcntype m_report_failed_on_stat;
-
-  // called when a directory is encountered
-  reportfcntype m_report_directory;
 
   // called when a symbolic link is found (file or directory)
   reportfcntype m_report_symlink;
@@ -63,17 +55,6 @@ public:
   {
     m_report_regular_file = reportfcn;
   }
-
-  void setreportfcn_failed_on_stat(reportfcntype reportfcn)
-  {
-    m_report_failed_on_stat = reportfcn;
-  }
-
-  void setreportfcn_report_directory(reportfcntype reportfcn)
-  {
-    m_report_directory = reportfcn;
-  }
-
   void setreportfcn_symlink(reportfcntype reportfcn)
   {
     m_report_symlink = reportfcn;
