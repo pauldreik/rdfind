@@ -12,6 +12,9 @@
 	  the default checksum is now sha1 instead of md5
 	* better error messages when -dryrun is misused. See Github #8
 	  and Debian Bug 754663
+	* performance: pruning empty files earlier and other improvements.
+	  "rdfind -checksum sha1 /usr /usr" goes from 5.9 to 4.86 seconds on the
+	  author's machine, with hot filesystem cache.
 2017-01-04 Paul Dreik <rdfind@pauldreik.se>
 	* release 1.3.5
 	* source cleanup like removing obsolete comments, formatting.

@@ -11,11 +11,12 @@
 #include "algos.hh" //to find duplicates in a vector
 #include <algorithm>
 #include <cassert>
+#include <chrono>
+#include <cstring>
 #include <fstream> //for file writing
 #include <ostream> //for output
 #include <string>  //for easier passing of string arguments
-#include <time.h>  //to be able to call nanosleep properly.
-#include <tuple>
+#include <thread>  //sleep
 
 int
 Rdutil::printtofile(const std::string& filename) const
@@ -83,7 +84,7 @@ applyactiononfile(std::vector<Fileinfo>& m_list, Function f)
         std::cerr << "hmm. is list badly sorted?\n";
     }
   }
-
+  // FIXME make to a size_t
   return ntimesapplied;
 }
 
@@ -196,6 +197,19 @@ cmpRank(const Fileinfo& a, const Fileinfo& b)
   return std::make_tuple(a.get_cmdline_index(), a.depth(), a.getidentity()) <
          std::make_tuple(b.get_cmdline_index(), b.depth(), b.getidentity());
 }
+// compares buffers
+bool
+cmpBuffers(const Fileinfo& a, const Fileinfo& b)
+{
+  return std::memcmp(a.getbyteptr(), b.getbyteptr(), a.getbuffersize()) < 0;
+}
+
+// compares file size
+bool
+cmpSize(const Fileinfo& a, const Fileinfo& b)
+{
+  return a.size() < b.size();
+}
 
 /**
  * goes through first to last, finds ranges of equal elements (determined by
@@ -211,17 +225,36 @@ apply_on_range(Iterator first, Iterator last, Cmp cmp, Callback callback)
 {
   assert(std::is_sorted(first, last, cmp));
 
-  while (first != last) {
-    auto p = std::equal_range(first, last, *first, cmp);
-    // p.first will point to first. p.second will point to first+1 if no
-    // duplicate is found
-    assert(p.first == first);
+  // switch between linear search and logarithmic. the linear should be good
+  // because most of the time, we search very few adjacent elements.
+  // the difference seem to be within measurement noise.
+  const bool linearsearch = false;
 
-    // a duplicate range with respect to cmp
-    callback(p.first, p.second);
+  if (linearsearch) {
+    while (first != last) {
+      auto sublast = first + 1;
+      while (sublast != last && !cmp(*first, *sublast)) {
+        ++sublast;
+      }
+      // a duplicate range with respect to cmp
+      callback(first, sublast);
 
-    // keep searching.
-    first = p.second;
+      // keep searching.
+      first = sublast;
+    }
+  } else {
+    while (first != last) {
+      auto p = std::equal_range(first, last, *first, cmp);
+      // p.first will point to first. p.second will point to first+1 if no
+      // duplicate is found
+      assert(p.first == first);
+
+      // a duplicate range with respect to cmp
+      callback(p.first, p.second);
+
+      // keep searching.
+      first = p.second;
+    }
   }
 }
 } // anon. namespace
@@ -236,10 +269,12 @@ Rdutil::sortOnDeviceAndInode()
 std::size_t
 Rdutil::removeIdenticalInodes()
 {
+#if 0
   // mark all elements as worth to keep
   for (auto& e : m_list) {
     e.setdeleteflag(false);
   }
+#endif
 
   // sort list on device and inode.
   auto cmp = cmpDeviceInode;
@@ -256,6 +291,59 @@ Rdutil::removeIdenticalInodes()
       best->setdeleteflag(false);
       std::for_each(best + 1, last, [](Fileinfo& f) { f.setdeleteflag(true); });
     });
+  return cleanup();
+}
+std::size_t
+Rdutil::removeUniqueSizes()
+{
+  // sort list on size
+  auto cmp = cmpSize;
+  std::sort(m_list.begin(), m_list.end(), cmp);
+
+  // loop over ranges of adjacent elements
+  using Iterator = decltype(m_list.begin());
+  apply_on_range(
+    m_list.begin(), m_list.end(), cmp, [](Iterator first, Iterator last) {
+      if (first + 1 == last) {
+        // single element. remove it!
+        first->setdeleteflag(true);
+      } else {
+        // multiple elements. keep them!
+        std::for_each(first, last, [](Fileinfo& f) { f.setdeleteflag(false); });
+      }
+    });
+  return cleanup();
+}
+
+std::size_t
+Rdutil::removeUniqSizeAndBuffer()
+{
+  // sort list on size
+  const auto cmp = cmpSize;
+  std::sort(m_list.begin(), m_list.end(), cmp);
+
+  const auto bufcmp = cmpBuffers;
+
+  // loop over ranges of adjacent elements
+  using Iterator = decltype(m_list.begin());
+  apply_on_range(
+    m_list.begin(), m_list.end(), cmp, [&](Iterator first, Iterator last) {
+      // all sizes are equal in [first,last) - sort on buffer content.
+      std::sort(first, last, bufcmp);
+
+      // on this set of buffers, find those which are unique
+      apply_on_range(
+        first, last, bufcmp, [](Iterator firstbuf, Iterator lastbuf) {
+          if (firstbuf + 1 == lastbuf) {
+            // we have a unique buffer!
+            firstbuf->setdeleteflag(true);
+          } else {
+            std::for_each(
+              firstbuf, lastbuf, [](Fileinfo& f) { f.setdeleteflag(false); });
+          }
+        });
+    });
+
   return cleanup();
 }
 
@@ -560,28 +648,19 @@ Rdutil::marksingle(std::vector<Fileinfo>::iterator start,
 int
 Rdutil::fillwithbytes(enum Fileinfo::readtobuffermode type,
                       enum Fileinfo::readtobuffermode lasttype,
-                      long nsecsleep)
+                      const long nsecsleep)
 {
 
-  // first sort on inode (to read efficently from harddrive)
-  sortlist(&Fileinfo::compareoninode, &Fileinfo::equalinode);
+  // first sort on inode (to read efficently from the hard drive)
+  sortOnDeviceAndInode();
 
-  std::vector<Fileinfo>::iterator it;
-  if (nsecsleep <= 0)
-    for (it = m_list.begin(); it != m_list.end(); ++it) {
-      it->fillwithbytes(type, lasttype);
-    }
-  else {
-    // shall we do sleep between each file or not
-    struct timespec time;
-    time.tv_sec = 0;
-    time.tv_nsec = nsecsleep;
+  const auto duration = std::chrono::nanoseconds{ nsecsleep };
 
-    for (it = m_list.begin(); it != m_list.end(); ++it) {
-      it->fillwithbytes(type, lasttype);
-      nanosleep(&time, 0);
+  for (auto& elem : m_list) {
+    elem.fillwithbytes(type, lasttype);
+    if (nsecsleep > 0) {
+      std::this_thread::sleep_for(duration);
     }
   }
-
   return 0;
 }

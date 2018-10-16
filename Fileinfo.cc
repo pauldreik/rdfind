@@ -27,8 +27,6 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
     if (this->size() <= static_cast<filesizetype>(m_somebytes.size())) {
       // pointless to read - all bytes in the file are in the field
       // m_somebytes, or checksum is calculated!
-      //      cout<<"Skipped reading from file because lasttype="<<lasttype
-      //	  <<" and size="<<size()<<endl;
       return 0;
     }
   }
@@ -91,7 +89,6 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
     }
   }
 
-  f1.close();
   return 0;
 }
 
@@ -122,8 +119,8 @@ Fileinfo::readfileinfo()
   m_info.stat_ino = info.st_ino;
   m_info.stat_dev = info.st_dev;
 
-  m_info.is_file = S_ISREG(info.st_mode) ? true : false;
-  m_info.is_directory = S_ISDIR(info.st_mode) ? true : false;
+  m_info.is_file = S_ISREG(info.st_mode);
+  m_info.is_directory = S_ISDIR(info.st_mode);
   return true;
 }
 

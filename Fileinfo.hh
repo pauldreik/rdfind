@@ -220,6 +220,7 @@ public:
 
   // get a pointer to the bytes read from the file
   const char* getbyteptr() const { return m_somebytes.data(); }
+  std::size_t getbuffersize() const { return m_somebytes.size(); }
 
   static bool compareonbytes(const Fileinfo& a, const Fileinfo& b);
 

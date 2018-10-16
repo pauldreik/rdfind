@@ -18,12 +18,10 @@
 #include "Rdutil.hh"      //to do some work
 #include "config.h"       //header file from autoconf
 
-#define REFACTOR 1
-
 // global variables
 
 // this vector holds the information about all files found
-std::vector<Fileinfo> filelist1;
+std::vector<Fileinfo> filelist;
 struct Options;
 const Options* global_options{};
 
@@ -228,7 +226,7 @@ report(const std::string& path, const std::string& name, int depth)
   if (tmp.readfileinfo()) {
     if (tmp.isRegularFile()) {
       if (tmp.size() >= global_options->minimumfilesize) {
-        filelist1.emplace_back(std::move(tmp));
+        filelist.emplace_back(std::move(tmp));
       }
     }
   } else {
@@ -255,7 +253,7 @@ main(int narg, const char* argv[])
   const std::string dryruntext(o.dryrun ? "(DRYRUN MODE) " : "");
 
   // an object to do sorting and duplicate finding
-  Rdutil gswd(filelist1);
+  Rdutil gswd(filelist);
 
   // an object to traverse the directory structure
   Dirlist dirlist(o.followsymlinks);
@@ -280,16 +278,16 @@ main(int narg, const char* argv[])
       return arg;
     }();
 
-    auto lastsize = filelist1.size();
+    auto lastsize = filelist.size();
     std::cout << dryruntext << "Now scanning \"" << file_or_dir << "\"";
     std::cout.flush();
     current_cmdline_index = parser.get_current_index();
     dirlist.walk(file_or_dir, 0);
-    std::cout << ", found " << filelist1.size() - lastsize << " files."
+    std::cout << ", found " << filelist.size() - lastsize << " files."
               << std::endl;
   }
 
-  std::cout << dryruntext << "Now have " << filelist1.size()
+  std::cout << dryruntext << "Now have " << filelist.size()
             << " files in total." << std::endl;
 
   // mark files with a number for correct ranking. The only ordering at this
@@ -299,107 +297,49 @@ main(int narg, const char* argv[])
 
   if (o.remove_identical_inode) {
     // remove files with identical devices and inodes from the list
-#if REFACTOR
     std::cout << dryruntext << "Removed " << gswd.removeIdenticalInodes()
               << " files due to nonunique device and inode." << std::endl;
-#else
-    gswd.sortOnDeviceAndInode();
-
-    gswd.sortlist(&Fileinfo::compareoninode,
-                  &Fileinfo::equalinode,
-                  &Fileinfo::compareondevice,
-                  &Fileinfo::equaldevice,
-                  &Fileinfo::compareoncmdlineindex,
-                  &Fileinfo::equalcmdlineindex,
-                  &Fileinfo::compareondepth,
-                  &Fileinfo::equaldepth);
-
-    // mark duplicates - these must be due to hard links or
-    // link that has been followed.
-    gswd.marknonuniq(&Fileinfo::equalinode, &Fileinfo::equaldevice);
-
-    // remove non-duplicates
-    std::cout << dryruntext << "Removed " << gswd.cleanup()
-              << " files due to nonunique device and inode." << std::endl;
-#endif
   }
 
   std::cout << dryruntext << "Total size is " << gswd.totalsizeinbytes()
             << " bytes or ";
   gswd.totalsize(std::cout) << std::endl;
 
-  std::cout << dryruntext << "Now sorting on size:";
-
-  std::sort(filelist1.begin(), filelist1.end(), Fileinfo::compareonsize);
-
-  // mark non-duplicates
-  gswd.markuniq(&Fileinfo::equalsize);
-
-  // remove non-duplicates
-  std::cout << "removed " << gswd.cleanup()
+  std::cout << "Removed " << gswd.removeUniqueSizes()
             << " files due to unique sizes from list.";
-  std::cout << filelist1.size() << " files left." << std::endl;
+  std::cout << filelist.size() << " files left." << std::endl;
 
-  // ok. we now need to do something stronger. read a few bytes.
-  const int nreadtobuffermodes = 5;
-  Fileinfo::readtobuffermode lasttype = Fileinfo::readtobuffermode::NOT_DEFINED;
-  Fileinfo::readtobuffermode type[nreadtobuffermodes];
-  type[0] = Fileinfo::readtobuffermode::READ_FIRST_BYTES;
-  type[1] = Fileinfo::readtobuffermode::READ_LAST_BYTES;
-  type[2] = (o.usemd5 ? Fileinfo::readtobuffermode::CREATE_MD5_CHECKSUM
-                      : Fileinfo::readtobuffermode::NOT_DEFINED);
-  type[3] = (o.usesha1 ? Fileinfo::readtobuffermode::CREATE_SHA1_CHECKSUM
-                       : Fileinfo::readtobuffermode::NOT_DEFINED);
-  type[4] = (o.usesha256 ? Fileinfo::readtobuffermode::CREATE_SHA256_CHECKSUM
-                         : Fileinfo::readtobuffermode::NOT_DEFINED);
+  // ok. we now need to do something stronger to disambiguate the duplicate
+  // candidates. start looking at the contents.
+  std::vector<std::pair<Fileinfo::readtobuffermode, const char*>> modes{
+    { Fileinfo::readtobuffermode::NOT_DEFINED, "" },
+    { Fileinfo::readtobuffermode::READ_FIRST_BYTES, "first bytes" },
+    { Fileinfo::readtobuffermode::READ_LAST_BYTES, "last bytes" },
+  };
+  if (o.usemd5) {
+    modes.emplace_back(Fileinfo::readtobuffermode::CREATE_MD5_CHECKSUM,
+                       "md5 checksum");
+  }
+  if (o.usesha1) {
+    modes.emplace_back(Fileinfo::readtobuffermode::CREATE_SHA1_CHECKSUM,
+                       "sha1 checksum");
+  }
+  if (o.usesha256) {
+    modes.emplace_back(Fileinfo::readtobuffermode::CREATE_SHA256_CHECKSUM,
+                       "sha256 checksum");
+  }
 
-  for (int i = 0; i < nreadtobuffermodes; i++) {
-    if (type[i] != Fileinfo::readtobuffermode::NOT_DEFINED) {
-      std::string description;
+  for (auto it = modes.begin() + 1; it != modes.end(); ++it) {
+    std::cout << dryruntext << "Now eliminating candidates based on "
+              << it->second << ":" << std::flush;
 
-      switch (type[i]) {
-        case Fileinfo::readtobuffermode::READ_FIRST_BYTES:
-          description = "first bytes";
-          break;
-        case Fileinfo::readtobuffermode::READ_LAST_BYTES:
-          description = "last bytes";
-          break;
-        case Fileinfo::readtobuffermode::CREATE_MD5_CHECKSUM:
-          description = "md5 checksum";
-          break;
-        case Fileinfo::readtobuffermode::CREATE_SHA1_CHECKSUM:
-          description = "sha1 checksum";
-          break;
-        case Fileinfo::readtobuffermode::CREATE_SHA256_CHECKSUM:
-          description = "sha256 checksum";
-          break;
-        default:
-          description = "--program error!!!---";
-          break;
-      }
-      std::cout << dryruntext << "Now eliminating candidates based on "
-                << description << ":";
+    // read bytes (destroys the sorting, for disk reading efficiency)
+    gswd.fillwithbytes(it[0].first, it[-1].first, o.nsecsleep);
 
-      std::cout.flush();
-
-      // read bytes (destroys the sorting, for efficiency)
-      gswd.fillwithbytes(type[i], lasttype, o.nsecsleep);
-
-      // sort on size, bytes
-      gswd.sortlist(&Fileinfo::compareonsize,
-                    &Fileinfo::equalsize,
-                    &Fileinfo::compareonbytes,
-                    &Fileinfo::equalbytes);
-
-      // mark non-duplicates
-      gswd.markuniq(&Fileinfo::equalsize, &Fileinfo::equalbytes);
-
-      // remove non-duplicates
-      std::cout << "removed " << gswd.cleanup() << " files from list.";
-      std::cout << filelist1.size() << " files left." << std::endl;
-
-      lasttype = type[i];
-    }
+    // remove non-duplicates
+    std::cout << "removed " << gswd.removeUniqSizeAndBuffer()
+              << " files from list.";
+    std::cout << filelist.size() << " files left." << std::endl;
   }
 
   // we now know we have only true duplicates left.
@@ -420,7 +360,7 @@ main(int narg, const char* argv[])
   // internally on command line index)
   gswd.markduplicates(&Fileinfo::equalsize, &Fileinfo::equalbytes);
 
-  std::cout << dryruntext << "It seems like you have " << filelist1.size()
+  std::cout << dryruntext << "It seems like you have " << filelist.size()
             << " files that are not unique\n"
             << std::endl;
 

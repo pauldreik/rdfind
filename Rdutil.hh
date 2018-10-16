@@ -37,6 +37,17 @@ public:
    */
   std::size_t removeIdenticalInodes();
 
+  /**
+   * remove files with unique size from the list.
+   * @return
+   */
+  std::size_t removeUniqueSizes();
+
+  /**
+   * remove files with unique combination of size and buffer from the list.
+   * @return
+   */
+  std::size_t removeUniqSizeAndBuffer();
   // sort list on multiple attributes.
   int sortlist(bool (*lessthan1)(const Fileinfo&, const Fileinfo&),
                bool (*equal1)(const Fileinfo&, const Fileinfo&),
