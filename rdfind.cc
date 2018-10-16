@@ -228,7 +228,7 @@ report(const std::string& path, const std::string& name, int depth)
   if (tmp.readfileinfo()) {
     if (tmp.isRegularFile()) {
       if (tmp.size() >= global_options->minimumfilesize) {
-        filelist1.push_back(tmp);
+        filelist1.emplace_back(std::move(tmp));
       }
     }
   } else {
