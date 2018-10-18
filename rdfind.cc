@@ -342,27 +342,13 @@ main(int narg, const char* argv[])
     std::cout << filelist.size() << " files left." << std::endl;
   }
 
-  // we now know we have only true duplicates left.
-
-  // figure out how to present the material
-
-  // sort, so that duplicates are collected together.
-  gswd.sortlist(&Fileinfo::compareonsize,
-                &Fileinfo::equalsize,
-                &Fileinfo::compareonbytes,
-                &Fileinfo::equalbytes,
-                &Fileinfo::compareondepth,
-                &Fileinfo::equaldepth,
-                &Fileinfo::compareonidentity,
-                &Fileinfo::equalidentity);
-
-  // mark duplicates with the right tag (will stable sort the list
-  // internally on command line index)
-  gswd.markduplicates(&Fileinfo::equalsize, &Fileinfo::equalbytes);
+  // What is left now is a list of duplicates, ordered on size.
+  // We also know the list is ordered on size, then bytes, and all unique files
+  // are gone so it contains sequences of duplicates. Go ahead and mark them.
+  gswd.markduplicates();
 
   std::cout << dryruntext << "It seems like you have " << filelist.size()
-            << " files that are not unique\n"
-            << std::endl;
+            << " files that are not unique\n";
 
   std::cout << dryruntext << "Totally, ";
   gswd.saveablespace(std::cout) << " can be reduced." << std::endl;

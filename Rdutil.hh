@@ -48,6 +48,17 @@ public:
    * @return
    */
   std::size_t removeUniqSizeAndBuffer();
+
+  /**
+   * Assumes the list is already sorted on size, and all elements with the same
+   * size have the same buffer. Marks duplicates with tags, depending on their
+   * nature. Shall be used when everything is done, and sorted.
+   * For each sequence of duplicates, the original will be placed first but no
+   * other guarantee on ordering is given.
+   *
+   */
+  void markduplicates();
+
   // sort list on multiple attributes.
   int sortlist(bool (*lessthan1)(const Fileinfo&, const Fileinfo&),
                bool (*equal1)(const Fileinfo&, const Fileinfo&),
@@ -105,13 +116,13 @@ public:
                     long nsecsleep = 0);
 
   // make symlinks of duplicates.
-  int makesymlinks(bool dryrun) const;
+  std::size_t makesymlinks(bool dryrun) const;
 
   // make hardlinks of duplicates.
-  int makehardlinks(bool dryrun) const;
+  std::size_t makehardlinks(bool dryrun) const;
 
   // delete duplicates.
-  int deleteduplicates(bool dryrun) const;
+  std::size_t deleteduplicates(bool dryrun) const;
 
   // a little helper class
   class adder_helper

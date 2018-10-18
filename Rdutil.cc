@@ -7,6 +7,7 @@
 
 #include "Fileinfo.hh"              //file container
 #include "MultiAttributeCompare.hh" //for sorting on multiple attributes
+#include "RdfindDebug.hh"
 #include "Rdutil.hh"
 #include "algos.hh" //to find duplicates in a vector
 #include <algorithm>
@@ -53,38 +54,44 @@ Rdutil::printtofile(const std::string& filename) const
 // if f returns nonzero, something is wrong.
 // returns how many times the function was invoked.
 template<typename Function>
-int
+std::size_t
 applyactiononfile(std::vector<Fileinfo>& m_list, Function f)
 {
 
-  std::vector<Fileinfo>::iterator it, src;
-  src = m_list.end();
+  const auto first = m_list.begin();
+  const auto last = m_list.end();
+  auto original = last;
 
-  int ntimesapplied = 0;
+  std::size_t ntimesapplied = 0;
 
   // loop over files
-  for (it = m_list.begin(); it != m_list.end(); ++it) {
-    if (it->getduptype() == Fileinfo::DUPTYPE_FIRST_OCCURRENCE) {
-      src = it;
+  for (auto it = first; it != last; ++it) {
+    switch (it->getduptype()) {
+      case Fileinfo::DUPTYPE_FIRST_OCCURRENCE: {
+        original = it;
+        assert(original->getidentity() >= 0 &&
+               "original file should have positive identity");
+      } break;
 
-      if (src->getidentity() <= 0) {
-        std::cerr << "hmm. this file should have positive identity.\n";
-      }
-    } else if (it->getduptype() == Fileinfo::DUPTYPE_OUTSIDE_TREE ||
-               it->getduptype() == Fileinfo::DUPTYPE_WITHIN_SAME_TREE) {
-      // double check that "it" shall be ~linked to "src"
-      if (it->getidentity() == -src->getidentity()) {
-        // everything is in order. we may now ~link it to src.
-        if (f(*it, *src)) {
-          std::cerr << "Rdutil.cc: Failed to apply function f on it.\n";
+      case Fileinfo::DUPTYPE_OUTSIDE_TREE:
+        [[fallthrough]];
+      case Fileinfo::DUPTYPE_WITHIN_SAME_TREE: {
+        assert(original != last);
+        // double check that "it" shall be ~linked to "src"
+        assert(it->getidentity() == -original->getidentity() &&
+               "it must be connected to src");
+        // everything is in order. we may now hardlink/symlink/remove it.
+        if (f(*it, *original)) {
+          RDDEBUG(__FILE__ ": Failed to apply function f on it.\n");
         } else {
-          ntimesapplied++;
+          ++ntimesapplied;
         }
-      } else
-        std::cerr << "hmm. is list badly sorted?\n";
+      } break;
+
+      default:
+        assert(!"file with bad duptype at this stage. Programming error!");
     }
   }
-  // FIXME make to a size_t
   return ntimesapplied;
 }
 
@@ -134,7 +141,7 @@ public:
   }
 };
 
-int
+std::size_t
 Rdutil::deleteduplicates(bool dryrun) const
 {
   if (dryrun) {
@@ -147,8 +154,7 @@ Rdutil::deleteduplicates(bool dryrun) const
     return applyactiononfile(m_list, &Fileinfo::static_deletefile);
   }
 }
-
-int
+std::size_t
 Rdutil::makesymlinks(bool dryrun) const
 {
   if (dryrun) {
@@ -161,7 +167,7 @@ Rdutil::makesymlinks(bool dryrun) const
   }
 }
 
-int
+std::size_t
 Rdutil::makehardlinks(bool dryrun) const
 {
   if (dryrun) {
@@ -197,18 +203,32 @@ cmpRank(const Fileinfo& a, const Fileinfo& b)
   return std::make_tuple(a.get_cmdline_index(), a.depth(), a.getidentity()) <
          std::make_tuple(b.get_cmdline_index(), b.depth(), b.getidentity());
 }
+bool
+cmpIdentity(const Fileinfo& a, const Fileinfo& b)
+{
+  return a.getidentity() < b.getidentity();
+}
 // compares buffers
 bool
 cmpBuffers(const Fileinfo& a, const Fileinfo& b)
 {
   return std::memcmp(a.getbyteptr(), b.getbyteptr(), a.getbuffersize()) < 0;
 }
-
+bool
+hasEqualBuffers(const Fileinfo& a, const Fileinfo& b)
+{
+  return std::memcmp(a.getbyteptr(), b.getbyteptr(), a.getbuffersize()) == 0;
+}
 // compares file size
 bool
 cmpSize(const Fileinfo& a, const Fileinfo& b)
 {
   return a.size() < b.size();
+}
+bool
+cmpSizeThenBuffer(const Fileinfo& a, const Fileinfo& b)
+{
+  return (a.size() < b.size()) || (a.size() == b.size() && cmpBuffers(a, b));
 }
 
 /**
@@ -345,6 +365,49 @@ Rdutil::removeUniqSizeAndBuffer()
     });
 
   return cleanup();
+}
+
+void
+Rdutil::markduplicates()
+{
+  const auto cmp = cmpSizeThenBuffer;
+  assert(std::is_sorted(m_list.begin(), m_list.end(), cmp));
+
+  // loop over ranges of adjacent elements
+  using Iterator = decltype(m_list.begin());
+  apply_on_range(
+    m_list.begin(),
+    m_list.end(),
+    cmp,
+    [](const Iterator first, const Iterator last) {
+      // size and buffer are equal in  [first,last) - all are duplicates!
+      assert(std::distance(first, last) >= 2);
+
+      // the one with the lowest rank is the original
+      auto orig = std::min_element(first, last, cmpRank);
+      assert(orig != last);
+      // place it first, so later stages will find the original first.
+      std::iter_swap(first, orig);
+      orig = first;
+
+      // make sure they are all duplicates
+      assert(last == find_if_not(first, last, [orig](const Fileinfo& a) {
+               return orig->size() == a.size() && hasEqualBuffers(*orig, a);
+             }));
+
+      // mark the files with the appropriate tag.
+      auto marker = [orig](Fileinfo& elem) {
+        elem.setidentity(-orig->getidentity());
+        if (elem.get_cmdline_index() == orig->get_cmdline_index()) {
+          elem.setduptype(Fileinfo::DUPTYPE_WITHIN_SAME_TREE);
+        } else {
+          elem.setduptype(Fileinfo::DUPTYPE_OUTSIDE_TREE);
+        }
+      };
+      orig->setduptype(Fileinfo::DUPTYPE_FIRST_OCCURRENCE);
+      std::for_each(first + 1, last, marker);
+      assert(first->getduptype() == Fileinfo::DUPTYPE_FIRST_OCCURRENCE);
+    });
 }
 
 int

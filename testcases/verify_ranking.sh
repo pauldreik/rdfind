@@ -29,7 +29,8 @@ disorderfs --sort-dirents=yes --reverse-dirents=no $DISORDERED_ROOT $DISORDERED_
 cr8() {
 while [ $# -gt 0 ] ; do
   mkdir -p $(dirname $1)
-  echo a>$1
+  # make sure the file is longer than what fits in the byte buffer
+  head -c1000 /dev/zero >$1
   shift
 done
 }
