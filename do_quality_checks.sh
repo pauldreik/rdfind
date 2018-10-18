@@ -96,15 +96,17 @@ if ! $1 -c x.cpp -std=c++11 >/dev/null 2>&1 ; then
   echo this compiler $1 does not understand c++11
   return 0
 fi
-compile_and_test_standard $1 c++11
 
-#loop over all standard flags>11 and try those which work.
+#loop over all standard flags>=11 and try those which work.
 #use the code words.
-for std in 1y 1z 2a ; do
+for std in 11 1y 1z 2a ; do
 if ! $1 -c x.cpp -std=c++$std >/dev/null 2>&1 ; then
   echo compiler does not understand c++$std, skipping this combination.
 else
-    compile_and_test_standard $1 c++$std
+    # debug build
+    compile_and_test_standard $1 c++$std "-Og -D_DEBUG=1"
+    # release build
+    compile_and_test_standard $1 c++$std "-O3 -DNDEBUG=1"
 fi
 done
 }
@@ -182,7 +184,7 @@ if which g++ >/dev/null ; then
     else
       #echo trying gcc $GCC:$($GCC --version|head -n1)
        echo $inode >>inodes_for_tested_compilers.txt
-       compile_and_test $COMPILER c++11
+       compile_and_test $COMPILER
     fi
   done
 fi
@@ -196,7 +198,7 @@ if which clang++ >/dev/null ; then
     else
       #echo trying gcc $GCC:$($GCC --version|head -n1)
        echo $inode >>inodes_for_tested_compilers.txt
-       compile_and_test $COMPILER c++11
+       compile_and_test $COMPILER
     fi
   done
 fi
