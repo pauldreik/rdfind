@@ -99,7 +99,7 @@ public:
    * m_duptype=Fileinfo::DUPTYPE_FIRST_OCCURRENCE
    * @return
    */
-  unsigned long long int totalsizeinbytes(int opmode = 0) const;
+  Fileinfo::filesizetype totalsizeinbytes(int opmode = 0) const;
 
   /**
    * outputs a nicely formatted string "45 bytes" or "3 Gibytes"

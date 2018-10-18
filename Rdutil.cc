@@ -444,61 +444,43 @@ Rdutil::remove_small_files(Fileinfo::filesizetype minsize)
   return size_before - m_list.size();
 }
 
-namespace {
-// a little helper class
-class adder_helper
-{
-public:
-  adder_helper()
-    : m_sum(0){};
-  typedef unsigned long long int sizetype_t;
-  sizetype_t m_sum;
-  void operator()(const Fileinfo& A)
-  {
-    m_sum += static_cast<sizetype_t>(A.size());
-  }
-  sizetype_t getsize(void) const { return m_sum; }
-};
-}
-
-unsigned long long
+Fileinfo::filesizetype
 Rdutil::totalsizeinbytes(int opmode) const
 {
-  // for some reason, for_each does not work.
-  adder_helper adder;
-  std::vector<Fileinfo>::iterator it;
+  assert(opmode == 0 || opmode == 1);
+
+  Fileinfo::filesizetype totalsize = 0;
   if (opmode == 0) {
-    for (it = m_list.begin(); it != m_list.end(); ++it) {
-      adder(*it);
+    for (const auto& elem : m_list) {
+      totalsize += elem.size();
     }
   } else if (opmode == 1) {
-    for (it = m_list.begin(); it != m_list.end(); ++it) {
-      if (it->getduptype() == Fileinfo::duptype::DUPTYPE_FIRST_OCCURRENCE) {
-        adder(*it);
+    for (const auto& elem : m_list) {
+      if (elem.getduptype() == Fileinfo::duptype::DUPTYPE_FIRST_OCCURRENCE) {
+        totalsize += elem.size();
       }
     }
-  } else {
-    throw std::runtime_error("bad input, mode should be 0 or 1");
   }
 
-  return adder.getsize();
+  return totalsize;
 }
 namespace littlehelper {
 // helper to make "size" into a more readable form.
 int
-calcrange(unsigned long long int& size)
+calcrange(Fileinfo::filesizetype& size)
 {
   int range = 0;
-  unsigned long long int tmp = 0ULL;
-  while (size > 1024ULL) {
+  Fileinfo::filesizetype tmp = 0;
+  while (size > 1024) {
     tmp = size >> 9;
     size = (tmp >> 1);
     ++range;
   }
 
   // round up if necessary
-  if (tmp & 0x1ULL)
+  if (tmp & 0x1) {
     size++;
+  }
 
   return range;
 }
@@ -541,7 +523,7 @@ Rdutil::totalsize(std::ostream& out, int opmode) const
 std::ostream&
 Rdutil::saveablespace(std::ostream& out) const
 {
-  unsigned long long int size = totalsizeinbytes(0) - totalsizeinbytes(1);
+  auto size = totalsizeinbytes(0) - totalsizeinbytes(1);
   int range = littlehelper::calcrange(size);
   out << size << " " << littlehelper::byteprefix(range);
   return out;
