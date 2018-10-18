@@ -27,6 +27,8 @@ public:
     SHA256,
   };
 
+  // hmm, why not a constructor?
+
   // init the object
   int init(int checksumtype);
 

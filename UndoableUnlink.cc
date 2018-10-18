@@ -4,11 +4,13 @@
    See LICENSE for further details.
 */
 
-#include "UndoableUnlink.hh"
-#include "EasyRandom.hh"
 #include <iostream>
 #include <stdexcept>
+
 #include <unistd.h> //for unlink etc.
+
+#include "EasyRandom.hh"
+#include "UndoableUnlink.hh"
 
 UndoableUnlink::UndoableUnlink(const std::string& filename)
   : m_filename(filename)

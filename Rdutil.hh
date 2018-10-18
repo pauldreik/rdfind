@@ -9,8 +9,9 @@
 #ifndef rdutil_hh
 #define rdutil_hh
 
-#include "Fileinfo.hh" //file container
 #include <vector>
+
+#include "Fileinfo.hh" //file container
 
 class Rdutil
 {
@@ -18,10 +19,14 @@ public:
   explicit Rdutil(std::vector<Fileinfo>& list)
     : m_list(list){};
 
-  // print file names to a file, with extra information.
+  /**
+   * print file names to a file, with extra information.
+   * @param filename
+   * @return zero on success
+   */
   int printtofile(const std::string& filename) const;
 
-  // mark files with a unique number
+  /// mark files with a unique number
   void markitems();
 
   /**
@@ -59,44 +64,8 @@ public:
    */
   void markduplicates();
 
-  // sort list on multiple attributes.
-  int sortlist(bool (*lessthan1)(const Fileinfo&, const Fileinfo&),
-               bool (*equal1)(const Fileinfo&, const Fileinfo&),
-               bool (*lessthan2)(const Fileinfo&, const Fileinfo&) = NULL,
-               bool (*equal2)(const Fileinfo&, const Fileinfo&) = NULL,
-               bool (*lessthan3)(const Fileinfo&, const Fileinfo&) = NULL,
-               bool (*equal3)(const Fileinfo&, const Fileinfo&) = NULL,
-               bool (*lessthan4)(const Fileinfo&, const Fileinfo&) = NULL,
-               bool (*equal4)(const Fileinfo&, const Fileinfo&) = NULL);
-
   /// removes all items from the list, that have the deleteflag set to true.
   std::size_t cleanup();
-
-  // marks non unique elements for deletion. list must be sorted first.
-  // this is good to eliminate duplicates on inode, to prevent from
-  // reading hardlinked files, or repeated input arguments to the main program.
-  int marknonuniq(bool (*equal1)(const Fileinfo&, const Fileinfo&),
-                  bool (*equal2)(const Fileinfo&, const Fileinfo&) = NULL,
-                  bool (*equal3)(const Fileinfo&, const Fileinfo&) = NULL,
-                  bool (*equal4)(const Fileinfo&, const Fileinfo&) = NULL);
-
-  // marks uniq elements for deletion (remember, this is a duplicate finder!)
-  // list must be sorted first, before calling this.
-  int markuniq(bool (*equal1)(const Fileinfo&, const Fileinfo&),
-               bool (*equal2)(const Fileinfo&, const Fileinfo&) = NULL,
-               bool (*equal3)(const Fileinfo&, const Fileinfo&) = NULL,
-               bool (*equal4)(const Fileinfo&, const Fileinfo&) = NULL);
-
-  // marks duplicates with tags, depending on their nature.
-  // shall be used when everything is done, and sorted.
-  int markduplicates(bool (*equal1)(const Fileinfo&, const Fileinfo&),
-                     bool (*equal2)(const Fileinfo&, const Fileinfo&) = NULL,
-                     bool (*equal3)(const Fileinfo&, const Fileinfo&) = NULL,
-                     bool (*equal4)(const Fileinfo&, const Fileinfo&) = NULL);
-
-  // subfunction to above
-  int marksingle(std::vector<Fileinfo>::iterator start,
-                 std::vector<Fileinfo>::iterator stop);
 
   /**
    * Removes items with file size less than minsize
@@ -115,40 +84,33 @@ public:
                       Fileinfo::readtobuffermode::NOT_DEFINED,
                     long nsecsleep = 0);
 
-  // make symlinks of duplicates.
+  /// make symlinks of duplicates.
   std::size_t makesymlinks(bool dryrun) const;
 
-  // make hardlinks of duplicates.
+  /// make hardlinks of duplicates.
   std::size_t makehardlinks(bool dryrun) const;
 
-  // delete duplicates.
+  /// delete duplicates from file system.
   std::size_t deleteduplicates(bool dryrun) const;
 
-  // a little helper class
-  class adder_helper
-  {
-  public:
-    adder_helper()
-      : m_sum(0){};
-    typedef unsigned long long int sizetype_t;
-    sizetype_t m_sum;
-    void operator()(const Fileinfo& A)
-    {
-      m_sum += static_cast<sizetype_t>(A.size());
-    }
-    sizetype_t getsize(void) const { return m_sum; }
-  };
-
-  // gets the total size, in bytes.
-  // opmode=0 just add everything
-  // opmode=1 only elements with m_duptype=Fileinfo::DUPTYPE_FIRST_OCCURRENCE
+  /**
+   * gets the total size, in bytes.
+   * @param opmode 0 just add everything, 1 only elements with
+   * m_duptype=Fileinfo::DUPTYPE_FIRST_OCCURRENCE
+   * @return
+   */
   unsigned long long int totalsizeinbytes(int opmode = 0) const;
 
-  // outputs a nicely formatted string "45 bytes" or "3 Gibytes"
-  // where 1024 is used as base
+  /**
+   * outputs a nicely formatted string "45 bytes" or "3 Gibytes"
+   * where 1024 is used as base
+   * @param out
+   * @param opmode
+   * @return
+   */
   std::ostream& totalsize(std::ostream& out, int opmode = 0) const;
 
-  // outputs the saveable amount of space
+  /// outputs the saveable amount of space
   std::ostream& saveablespace(std::ostream& out) const;
 
 private:

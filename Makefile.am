@@ -1,4 +1,4 @@
-# copyright 20016-2017 Paul Dreik (earlier Paul Sundvall)
+# copyright 2006-2018 Paul Dreik (earlier Paul Sundvall)
 # Distributed under GPL v 2.0 or later, at your option.
 # See LICENSE for further details.
 AUTOMAKE_OPTIONS = gnu # I would like dist-bzip2 here, but automake complains
@@ -27,7 +27,7 @@ TESTS=testcases/largefilesupport.sh \
 #TESTS_ENVIRONMENT =  VALGRIND='$(VALGRIND)'
 
 EXTRA_DIST = \
-  algos.hh Dirlist.hh MultiAttributeCompare.hh Checksum.hh  Fileinfo.hh \
+  Dirlist.hh Checksum.hh  Fileinfo.hh \
   Rdutil.hh bootstrap.sh RdfindDebug.hh EasyRandom.hh UndoableUnlink.hh \
   CmdlineParser.hh \
   $(TESTS) \

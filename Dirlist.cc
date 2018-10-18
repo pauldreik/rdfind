@@ -3,18 +3,23 @@
    Distributed under GPL v 2.0 or later, at your option.
    See LICENSE for further details.
 */
-#include "Dirlist.hh"
-#include "config.h"
+
+// std
 #include <cerrno>
 #include <cstring>
-#include <dirent.h>
 #include <iostream>
 #include <string>
+
+// os
+#include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
+// project
+#include "Dirlist.hh"
 #include "RdfindDebug.hh" //debug macros
+#include "config.h"
 
 static const int maxdepth = 50;
 
@@ -166,7 +171,6 @@ Dirlist::handlepossiblefile(const std::string& possiblefile, int recursionlevel)
   }
 
   if (S_ISREG(info.st_mode)) {
-    //    cout<<"found regular file"<<endl;
     RDDEBUG("it is a regular file" << std::endl);
     (*m_callback)(path, filename, recursionlevel);
     return 0;
@@ -174,7 +178,7 @@ Dirlist::handlepossiblefile(const std::string& possiblefile, int recursionlevel)
     RDDEBUG("not a regular file" << std::endl);
   }
   std::cout
-    << "Dirlist.cc::handlepossiblefile: found something else than a dir or "
+    << "Dirlist.cc::handlepossiblefile(): found something else than a dir or "
        "a regular file."
     << std::endl;
   return -1;

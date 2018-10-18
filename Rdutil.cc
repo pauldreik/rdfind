@@ -3,21 +3,25 @@
    Distributed under GPL v 2.0 or later, at your option.
    See LICENSE for further details.
 */
-#include "config.h"
 
-#include "Fileinfo.hh"              //file container
-#include "MultiAttributeCompare.hh" //for sorting on multiple attributes
-#include "RdfindDebug.hh"
-#include "Rdutil.hh"
-#include "algos.hh" //to find duplicates in a vector
+// std
 #include <algorithm>
 #include <cassert>
 #include <chrono>
 #include <cstring>
-#include <fstream> //for file writing
-#include <ostream> //for output
-#include <string>  //for easier passing of string arguments
-#include <thread>  //sleep
+#include <fstream>  //for file writing
+#include <iostream> //for std::cerr
+#include <ostream>  //for output
+#include <string>   //for easier passing of string arguments
+#include <thread>   //sleep
+
+// project
+#include "Fileinfo.hh" //file container
+#include "RdfindDebug.hh"
+#include "config.h"
+
+// class declaration
+#include "Rdutil.hh"
 
 int
 Rdutil::printtofile(const std::string& filename) const
@@ -74,7 +78,7 @@ applyactiononfile(std::vector<Fileinfo>& m_list, Function f)
       } break;
 
       case Fileinfo::DUPTYPE_OUTSIDE_TREE:
-        // intential fallthrough
+        // intentional fallthrough
       case Fileinfo::DUPTYPE_WITHIN_SAME_TREE: {
         assert(original != last);
         // double check that "it" shall be ~linked to "src"
@@ -155,6 +159,7 @@ Rdutil::deleteduplicates(bool dryrun) const
     return applyactiononfile(m_list, &Fileinfo::static_deletefile);
   }
 }
+
 std::size_t
 Rdutil::makesymlinks(bool dryrun) const
 {
@@ -204,13 +209,6 @@ cmpRank(const Fileinfo& a, const Fileinfo& b)
   return std::make_tuple(a.get_cmdline_index(), a.depth(), a.getidentity()) <
          std::make_tuple(b.get_cmdline_index(), b.depth(), b.getidentity());
 }
-#if 0
-bool
-cmpIdentity(const Fileinfo& a, const Fileinfo& b)
-{
-  return a.getidentity() < b.getidentity();
-}
-#endif
 // compares buffers
 bool
 cmpBuffers(const Fileinfo& a, const Fileinfo& b)
@@ -296,13 +294,6 @@ Rdutil::sortOnDeviceAndInode()
 std::size_t
 Rdutil::removeIdenticalInodes()
 {
-#if 0
-  // mark all elements as worth to keep
-  for (auto& e : m_list) {
-    e.setdeleteflag(false);
-  }
-#endif
-
   // sort list on device and inode.
   auto cmp = cmpDeviceInode;
   std::sort(m_list.begin(), m_list.end(), cmp);
@@ -320,6 +311,7 @@ Rdutil::removeIdenticalInodes()
     });
   return cleanup();
 }
+
 std::size_t
 Rdutil::removeUniqueSizes()
 {
@@ -417,28 +409,6 @@ Rdutil::markduplicates()
     });
 }
 
-int
-Rdutil::sortlist(bool (*lessthan1)(const Fileinfo&, const Fileinfo&),
-                 bool (*equal1)(const Fileinfo&, const Fileinfo&),
-                 bool (*lessthan2)(const Fileinfo&, const Fileinfo&),
-                 bool (*equal2)(const Fileinfo&, const Fileinfo&),
-                 bool (*lessthan3)(const Fileinfo&, const Fileinfo&),
-                 bool (*equal3)(const Fileinfo&, const Fileinfo&),
-                 bool (*lessthan4)(const Fileinfo&, const Fileinfo&),
-                 bool (*equal4)(const Fileinfo&, const Fileinfo&))
-{
-  MultiAttributeCompare<Fileinfo, 10> comp;
-  comp.addattrib(lessthan1, equal1);
-  comp.addattrib(lessthan2, equal2);
-  comp.addattrib(lessthan3, equal3);
-  comp.addattrib(lessthan4, equal4);
-
-  sort(m_list.begin(), m_list.end(), comp);
-
-  return 0;
-}
-
-// cleans up, by removing all items that have the deleteflag set to true.
 std::size_t
 Rdutil::cleanup()
 {
@@ -471,14 +441,28 @@ Rdutil::remove_small_files(Fileinfo::filesizetype minsize)
   return size_before - m_list.size();
 }
 
-// total size
-// opmode=0 just add everything
-// opmode=1 only elements with m_duptype=Fileinfo::DUPTYPE_FIRST_OCCURRENCE
+namespace {
+// a little helper class
+class adder_helper
+{
+public:
+  adder_helper()
+    : m_sum(0){};
+  typedef unsigned long long int sizetype_t;
+  sizetype_t m_sum;
+  void operator()(const Fileinfo& A)
+  {
+    m_sum += static_cast<sizetype_t>(A.size());
+  }
+  sizetype_t getsize(void) const { return m_sum; }
+};
+}
+
 unsigned long long
 Rdutil::totalsizeinbytes(int opmode) const
 {
   // for some reason, for_each does not work.
-  Rdutil::adder_helper adder;
+  adder_helper adder;
   std::vector<Fileinfo>::iterator it;
   if (opmode == 0) {
     for (it = m_list.begin(); it != m_list.end(); ++it) {
@@ -516,7 +500,7 @@ calcrange(unsigned long long int& size)
   return range;
 }
 
-// helper. source of capitalization rules etc:
+// source of capitalization rules etc:
 // https://en.wikipedia.org/wiki/Binary_prefix
 std::string
 byteprefix(int range)
@@ -541,6 +525,7 @@ byteprefix(int range)
   }
 }
 }
+
 std::ostream&
 Rdutil::totalsize(std::ostream& out, int opmode) const
 {
@@ -559,169 +544,12 @@ Rdutil::saveablespace(std::ostream& out) const
   return out;
 }
 
-// marks non unique elements for deletion. list must be sorted first.
-int
-Rdutil::marknonuniq(bool (*equal1)(const Fileinfo&, const Fileinfo&),
-                    bool (*equal2)(const Fileinfo&, const Fileinfo&),
-                    bool (*equal3)(const Fileinfo&, const Fileinfo&),
-                    bool (*equal4)(const Fileinfo&, const Fileinfo&))
-{
-
-  // create on object that can compare two files
-  MultiAttributeCompare<Fileinfo, 10> comp;
-  comp.addattrib(equal1);
-  comp.addattrib(equal2);
-  comp.addattrib(equal3);
-  comp.addattrib(equal4);
-
-  // an object to apply on duplicate regions
-  ApplyOnDuplicateFunction<Fileinfo> apf;
-
-  // set all delete flags to false
-  std::vector<Fileinfo>::iterator it, start, stop;
-
-  start = m_list.begin();
-  stop = m_list.end();
-
-  for (it = m_list.begin(); it != m_list.end(); ++it) {
-    it->setdeleteflag(false);
-  }
-
-  apply_on_duplicate_regions<Fileinfo>(start, stop, comp, apf);
-
-  return 0;
-}
-
-// marks uniq elements for deletion. list must be sorted first, before calling
-// this.
-int
-Rdutil::markuniq(bool (*equal1)(const Fileinfo&, const Fileinfo&),
-                 bool (*equal2)(const Fileinfo&, const Fileinfo&),
-                 bool (*equal3)(const Fileinfo&, const Fileinfo&),
-                 bool (*equal4)(const Fileinfo&, const Fileinfo&))
-{
-  // create on object that can compare two files
-  MultiAttributeCompare<Fileinfo, 10> comp;
-  comp.addattrib(equal1);
-  comp.addattrib(equal2);
-  comp.addattrib(equal3);
-  comp.addattrib(equal4);
-
-  // identify the regions with duplicates
-  int a = 1;
-  int ndup = 0;
-  std::vector<Fileinfo>::iterator start, stop, segstart, segstop;
-  start = m_list.begin();
-  stop = m_list.end();
-
-  std::vector<Fileinfo>::iterator it;
-
-  for (it = start; it != stop; ++it) {
-    it->setdeleteflag(true);
-  }
-
-  while (a > 0) {
-    // find the first region
-    a = find_duplicate_regions<Fileinfo, MultiAttributeCompare<Fileinfo, 10>>(
-      start, stop, segstart, segstop, comp);
-
-    if (a > 0) {
-      // found region.
-      // cout<<"found region with "<<a<<" duplicates."<<endl;
-
-      // let the duplicate search start at a suitable place next time.
-      start = segstop;
-
-      // apply something on the objects that are duplicates
-      for (it = segstart; it != segstop; ++it) {
-        it->setdeleteflag(false);
-      }
-    }
-    ndup += a;
-  } // end while a>0
-
-  return 0;
-}
-
-// marks duplicates
-int
-Rdutil::markduplicates(bool (*equal1)(const Fileinfo&, const Fileinfo&),
-                       bool (*equal2)(const Fileinfo&, const Fileinfo&),
-                       bool (*equal3)(const Fileinfo&, const Fileinfo&),
-                       bool (*equal4)(const Fileinfo&, const Fileinfo&))
-{
-  // create on object that can compare two files
-  MultiAttributeCompare<Fileinfo, 10> comp;
-  comp.addattrib(equal1);
-  comp.addattrib(equal2);
-  comp.addattrib(equal3);
-  comp.addattrib(equal4);
-
-  // identify the regions with duplicates
-  int a = 1;
-  int ndup = 0;
-  std::vector<Fileinfo>::iterator start, stop, segstart, segstop;
-  start = m_list.begin();
-  stop = m_list.end();
-  while (a > 0) {
-    // find the first region
-    a = find_duplicate_regions<Fileinfo, MultiAttributeCompare<Fileinfo, 10>>(
-      start, stop, segstart, segstop, comp);
-
-    if (a > 0) {
-      // found region
-      // let the duplicate search start at a suitable place next time.
-      start = segstop;
-
-      // mark the file
-      marksingle(segstart, segstop);
-    }
-    ndup += a;
-  } // end while a>0
-
-  return 0;
-}
-
-// formats output in a nice way.
-int
-Rdutil::marksingle(std::vector<Fileinfo>::iterator start,
-                   std::vector<Fileinfo>::iterator stop)
-{
-  // sort on command line index - keep the other ordering (stable_sort instead
-  // of sort)
-  std::stable_sort(start, stop, &Fileinfo::compareoncmdlineindex);
-
-  std::vector<Fileinfo>::iterator it;
-
-  // only considering a file belonging to a different command line index as a
-  // duplicate
-
-  for (it = start; it != stop; ++it) {
-    if (it == start) {
-      it->setduptype(Fileinfo::DUPTYPE_FIRST_OCCURRENCE);
-    } else {
-      // point out the file that it is a copy of
-      it->setidentity(-Fileinfo::identity(*start));
-      if (it->get_cmdline_index() == start->get_cmdline_index() &&
-          it != start) {
-        it->setduptype(Fileinfo::DUPTYPE_WITHIN_SAME_TREE);
-      } else {
-        it->setduptype(Fileinfo::DUPTYPE_OUTSIDE_TREE);
-      }
-    }
-  }
-
-  return 0;
-}
-
-// read some bytes. note! destroys the order of the list.
 int
 Rdutil::fillwithbytes(enum Fileinfo::readtobuffermode type,
                       enum Fileinfo::readtobuffermode lasttype,
                       const long nsecsleep)
 {
-
-  // first sort on inode (to read efficently from the hard drive)
+  // first sort on inode (to read efficiently from the hard drive)
   sortOnDeviceAndInode();
 
   const auto duration = std::chrono::nanoseconds{ nsecsleep };

@@ -4,13 +4,13 @@
    See LICENSE for further details.
 */
 
-#include "config.h"
-
+// std
 #include <algorithm>
-#include <iostream> //cout etc
+#include <iostream>
 #include <string>
 #include <vector>
 
+// project
 #include "CmdlineParser.hh"
 #include "Dirlist.hh"     //to find files
 #include "Fileinfo.hh"    //file container

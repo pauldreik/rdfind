@@ -4,10 +4,12 @@
    See LICENSE for further details.
 */
 
+// std
 #include <algorithm>
 #include <array>
 #include <random>
 
+// project
 #include "EasyRandom.hh"
 
 class EasyRandom::GlobalRandom

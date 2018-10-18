@@ -15,12 +15,12 @@ static void
 display_hex(std::size_t length, const void* data_)
 {
   const char* data = static_cast<const char*>(data_);
-  for (std::size_t i = 0; i < length; i++)
+  for (std::size_t i = 0; i < length; i++) {
     std::printf("%02x", data[i]);
+  }
   std::printf("\n");
 }
 
-// init
 int
 Checksum::init(int checksumtype)
 {
@@ -28,8 +28,9 @@ Checksum::init(int checksumtype)
   m_checksumtype = checksumtype;
 
   // one may not init to something stupid
-  if (m_checksumtype == NOTSET)
+  if (m_checksumtype == NOTSET) {
     return -2;
+  }
 
   switch (m_checksumtype) {
     case SHA1: {
@@ -48,7 +49,6 @@ Checksum::init(int checksumtype)
   return 0;
 }
 
-// update
 int
 Checksum::update(std::size_t length, const unsigned char* buffer)
 {
@@ -67,6 +67,7 @@ Checksum::update(std::size_t length, const unsigned char* buffer)
   }
   return 0;
 }
+
 int
 Checksum::update(std::size_t length, const char* buffer)
 {
@@ -109,7 +110,6 @@ Checksum::print()
   return 0;
 }
 
-// returns the number of bytes that the buffer needs to be
 int
 Checksum::getDigestLength() const
 {
@@ -126,7 +126,6 @@ Checksum::getDigestLength() const
   return -1;
 }
 
-// writes the checksum to buffer
 int
 Checksum::printToBuffer(void* buffer, std::size_t N)
 {

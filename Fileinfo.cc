@@ -3,18 +3,22 @@
    Distributed under GPL v 2.0 or later, at your option.
    See LICENSE for further details.
 */
-#include "Fileinfo.hh"
-#include "config.h"
 
+// std
 #include <cerrno> //for errno
 #include <cstring>
-#include <fstream>    //for file reading
-#include <iostream>   //for cout etc
+#include <fstream>  //for file reading
+#include <iostream> //for cout etc
+
+// os
 #include <sys/stat.h> //for file info
 #include <unistd.h>   //for unlink etc.
 
+// project
 #include "Checksum.hh" //checksum calculation
+#include "Fileinfo.hh"
 #include "UndoableUnlink.hh"
+#include "config.h"
 
 int
 Fileinfo::fillwithbytes(enum readtobuffermode filltype,

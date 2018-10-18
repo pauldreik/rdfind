@@ -1,14 +1,16 @@
 /*
- * CmdlineParser.cc
- *
- *  Created on: 16 okt. 2018
- *      Author: paul
- */
+   copyright 2018 Paul Dreik (earlier Paul Sundvall)
+   Distributed under GPL v 2.0 or later, at your option.
+   See LICENSE for further details.
+*/
 
-#include "CmdlineParser.hh"
+// std
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+
+// project
+#include "CmdlineParser.hh"
 
 bool
 Parser::try_parse_bool(const char* arg)

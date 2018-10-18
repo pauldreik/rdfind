@@ -10,11 +10,8 @@
 
 /**
  * Helper object to "provide a replacement of std::rand()"
- *
  * It is automatically seeded.
- *
  * The state is global, and not held in the class
- *
  * This class is not thread safe.
  */
 class EasyRandom
@@ -22,6 +19,11 @@ class EasyRandom
 public:
   class GlobalRandom;
   EasyRandom();
+  /**
+   * makes N random characters, suitable to use for a random filename.
+   * @param N
+   * @return
+   */
   std::string makeRandomFileString(std::size_t N = 16);
 
 private:

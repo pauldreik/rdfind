@@ -1,9 +1,8 @@
 /*
- * CmdlineParser.hh
- *
- *  Created on: 16 okt. 2018
- *      Author: paul
- */
+   copyright 2018 Paul Dreik (earlier Paul Sundvall)
+   Distributed under GPL v 2.0 or later, at your option.
+   See LICENSE for further details.
+*/
 
 #ifndef RDFIND_CMDLINEPARSER_HH_
 #define RDFIND_CMDLINEPARSER_HH_
