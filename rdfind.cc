@@ -364,7 +364,7 @@ main(int narg, const char* argv[])
   if (o.makesymlinks) {
     std::cout << dryruntext << "Now making symbolic links. creating "
               << std::endl;
-    int tmp = gswd.makesymlinks(o.dryrun);
+    const auto tmp = gswd.makesymlinks(o.dryrun);
     std::cout << "Making " << tmp << " links." << std::endl;
     return 0;
   }
@@ -372,7 +372,7 @@ main(int narg, const char* argv[])
   // traverse the list and replace with hard links
   if (o.makehardlinks) {
     std::cout << dryruntext << "Now making hard links." << std::endl;
-    int tmp = gswd.makehardlinks(o.dryrun);
+    const auto tmp = gswd.makehardlinks(o.dryrun);
     std::cout << "Making " << tmp << " links." << std::endl;
     return 0;
   }
@@ -380,7 +380,7 @@ main(int narg, const char* argv[])
   // traverse the list and delete files
   if (o.deleteduplicates) {
     std::cout << dryruntext << "Now deleting duplicates:" << std::endl;
-    int tmp = gswd.deleteduplicates(o.dryrun);
+    const auto tmp = gswd.deleteduplicates(o.dryrun);
     std::cout << "Deleted " << tmp << " files." << std::endl;
     return 0;
   }

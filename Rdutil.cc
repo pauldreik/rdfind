@@ -74,7 +74,7 @@ applyactiononfile(std::vector<Fileinfo>& m_list, Function f)
       } break;
 
       case Fileinfo::DUPTYPE_OUTSIDE_TREE:
-        [[fallthrough]];
+        //[[fallthrough]];
       case Fileinfo::DUPTYPE_WITHIN_SAME_TREE: {
         assert(original != last);
         // double check that "it" shall be ~linked to "src"
@@ -89,7 +89,8 @@ applyactiononfile(std::vector<Fileinfo>& m_list, Function f)
       } break;
 
       default:
-        assert(!"file with bad duptype at this stage. Programming error!");
+        assert("file with bad duptype at this stage. Programming error!" !=
+               nullptr);
     }
   }
   return ntimesapplied;
@@ -203,22 +204,28 @@ cmpRank(const Fileinfo& a, const Fileinfo& b)
   return std::make_tuple(a.get_cmdline_index(), a.depth(), a.getidentity()) <
          std::make_tuple(b.get_cmdline_index(), b.depth(), b.getidentity());
 }
+#if 0
 bool
 cmpIdentity(const Fileinfo& a, const Fileinfo& b)
 {
   return a.getidentity() < b.getidentity();
 }
+#endif
 // compares buffers
 bool
 cmpBuffers(const Fileinfo& a, const Fileinfo& b)
 {
   return std::memcmp(a.getbyteptr(), b.getbyteptr(), a.getbuffersize()) < 0;
 }
+
+#if !defined(NDEBUG)
 bool
 hasEqualBuffers(const Fileinfo& a, const Fileinfo& b)
 {
   return std::memcmp(a.getbyteptr(), b.getbyteptr(), a.getbuffersize()) == 0;
 }
+#endif
+
 // compares file size
 bool
 cmpSize(const Fileinfo& a, const Fileinfo& b)
