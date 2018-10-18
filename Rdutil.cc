@@ -74,7 +74,7 @@ applyactiononfile(std::vector<Fileinfo>& m_list, Function f)
       } break;
 
       case Fileinfo::DUPTYPE_OUTSIDE_TREE:
-        //[[fallthrough]];
+        // intential fallthrough
       case Fileinfo::DUPTYPE_WITHIN_SAME_TREE: {
         assert(original != last);
         // double check that "it" shall be ~linked to "src"

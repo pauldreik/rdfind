@@ -155,6 +155,30 @@ if test "x$set_more_warnings" != xno; then
 	unset option
 fi
 
+dnl check for fallthrough. this is tricky to use, because it may give a warning
+dnl on some compilers (clang in c++11, pedantic mode with warnings enabled)
+dnl therefore, do not use this for now.
+AC_MSG_CHECKING([check for fallthrough support])
+define([str],[[[[fallthrough]]]])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+ int f() {
+  switch(1){
+  case 1:
+  [[fallthrough]];
+  case 2:
+  return 2;
+  };
+ }
+]], [])],
+            [has_fallthrough=yes],
+            [has_fallthrough=no])
+AC_MSG_RESULT($has_fallthrough)
+if test $has_fallthrough = yes; then            
+AC_DEFINE(FALLTHROUGH, [str], "support for c++17 fallthrough")
+else
+AC_DEFINE(FALLTHROUGH, [], "support for c++17 fallthrough")
+fi
+
 dnl valgrind support
 dnl unfortunately it makes checking much slower
 dnl even if valgrind is not used, so leave it inactive.
