@@ -71,15 +71,15 @@ applyactiononfile(std::vector<Fileinfo>& m_list, Function f)
   // loop over files
   for (auto it = first; it != last; ++it) {
     switch (it->getduptype()) {
-      case Fileinfo::DUPTYPE_FIRST_OCCURRENCE: {
+      case Fileinfo::duptype::DUPTYPE_FIRST_OCCURRENCE: {
         original = it;
         assert(original->getidentity() >= 0 &&
                "original file should have positive identity");
       } break;
 
-      case Fileinfo::DUPTYPE_OUTSIDE_TREE:
+      case Fileinfo::duptype::DUPTYPE_OUTSIDE_TREE:
         // intentional fallthrough
-      case Fileinfo::DUPTYPE_WITHIN_SAME_TREE: {
+      case Fileinfo::duptype::DUPTYPE_WITHIN_SAME_TREE: {
         assert(original != last);
         // double check that "it" shall be ~linked to "src"
         assert(it->getidentity() == -original->getidentity() &&
@@ -398,14 +398,15 @@ Rdutil::markduplicates()
       auto marker = [orig](Fileinfo& elem) {
         elem.setidentity(-orig->getidentity());
         if (elem.get_cmdline_index() == orig->get_cmdline_index()) {
-          elem.setduptype(Fileinfo::DUPTYPE_WITHIN_SAME_TREE);
+          elem.setduptype(Fileinfo::duptype::DUPTYPE_WITHIN_SAME_TREE);
         } else {
-          elem.setduptype(Fileinfo::DUPTYPE_OUTSIDE_TREE);
+          elem.setduptype(Fileinfo::duptype::DUPTYPE_OUTSIDE_TREE);
         }
       };
-      orig->setduptype(Fileinfo::DUPTYPE_FIRST_OCCURRENCE);
+      orig->setduptype(Fileinfo::duptype::DUPTYPE_FIRST_OCCURRENCE);
       std::for_each(first + 1, last, marker);
-      assert(first->getduptype() == Fileinfo::DUPTYPE_FIRST_OCCURRENCE);
+      assert(first->getduptype() ==
+             Fileinfo::duptype::DUPTYPE_FIRST_OCCURRENCE);
     });
 }
 
@@ -472,7 +473,7 @@ Rdutil::totalsizeinbytes(int opmode) const
     }
   } else if (opmode == 1) {
     for (it = m_list.begin(); it != m_list.end(); ++it) {
-      if (it->getduptype() == Fileinfo::DUPTYPE_FIRST_OCCURRENCE) {
+      if (it->getduptype() == Fileinfo::duptype::DUPTYPE_FIRST_OCCURRENCE) {
         adder(*it);
       }
     }

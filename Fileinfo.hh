@@ -26,7 +26,7 @@ public:
     : m_info()
     , m_filename(std::move(name))
     , m_delete(false)
-    , m_duptype(DUPTYPE_UNKNOWN)
+    , m_duptype(duptype::DUPTYPE_UNKNOWN)
     , m_cmdline_index(cmdline_index)
     , m_depth(depth)
     , m_identity(0)
@@ -38,7 +38,7 @@ public:
   using filesizetype = off_t;
 
   // enums used to tell how to read data into the buffer
-  enum class readtobuffermode
+  enum class readtobuffermode : signed char
   {
     NOT_DEFINED = -1,
     READ_FIRST_BYTES = 0,
@@ -49,7 +49,7 @@ public:
   };
 
   // type of duplicate
-  enum duptype
+  enum class duptype : char
   {
     DUPTYPE_UNKNOWN,
     DUPTYPE_FIRST_OCCURRENCE,
@@ -75,7 +75,7 @@ public:
    */
   bool readfileinfo();
 
-  int getduptype() const { return m_duptype; };
+  duptype getduptype() const { return m_duptype; };
 
   /// makes a symlink of "this" that points to A.
   int makesymlink(const Fileinfo& A);

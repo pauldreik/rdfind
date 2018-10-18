@@ -134,13 +134,13 @@ Fileinfo::getduptypestring(const Fileinfo& A)
 {
 
   switch (A.getduptype()) {
-    case DUPTYPE_UNKNOWN:
+    case duptype::DUPTYPE_UNKNOWN:
       return "DUPTYPE_UNKNOWN";
-    case DUPTYPE_FIRST_OCCURRENCE:
+    case duptype::DUPTYPE_FIRST_OCCURRENCE:
       return "DUPTYPE_FIRST_OCCURRENCE";
-    case DUPTYPE_WITHIN_SAME_TREE:
+    case duptype::DUPTYPE_WITHIN_SAME_TREE:
       return "DUPTYPE_WITHIN_SAME_TREE";
-    case DUPTYPE_OUTSIDE_TREE:
+    case duptype::DUPTYPE_OUTSIDE_TREE:
       return "DUPTYPE_OUTSIDE_TREE";
     default:
       assert("we should not get here!" != nullptr);
