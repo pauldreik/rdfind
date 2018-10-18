@@ -5,8 +5,9 @@
 */
 
 // std
-#include <cerrno> //for errno
-#include <cstring>
+#include <cassert>
+#include <cerrno>   //for errno
+#include <cstring>  //for strerror
 #include <fstream>  //for file reading
 #include <iostream> //for cout etc
 
@@ -114,7 +115,7 @@ Fileinfo::readfileinfo()
     m_info.stat_dev = 0;
     std::cerr << "readfileinfo.cc:Something went wrong when reading file "
                  "info from \""
-              << m_filename << "\" :" << strerror(errno) << std::endl;
+              << m_filename << "\" :" << std::strerror(errno) << std::endl;
     return false;
   }
 
@@ -128,7 +129,7 @@ Fileinfo::readfileinfo()
   return true;
 }
 
-std::string
+const char*
 Fileinfo::getduptypestring(const Fileinfo& A)
 {
 
@@ -142,8 +143,9 @@ Fileinfo::getduptypestring(const Fileinfo& A)
     case DUPTYPE_OUTSIDE_TREE:
       return "DUPTYPE_OUTSIDE_TREE";
     default:
-      std::cerr << "error. does not know that one" << std::endl;
+      assert("we should not get here!" != nullptr);
   }
+
   return "error-error";
 }
 
@@ -203,6 +205,7 @@ makeAbsolute(std::string& target)
 
     // yes, this is possible to do with dynamically allocated memory,
     // but it is not portable then (and more work).
+    // hmm, would it be possible to cache this and gain some speedup?
     const size_t buflength = 256;
     char buf[buflength];
     if (buf != getcwd(buf, buflength)) {
@@ -307,37 +310,4 @@ int
 Fileinfo::static_makehardlink(Fileinfo& A, const Fileinfo& B)
 {
   return A.makehardlink(B);
-}
-
-bool
-Fileinfo::compareonbytes(const Fileinfo& a, const Fileinfo& b)
-{
-  const int retval =
-    std::memcmp(a.getbyteptr(), b.getbyteptr(), a.m_somebytes.size());
-  return retval < 0;
-}
-
-bool
-Fileinfo::equalbytes(const Fileinfo& a, const Fileinfo& b)
-{
-  const int retval =
-    std::memcmp(a.getbyteptr(), b.getbyteptr(), a.m_somebytes.size());
-  return retval == 0;
-}
-
-bool
-Fileinfo::compareonsizeandfirstbytes(const Fileinfo& a, const Fileinfo& b)
-{
-  if (a.size() > b.size())
-    return true;
-  if (a.size() < b.size())
-    return false;
-  // must be equal. compare on bytes.
-  return compareonbytes(a, b);
-}
-
-bool
-Fileinfo::equalsize(const Fileinfo& a, const Fileinfo& b)
-{
-  return a.size() == b.size();
 }

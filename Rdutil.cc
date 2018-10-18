@@ -413,8 +413,9 @@ std::size_t
 Rdutil::cleanup()
 {
   const auto size_before = m_list.size();
-  auto it =
-    std::remove_if(m_list.begin(), m_list.end(), Fileinfo::static_deleteflag);
+  auto it = std::remove_if(m_list.begin(), m_list.end(), [](const Fileinfo& A) {
+    return A.deleteflag();
+  });
 
   m_list.erase(it, m_list.end());
 
@@ -431,10 +432,11 @@ Rdutil::remove_small_files(Fileinfo::filesizetype minsize)
   const auto end = m_list.end();
   decltype(m_list.begin()) it;
   if (minsize == 0) {
-    it = std::remove_if(begin, end, &Fileinfo::isempty);
+    it =
+      std::remove_if(begin, end, [](const Fileinfo& A) { return A.isempty(); });
   } else {
     it = std::remove_if(begin, end, [=](const Fileinfo& A) {
-      return Fileinfo::is_smaller_than(A, minsize);
+      return A.is_smaller_than(minsize);
     });
   }
   m_list.erase(it, end);
