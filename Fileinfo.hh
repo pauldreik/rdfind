@@ -23,10 +23,10 @@ class Fileinfo
 public:
   // constructor
   Fileinfo(std::string name, int cmdline_index, int depth)
-    : m_filename(std::move(name))
+    : m_info()
+    , m_filename(std::move(name))
     , m_delete(false)
     , m_duptype(DUPTYPE_UNKNOWN)
-    , m_info()
     , m_cmdline_index(cmdline_index)
     , m_depth(depth)
     , m_identity(0)
@@ -65,57 +65,6 @@ public:
   static const char* getduptypestring(const Fileinfo& A);
   void setduptype(enum duptype duptype_) { m_duptype = duptype_; }
 
-private:
-  // to store info about the file
-  struct Fileinfostat
-  {
-    filesizetype stat_size; // size
-    unsigned long stat_ino; // inode
-    unsigned long stat_dev; // device
-    bool is_file;
-    bool is_directory;
-    Fileinfostat();
-  };
-  Fileinfostat m_info;
-
-  // to keep the name of the file, including path
-  std::string m_filename;
-
-  // to be deleted or not
-  bool m_delete;
-
-  duptype m_duptype;
-
-  // If two files are found to be identical, the one with highest ranking is
-  // chosen. The rules are listed in the man page.
-  // lowest cmdlineindex wins, followed by the lowest depth, then first found.
-
-  /**
-   * in which order it appeared on the command line. can't be const, because
-   * that means the implicitly defined assignment needed by the stl will be
-   * illformed.
-   * This is fine to be an int, because that is what argc,argv use.
-   */
-  int m_cmdline_index;
-
-  /**
-   * the directory depth at which this file was found.
-   */
-  int m_depth;
-
-  /**
-   * a number to identify this individual file. used for ranking.
-   */
-  std::int64_t m_identity;
-
-  enum ByteSize
-  {
-    SomeByteSize = 64
-  };
-  /// a buffer that will be filled with some bytes of the file or a hash
-  std::array<char, SomeByteSize> m_somebytes;
-
-public:
   std::int64_t getidentity() const { return m_identity; }
   static std::int64_t identity(const Fileinfo& A) { return A.getidentity(); }
   void setidentity(std::int64_t id) { m_identity = id; };
@@ -203,6 +152,56 @@ public:
 
   // returns true if file is a directory . call readfileinfo first!
   bool isDirectory() const { return m_info.is_directory; }
+
+private:
+  // to store info about the file
+  struct Fileinfostat
+  {
+    filesizetype stat_size; // size
+    unsigned long stat_ino; // inode
+    unsigned long stat_dev; // device
+    bool is_file;
+    bool is_directory;
+    Fileinfostat();
+  };
+  Fileinfostat m_info;
+
+  // to keep the name of the file, including path
+  std::string m_filename;
+
+  // to be deleted or not
+  bool m_delete;
+
+  duptype m_duptype;
+
+  // If two files are found to be identical, the one with highest ranking is
+  // chosen. The rules are listed in the man page.
+  // lowest cmdlineindex wins, followed by the lowest depth, then first found.
+
+  /**
+   * in which order it appeared on the command line. can't be const, because
+   * that means the implicitly defined assignment needed by the stl will be
+   * illformed.
+   * This is fine to be an int, because that is what argc,argv use.
+   */
+  int m_cmdline_index;
+
+  /**
+   * the directory depth at which this file was found.
+   */
+  int m_depth;
+
+  /**
+   * a number to identify this individual file. used for ranking.
+   */
+  std::int64_t m_identity;
+
+  enum ByteSize
+  {
+    SomeByteSize = 64
+  };
+  /// a buffer that will be filled with some bytes of the file or a hash
+  std::array<char, SomeByteSize> m_somebytes;
 };
 
 #endif
