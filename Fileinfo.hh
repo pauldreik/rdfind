@@ -1,5 +1,5 @@
 /*
-   copyright 20016-2017 Paul Dreik (earlier Paul Sundvall)
+   copyright 2006-2018 Paul Dreik (earlier Paul Sundvall)
    Distributed under GPL v 2.0 or later, at your option.
    See LICENSE for further details.
 */
