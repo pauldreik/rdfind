@@ -4,6 +4,10 @@
    See LICENSE for further details.
 */
 
+
+//pick up project config incl. assert control.
+#include "config.h"
+
 // std
 #include <algorithm>
 #include <cassert>
@@ -18,7 +22,6 @@
 // project
 #include "Fileinfo.hh" //file container
 #include "RdfindDebug.hh"
-#include "config.h"
 
 // class declaration
 #include "Rdutil.hh"

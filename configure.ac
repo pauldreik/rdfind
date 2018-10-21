@@ -31,9 +31,10 @@ AC_ARG_ENABLE(debug,
 AC_MSG_RESULT($showdebugmessages)
 if test x"$showdebugmessages" = x"yes"; then
 	AC_DEFINE([RDFIND_DEBUG],[1],[Enable debug printouts in program])
-dnl	CXXFLAGS="$CXXFLAGS -g -Wall -Werror"
-fi	
+fi
 
+dnl for assert() support
+AC_HEADER_ASSERT
 
 dnl test for nettle
 AC_CHECK_HEADER(nettle/sha.h,,[AC_MSG_ERROR([
@@ -57,13 +58,6 @@ AC_CHECK_LIB(nettle,main,,[AC_MSG_ERROR([
 
 dnl test for some specific functions
 AC_CHECK_FUNC(stat,,AC_MSG_ERROR(oops! no stat ?!?))
-AC_CHECK_FUNC(nanosleep,,AC_MSG_WARN(cant do nanosleep ?))
-
-AC_CHECK_LIB(stdc++, main,,AC_MSG_ERROR(rdfind requires libstdc++))          
-
-AC_CHECK_HEADERS(string,,AC_MSG_WARN(STL classes missing ?))
-AC_CHECK_HEADERS(vector,,AC_MSG_WARN(STL classes missing ?))
-AC_CHECK_HEADERS(time.h,,AC_MSG_WARN(nanosleep header time.h missing?))
 
 dnl check for 64 bit support
 AC_SYS_LARGEFILE
@@ -98,6 +92,7 @@ AC_ARG_ENABLE(warnings,
 )
 dnl the following warning related paragraph is from the gnumeric project, which
 dnl is gpl-v2 licensed. I modified and expanded it a bit.
+
 if test "x$set_more_warnings" != xno; then
 	dnl Clang needs this option, or else it will appear to support any
 	dnl warning option, only to spew warnings about them later.
