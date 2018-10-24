@@ -4,6 +4,8 @@
    See LICENSE for further details.
 */
 
+#include "config.h"
+
 // std
 #include <cassert>
 #include <cerrno>   //for errno
@@ -19,7 +21,6 @@
 #include "Checksum.hh" //checksum calculation
 #include "Fileinfo.hh"
 #include "UndoableUnlink.hh"
-#include "config.h"
 
 int
 Fileinfo::fillwithbytes(enum readtobuffermode filltype,

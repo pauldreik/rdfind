@@ -4,6 +4,9 @@
    See LICENSE for further details.
 */
 
+
+#include "config.h"
+
 // std
 #include <cstdlib>
 #include <cstring>

@@ -4,6 +4,8 @@
    See LICENSE for further details.
 */
 
+#include "config.h"       //header file from autoconf
+
 // std
 #include <algorithm>
 #include <iostream>
@@ -16,7 +18,6 @@
 #include "Fileinfo.hh"    //file container
 #include "RdfindDebug.hh" //debug macro
 #include "Rdutil.hh"      //to do some work
-#include "config.h"       //header file from autoconf
 
 // global variables
 

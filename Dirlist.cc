@@ -4,6 +4,8 @@
    See LICENSE for further details.
 */
 
+#include "config.h"
+
 // std
 #include <cerrno>
 #include <cstring>
@@ -19,7 +21,6 @@
 // project
 #include "Dirlist.hh"
 #include "RdfindDebug.hh" //debug macros
-#include "config.h"
 
 static const int maxdepth = 50;
 

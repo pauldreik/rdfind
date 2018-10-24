@@ -3,12 +3,17 @@
    Distributed under GPL v 2.0 or later, at your option.
    See LICENSE for further details.
 */
-#include "Checksum.hh"
+
+#include "config.h"
+
+//std
 #include <array>
 #include <cassert>
 #include <cstdio>
-
 #include <cstring> //for memcpy
+
+//project
+#include "Checksum.hh"
 
 // this is a small function to print the checksum to stdout
 static void
