@@ -4,7 +4,6 @@
    See LICENSE for further details.
 */
 
-
 #include "config.h"
 
 // std

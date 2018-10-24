@@ -4,7 +4,7 @@
    See LICENSE for further details.
 */
 
-#include "config.h"       //header file from autoconf
+#include "config.h" //header file from autoconf
 
 // std
 #include <algorithm>
@@ -59,6 +59,8 @@ usage()
        "device and inode\n"
     << " -checksum           md5 |(sha1)| sha256\n"
     << "                                  checksum type\n"
+	<< " -deterministic    (true)| false  makes results independent of order"
+	<< "                                  from listing the filesystem"
     << " -makesymlinks      true |(false) replace duplicate files with "
        "symbolic links\n"
     << " -makehardlinks     true |(false) replace duplicate files with "
@@ -98,6 +100,7 @@ struct Options
   bool usemd5 = false;    // use md5 checksum to check for similarity
   bool usesha1 = false;   // use sha1 checksum to check for similarity
   bool usesha256 = false; // use sha256 checksum to check for similarity
+  bool deterministic = true; // be independent of filesystem order
   long nsecsleep = 0; // number of nanoseconds to sleep between each file read.
   std::string resultsfile = "results.txt"; // results file name.
 };
@@ -150,6 +153,8 @@ parseOptions(Parser& parser)
       o.dryrun = parser.get_parsed_bool();
     } else if (parser.try_parse_bool("-removeidentinode")) {
       o.remove_identical_inode = parser.get_parsed_bool();
+    } else if (parser.try_parse_bool("-deterministic")) {
+      o.deterministic = parser.get_parsed_bool();
     } else if (parser.try_parse_string("-checksum")) {
       if (parser.parsed_string_is("md5")) {
         o.usemd5 = true;
@@ -286,6 +291,12 @@ main(int narg, const char* argv[])
     dirlist.walk(file_or_dir, 0);
     std::cout << ", found " << filelist.size() - lastsize << " files."
               << std::endl;
+
+    // if we want deterministic output, we will sort the newly added
+    // items on depth, then filename.
+    if (o.deterministic) {
+      gswd.sort_on_depth_and_name(lastsize);
+    }
   }
 
   std::cout << dryruntext << "Now have " << filelist.size()

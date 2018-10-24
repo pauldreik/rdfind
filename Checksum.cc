@@ -6,13 +6,13 @@
 
 #include "config.h"
 
-//std
+// std
 #include <array>
 #include <cassert>
 #include <cstdio>
 #include <cstring> //for memcpy
 
-//project
+// project
 #include "Checksum.hh"
 
 // this is a small function to print the checksum to stdout

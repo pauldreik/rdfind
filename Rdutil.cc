@@ -4,8 +4,7 @@
    See LICENSE for further details.
 */
 
-
-//pick up project config incl. assert control.
+// pick up project config incl. assert control.
 #include "config.h"
 
 // std
@@ -212,6 +211,13 @@ cmpRank(const Fileinfo& a, const Fileinfo& b)
   return std::make_tuple(a.get_cmdline_index(), a.depth(), a.getidentity()) <
          std::make_tuple(b.get_cmdline_index(), b.depth(), b.getidentity());
 }
+bool
+cmpDepthName(const Fileinfo& a, const Fileinfo& b)
+{
+	//inefficient, make it a reference.
+  return std::make_tuple( a.depth(), a.name()) <
+         std::make_tuple( b.depth(), b.name());
+}
 // compares buffers
 bool
 cmpBuffers(const Fileinfo& a, const Fileinfo& b)
@@ -292,6 +298,15 @@ Rdutil::sortOnDeviceAndInode()
 
   std::sort(m_list.begin(), m_list.end(), cmpDeviceInode);
   return 0;
+}
+
+void Rdutil::sort_on_depth_and_name(std::size_t index_of_first) {
+	assert(index_of_first<=m_list.size());
+	  auto cmp = cmpDepthName;
+
+	  auto first=m_list.begin();
+	  std::advance(first,index_of_first);
+	  std::sort(first,m_list.end(), cmp);
 }
 
 std::size_t

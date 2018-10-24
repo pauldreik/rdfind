@@ -36,6 +36,12 @@ public:
   int sortOnDeviceAndInode();
 
   /**
+   * sorts from the given index to the end on depth, then name.
+   * this is useful to be independent of the filesystem order.
+   */
+  void sort_on_depth_and_name(std::size_t index_of_first);
+
+  /**
    * for each group of identical inodes, only keep the one with the highest
    * rank.
    * @return number of elements removed

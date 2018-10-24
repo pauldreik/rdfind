@@ -66,7 +66,11 @@ Follow symlinks. Default is false.
 removes items found which have identical inode and device ID. Default
 is true.
 .IP "-checksum md5|sha1|sha256"
-what type of checksum to be used: md5, sha1 or sha256. The default is sha1 since version 1.4.0.
+What type of checksum to be used: md5, sha1 or sha256. The default is sha1 since version 1.4.0.
+.IP "-deterministic true|false"
+If set, sort files of equal rank in an unspecified but deterministic
+order. This makes the behaviour independent of in which order files
+are listed when querying the file system.
 .PP
 .B Action options:
 .IP "-makesymlinks true|false"
