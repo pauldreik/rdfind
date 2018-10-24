@@ -303,10 +303,7 @@ Rdutil::sortOnDeviceAndInode()
 void Rdutil::sort_on_depth_and_name(std::size_t index_of_first) {
 	assert(index_of_first<=m_list.size());
 	  auto cmp = cmpDepthName;
-
-	  auto first=m_list.begin();
-	  std::advance(first,index_of_first);
-	  std::sort(first,m_list.end(), cmp);
+	  std::sort(&m_list[index_of_first],&m_list[m_list.size()], cmp);
 }
 
 std::size_t
