@@ -52,49 +52,64 @@ unspecified but deterministic. If disabled, the one that was reported
 first from the file system is highest ranked.
 
 .SH OPTIONS
-.B Searching options etc:
-.IP "-ignoreempty true|false"
+Searching options etc:
+.TP
+.BR \-ignoreempty " " \fItrue\fR|\fIfalse\fR
 Ignore empty files. Setting this to true (the default) is equivalent to
 -minsize 1, false is equivalent to -minsize 0.
-.IP "-minsize N"
+.TP
+.BR \-minsize " "\fIN\fR
 Ignores files with less than N bytes. Default is 1, meaning empty files
 are ignored.
-.IP "-followsymlinks true|false"
+.TP
+.BR \-followsymlinks " " \fItrue\fR|\fIfalse\fR
 Follow symlinks. Default is false.
-.IP "-removeidentinode true|false"
+.TP
+.BR \-removeidentinode " " \fItrue\fR|\fIfalse\fR
 removes items found which have identical inode and device ID. Default
 is true.
-.IP "-checksum md5|sha1|sha256"
+.TP
+.BR \-checksum " " \fImd5\fR|\fIsha1\fR|\fIsha256\fR
 What type of checksum to be used: md5, sha1 or sha256. The default is
 sha1 since version 1.4.0.
-.IP "-deterministic true|false"
+.TP
+.BR \-deterministic " " \fItrue\fR|\fIfalse\fR
 If set (the default), sort files of equal rank in an unspecified but
 deterministic order. This makes the behaviour independent of in which
 order files are listed when querying the file system.
 .PP
-.B Action options:
-.IP "-makesymlinks true|false"
+Action options:
+.TP
+.BR \-makesymlinks " " \fItrue\fR|\fIfalse\fR
 Replace duplicate files with symbolic links. Default is false.
-.IP "-makehardlinks true|false"
+.TP
+.BR \-makehardlinks " " \fItrue\fR|\fIfalse\fR
 Replace duplicate files with hard links. Default is false.
-.IP "-makeresultsfile true|false"
+.TP
+.BR \-makeresultsfile " " \fItrue\fR|\fIfalse\fR
 Make a results file in the current directory. Default is true.
-.IP "-outputname name"
+.TP
+.BR \-outputname " " \fIname\fR
 Make the results file name to be "name" instead of the default results.txt.
-.IP "-deleteduplicates true|false"
+.TP
+.BR \-deleteduplicates " " \fItrue\fR|\fIfalse\fR
 Delete (unlink) files. Default is false.
 .PP
-.B General options:
-.IP "-sleep Xms"
+General options:
+.TP
+.BR \-sleep " " \fIX\fRms
 sleeps X milliseconds between reading each file, to reduce
 load. Default is 0 (no sleep). Note that only a few values are
 supported at present: 0,1-5,10,25,50,100 milliseconds. 
-.IP "-n, -dryrun true|false"
+.TP
+.BR \-n ", " \-dryrun " " \fItrue\fR|\fIfalse\fR
 displays what should have been done, don't actually delete or link
 anything. Default is false.
-.IP "-h, -help, --help"
+.TP
+.BR \-h ", " \-help ", " \-\-help
 displays a brief help message.
-.IP "-v, -version, --version"
+.TP
+.BR \-v ", " \-version ", " \-\-version
 displays the version number.
 .SH EXAMPLES
 .TP
