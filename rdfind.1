@@ -65,7 +65,8 @@ Follow symlinks. Default is false.
 removes items found which have identical inode and device ID. Default
 is true.
 .IP "-checksum md5|sha1|sha256"
-What type of checksum to be used: md5, sha1 or sha256. The default is sha1 since version 1.4.0.
+What type of checksum to be used: md5, sha1 or sha256. The default is
+sha1 since version 1.4.0.
 .IP "-deterministic true|false"
 If set (the default), sort files of equal rank in an unspecified but
 deterministic order. This makes the behaviour independent of in which
@@ -73,23 +74,24 @@ order files are listed when querying the file system.
 .PP
 .B Action options:
 .IP "-makesymlinks true|false"
-Replace duplicate files with symbolic links
+Replace duplicate files with symbolic links. Default is false.
 .IP "-makehardlinks true|false"
-Replace duplicate files with hard links
+Replace duplicate files with hard links. Default is false.
 .IP "-makeresultsfile true|false"
-Make a results file results.txt (default) in the current directory.
+Make a results file in the current directory. Default is true.
 .IP "-outputname name"
 Make the results file name to be "name" instead of the default results.txt.
 .IP "-deleteduplicates true|false"
-Delete (unlink) files.
+Delete (unlink) files. Default is false.
 .PP
 .B General options:
 .IP "-sleep Xms"
 sleeps X milliseconds between reading each file, to reduce
 load. Default is 0 (no sleep). Note that only a few values are
 supported at present: 0,1-5,10,25,50,100 milliseconds. 
-.IP "-n, -dryrun true|(false)"
-displays what should have been done, don't actually delete or link anything.
+.IP "-n, -dryrun true|false"
+displays what should have been done, don't actually delete or link
+anything. Default is false.
 .IP "-h, -help, --help"
 displays brief help message.
 .IP "-v, -version, --version"
