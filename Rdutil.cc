@@ -14,7 +14,6 @@
 #include <cstring>
 #include <fstream>  //for file writing
 #include <iostream> //for std::cerr
-#include <iterator> //advance
 #include <ostream>  //for output
 #include <string>   //for easier passing of string arguments
 #include <thread>   //sleep
@@ -306,10 +305,8 @@ Rdutil::sort_on_depth_and_name(std::size_t index_of_first)
 {
   assert(index_of_first <= m_list.size());
 
-  auto it = std::begin(m_list);
-  std::advance(it, index_of_first);
-  auto cmp = cmpDepthName;
-  std::sort(it, std::end(m_list), cmp);
+  auto it = std::begin(m_list) + static_cast<std::ptrdiff_t>(index_of_first);
+  std::sort(it, std::end(m_list), cmpDepthName);
 }
 
 std::size_t
