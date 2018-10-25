@@ -1,5 +1,5 @@
 .\" View this file with
-.\" groff -man -Tascii rdfind.1 |less
+.\" groff -man -Tutf8 rdfind.1 |less
 .\"
 .\" Author Paul Dreik 2006
 .\" see LICENSE for details.
@@ -36,13 +36,13 @@ Given two or more equal files, the one with the highest rank is
 selected to be the original and the rest are duplicates. The rules of
 ranking are given below, where the rules are executed from start until
 an original has been found. Given two files A and B which have equal
-content, the ranking is as follows: 
+size and content, the ranking is as follows: 
 
 If A was found while scanning an input argument earlier than than B, A
 is higher ranked.
 
-If A was found at a depth lower than B, A is higher ranked (A closer
-to the root)
+If A was found at a directory depth lower than B, A is higher ranked
+(A is closer to the root).
 
 if A and B are found during scanning of the same input argument and share
 the same directory depth, the one that ranks highest depends on if
@@ -93,15 +93,15 @@ supported at present: 0,1-5,10,25,50,100 milliseconds.
 displays what should have been done, don't actually delete or link
 anything. Default is false.
 .IP "-h, -help, --help"
-displays brief help message.
+displays a brief help message.
 .IP "-v, -version, --version"
-displays version number.
+displays the version number.
 .SH EXAMPLES
 .TP
-Search for duplicate files in home directory and a backup directory:
+Search for duplicate files in the home directory and a backup directory:
 .B rdfind ~ /mnt/backup
 .TP
-Delete duplicate in a backup directory:
+Delete duplicates in a backup directory:
 .B rdfind -deleteduplicates true /mnt/backup
 .TP
 Search for duplicate files in directories called foo:
@@ -139,14 +139,13 @@ Older versions unfortunately contained a misspelling on the word
 occurrence. This is now corrected (since 1.3), which might affect
 user scripts parsing the output file written by rdfind.
 
-There are lots of enhancements left to do. Please contribute!
 .SH SECURITY CONSIDERATIONS
 Avoid manipulating the directories while rdfind is reading.
 rdfind is quite brittle in that case. Especially, when deleting
 or making links, rdfind can be subject to a symlink attack.
 Use with care!
 .SH AUTHOR
-Paul Dreik 2006, reachable at rdfind@pauldreik.se
+Paul Dreik 2006-2018, reachable at rdfind@pauldreik.se
 Rdfind can be found at https://rdfind.pauldreik.se/
 
 Do you find rdfind useful? Drop me a line! It is always fun to
