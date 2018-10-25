@@ -59,8 +59,8 @@ usage()
        "device and inode\n"
     << " -checksum           md5 |(sha1)| sha256\n"
     << "                                  checksum type\n"
-	<< " -deterministic    (true)| false  makes results independent of order"
-	<< "                                  from listing the filesystem"
+    << " -deterministic    (true)| false  makes results independent of order"
+    << "                                  from listing the filesystem"
     << " -makesymlinks      true |(false) replace duplicate files with "
        "symbolic links\n"
     << " -makehardlinks     true |(false) replace duplicate files with "
@@ -97,9 +97,9 @@ struct Options
   bool followsymlinks = false;        // follow symlinks
   bool dryrun = false;                // only dryrun, dont destroy anything
   bool remove_identical_inode = true; // remove files with identical inodes
-  bool usemd5 = false;    // use md5 checksum to check for similarity
-  bool usesha1 = false;   // use sha1 checksum to check for similarity
-  bool usesha256 = false; // use sha256 checksum to check for similarity
+  bool usemd5 = false;       // use md5 checksum to check for similarity
+  bool usesha1 = false;      // use sha1 checksum to check for similarity
+  bool usesha256 = false;    // use sha256 checksum to check for similarity
   bool deterministic = true; // be independent of filesystem order
   long nsecsleep = 0; // number of nanoseconds to sleep between each file read.
   std::string resultsfile = "results.txt"; // results file name.

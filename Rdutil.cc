@@ -214,9 +214,9 @@ cmpRank(const Fileinfo& a, const Fileinfo& b)
 bool
 cmpDepthName(const Fileinfo& a, const Fileinfo& b)
 {
-	//inefficient, make it a reference.
-  return std::make_tuple( a.depth(), a.name()) <
-         std::make_tuple( b.depth(), b.name());
+  // inefficient, make it a reference.
+  return std::make_tuple(a.depth(), a.name()) <
+         std::make_tuple(b.depth(), b.name());
 }
 // compares buffers
 bool
@@ -300,10 +300,12 @@ Rdutil::sortOnDeviceAndInode()
   return 0;
 }
 
-void Rdutil::sort_on_depth_and_name(std::size_t index_of_first) {
-	assert(index_of_first<=m_list.size());
-	  auto cmp = cmpDepthName;
-	  std::sort(&m_list[index_of_first],&m_list[m_list.size()], cmp);
+void
+Rdutil::sort_on_depth_and_name(std::size_t index_of_first)
+{
+  assert(index_of_first <= m_list.size());
+  auto cmp = cmpDepthName;
+  std::sort(&m_list[index_of_first], &m_list[m_list.size()], cmp);
 }
 
 std::size_t
