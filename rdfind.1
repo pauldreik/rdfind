@@ -44,13 +44,12 @@ is higher ranked.
 If A was found at a depth lower than B, A is higher ranked (A closer
 to the root)
 
-If A was found earlier than B, A is higher ranked.
-
-The last rule is needed when two files are found in the same directory
-(obviously not given in separate arguments, otherwise the first rule applies)
-and gives the same order between the files as the operating system
-delivers the files while listing the directory. This is operating
-system specific behaviour.
+if A and B are found during scanning of the same input argument and share
+the same directory depth, the one that ranks highest depends on if
+deterministic operation is enabled. This is on by default, see option
+\fB-deterministic\fR). If enabled, which one ranks highest is
+unspecified but deterministic. If disabled, the one that was reported
+first from the file system is highest ranked.
 
 .SH OPTIONS
 .B Searching options etc:
@@ -68,9 +67,9 @@ is true.
 .IP "-checksum md5|sha1|sha256"
 What type of checksum to be used: md5, sha1 or sha256. The default is sha1 since version 1.4.0.
 .IP "-deterministic true|false"
-If set, sort files of equal rank in an unspecified but deterministic
-order. This makes the behaviour independent of in which order files
-are listed when querying the file system.
+If set (the default), sort files of equal rank in an unspecified but
+deterministic order. This makes the behaviour independent of in which
+order files are listed when querying the file system.
 .PP
 .B Action options:
 .IP "-makesymlinks true|false"
