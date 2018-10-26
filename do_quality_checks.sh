@@ -215,7 +215,7 @@ if which clang++ >/dev/null ; then
 fi
 
 #run unit tests with sanitizers enabled
-ASSERT="--enable-asserts"
+ASSERT="--enable-assert"
 run_with_sanitizer "-fsanitize=undefined -O3"
 run_with_sanitizer "-fsanitize=address -O0"
 
@@ -225,19 +225,19 @@ ASSERT=""
 run_with_debian_buildflags
 
 #make a test build with debug iterators
-ASSERT="--enable-asserts"
+ASSERT="--enable-assert"
 compile_and_test_standard g++ c++11 "-D_GLIBCXX_DEBUG"
 
 #test run with clang/libc++
-ASSERT="--enable-asserts"
+ASSERT="--enable-assert"
 run_with_libcpp
-ASSERT="--disable-asserts"
+ASSERT="--disable-assert"
 run_with_libcpp
 
 #test build with running through valgrind
 if which valgrind >/dev/null; then
   echo running unit tests through valgrind
-  ASSERT="--disable-asserts"
+  ASSERT="--disable-assert"
   compile_and_test_standard g++ c++11 "-O3"
   VALGRIND=valgrind make check >make-check.log
 fi
