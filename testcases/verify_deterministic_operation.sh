@@ -65,7 +65,7 @@ run_outcome() {
 }
 
 
-if !which disorderfs >/dev/null ; then
+if ! which disorderfs >/dev/null ; then
   dbgecho "could not execute tests for deterministic behaviour - please install disorderfs"
   exit 0
 fi
