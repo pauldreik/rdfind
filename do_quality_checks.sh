@@ -36,6 +36,9 @@ export LANG=
 
 rootdir=$(dirname $0)
 
+#flags to configure, for assert.
+ASSERT=
+
 ###############################################################################
 
 start_from_scratch() {
@@ -62,7 +65,7 @@ if ! ./bootstrap.sh >bootstrap.log 2>&1; then
   echo failed bootstrap - see bootstrap.log
   exit 1
 fi
-if ! ./configure --enable-warnings CXX=$1 CXXFLAGS="-std=$2 $3" >configure.log 2>&1 ; then
+if ! ./configure $ASSERT --enable-warnings CXX=$1 CXXFLAGS="-std=$2 $3" >configure.log 2>&1 ; then
   echo failed configure - see configure.log
   exit 1
 fi
@@ -104,9 +107,14 @@ if ! $1 -c x.cpp -std=c++$std >/dev/null 2>&1 ; then
   echo compiler does not understand c++$std, skipping this combination.
 else
     # debug build
-    compile_and_test_standard $1 c++$std "-Og -D_DEBUG=1"
+    ASSERT=--enable-assert
+    compile_and_test_standard $1 c++$std "-Og"
+
     # release build
-    compile_and_test_standard $1 c++$std "-O3 -DNDEBUG=1"
+    ASSERT=--disable-assert
+    compile_and_test_standard $1 c++$std "-O2"
+    compile_and_test_standard $1 c++$std "-O3"
+    compile_and_test_standard $1 c++$std "-Os"
 fi
 done
 }
@@ -123,13 +131,16 @@ fi
 
 start_from_scratch
 ./bootstrap.sh >bootstrap.log
-./configure CXX=$latestclang CXXFLAGS="-std=c++1y $1"   >configure.log
+./configure $ASSERT CXX=$latestclang CXXFLAGS="-std=c++1y $1"   >configure.log
 make > make.log 2>&1
 export UBSAN_OPTIONS="halt_on_error=true exitcode=1"
 export ASAN_OPTIONS="halt_on_error=true exitcode=1"
 make check >make-check.log 2>&1
+unset UBSAN_OPTIONS
+unset ASAN_OPTIONS
 }
 ###############################################################################
+#This tries to mimick how the debian package is built
 run_with_debian_buildflags() {
 echo "running with buildflags from debian dpkg-buildflags"
 if ! which dpkg-buildflags >/dev/null  ; then
@@ -168,7 +179,7 @@ if ! $latestclang -std=c++11 -stdlib=libc++ -lc++abi x.cpp >/dev/null 2>&1 && [ 
   return 0
 fi
 #echo using $latestclang with libc++
-compile_and_test_standard $latestclang c++11 "-stdlib=libc++"
+compile_and_test_standard $latestclang c++11 "-stdlib=libc++ -D_LIBCPP_DEBUG=1"
 }
 ###############################################################################
 
@@ -204,29 +215,32 @@ if which clang++ >/dev/null ; then
 fi
 
 #run unit tests with sanitizers enabled
+ASSERT="--enable-asserts"
 run_with_sanitizer "-fsanitize=undefined -O3"
 run_with_sanitizer "-fsanitize=address -O0"
 
 #build and test with all flags from debian, if available. this increases
 #the likelilihood rdfind will build when creating a deb package.
+ASSERT=""
 run_with_debian_buildflags
 
 #make a test build with debug iterators
+ASSERT="--enable-asserts"
 compile_and_test_standard g++ c++11 "-D_GLIBCXX_DEBUG"
 
 #test run with clang/libc++
+ASSERT="--enable-asserts"
+run_with_libcpp
+ASSERT="--disable-asserts"
 run_with_libcpp
 
-#make sure release builds are all ok (provokes possible heisenbugs from assert misusage)
-compile_and_test_standard g++ c++11 "-DNDEBUG=1 -O3"
-
-#test build with running through valgrind, while we still have the release
-#binary available
+#test build with running through valgrind
 if which valgrind >/dev/null; then
   echo running unit tests through valgrind
+  ASSERT="--disable-asserts"
+  compile_and_test_standard g++ c++11 "-O3"
   VALGRIND=valgrind make check >make-check.log
 fi
-
 
 echo "$(basename $0): congratulations, all tests that were possible to run passed!"
 
