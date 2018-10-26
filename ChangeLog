@@ -17,6 +17,9 @@
 	  author's machine, with hot filesystem cache.
 	* increase size of integer types to be able to handle more than INTMAX
 	  files.
+	* add deterministic mode, enabled by default. See Github issue #13 and
+	  Debian Bug 795790. When enabled, makes the program insensitive to the
+	  order of files when listing directories.
 2017-01-04 Paul Dreik <rdfind@pauldreik.se>
 	* release 1.3.5
 	* source cleanup like removing obsolete comments, formatting.
