@@ -14,6 +14,7 @@ TESTS=testcases/largefilesupport.sh \
       testcases/verify_filesize_option.sh \
       testcases/verify_dryrun_option.sh \
       testcases/verify_ranking.sh \
+      testcases/verify_deterministic_operation.sh \
       testcases/checksum_options.sh \
       testcases/md5collisions.sh \
       testcases/sha1collisions.sh
