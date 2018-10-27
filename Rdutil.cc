@@ -103,57 +103,43 @@ applyactiononfile(std::vector<Fileinfo>& m_list, Function f)
 }
 
 // helper for dryruns
-template<class Outputobject>
+namespace {
+template<bool outputBname>
 class dryrun_helper
 {
 public:
-  dryrun_helper(Outputobject& out,
-                std::string m1,
-                std::string m2,
-                std::string m3,
-                int retval = 0)
+  /// @param m1 may not be null
+  /// @param m2 may be null
+  explicit dryrun_helper(const char* m1, const char* m2 = nullptr)
     : m_m1(m1)
-    , m_m2(m2)
-    , m_m3(m3)
-    , m_retval(retval)
-    , m_out(out)
-    , m_outputAname(true)
-    , m_outputBname(true){};
+    , m_m2(m2){};
 
-  std::string m_m1, m_m2, m_m3;
-  int m_retval;
-  Outputobject& m_out;
-  bool m_outputAname;
-  bool m_outputBname;
+  const char* const m_m1;
+  const char* const m_m2;
 
-  void disableAname(void) { m_outputAname = false; }
-  void disableBname(void) { m_outputBname = false; }
-
-  bool operator()(const Fileinfo& A, const Fileinfo& B)
+  /// Mimic the return value of makeHardlinks etc. - pretend success
+  int operator()(const Fileinfo& A, const Fileinfo& B) const
   {
-    std::string retstring = m_m1;
-    if (m_outputAname)
-      retstring += A.name();
+    std::cout << m_m1 << A.name();
+    if (m_m2) {
+      std::cout << m_m2;
+    }
+    if (outputBname) {
+      std::cout << B.name();
+    }
+    std::cout << '\n';
 
-    retstring += m_m2;
-
-    if (m_outputBname)
-      retstring += B.name();
-
-    retstring += m_m3;
-
-    m_out << retstring << '\n';
-
-    return m_retval;
+    return 0;
   }
-};
+}; // class
+} // anon. namespace
 
 std::size_t
 Rdutil::deleteduplicates(bool dryrun) const
 {
   if (dryrun) {
-    dryrun_helper<std::ostream> obj(std::cout, "delete ", "", "");
-    obj.disableBname();
+    const bool outputBname = false;
+    dryrun_helper<outputBname> obj("delete ");
     auto ret = applyactiononfile(m_list, obj);
     std::cout.flush();
     return ret;
@@ -166,7 +152,8 @@ std::size_t
 Rdutil::makesymlinks(bool dryrun) const
 {
   if (dryrun) {
-    dryrun_helper<std::ostream> obj(std::cout, "symlink ", " to ", "");
+    const bool outputBname = true;
+    dryrun_helper<outputBname> obj("symlink ", " to ");
     auto ret = applyactiononfile(m_list, obj);
     std::cout.flush();
     return ret;
@@ -179,7 +166,8 @@ std::size_t
 Rdutil::makehardlinks(bool dryrun) const
 {
   if (dryrun) {
-    dryrun_helper<std::ostream> obj(std::cout, "hardlink ", " to ", "");
+    const bool outputBname = true;
+    dryrun_helper<outputBname> obj("hardlink ", " to ");
     const auto ret = applyactiononfile(m_list, obj);
     std::cout.flush();
     return ret;
