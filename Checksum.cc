@@ -15,17 +15,6 @@
 // project
 #include "Checksum.hh"
 
-// this is a small function to print the checksum to stdout
-static void
-display_hex(std::size_t length, const void* data_)
-{
-  const char* data = static_cast<const char*>(data_);
-  for (std::size_t i = 0; i < length; i++) {
-    std::printf("%02x", data[i]);
-  }
-  std::printf("\n");
-}
-
 int
 Checksum::init(int checksumtype)
 {
@@ -88,7 +77,17 @@ Checksum::update(long length, const char* buffer)
     static_cast<std::size_t>(length),
     static_cast<const unsigned char*>(static_cast<const void*>(buffer)));
 }
-
+#if 0
+// prints checksum to stdout
+static void
+display_hex(std::size_t length, const void* data_)
+{
+  const char* data = static_cast<const char*>(data_);
+  for (std::size_t i = 0; i < length; i++) {
+    std::printf("%02x", data[i]);
+  }
+  std::printf("\n");
+}
 int
 Checksum::print()
 {
@@ -114,7 +113,7 @@ Checksum::print()
   }
   return 0;
 }
-
+#endif
 int
 Checksum::getDigestLength() const
 {

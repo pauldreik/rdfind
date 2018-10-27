@@ -36,9 +36,10 @@ public:
   int update(std::size_t length, const char* buffer);
   int update(long length, const char* buffer);
 
+#if 0
   /// prints the checksum on stdout
   int print();
-
+#endif
   // writes the checksum to buffer.
   // returns 0 if everything went ok.
   int printToBuffer(void* buffer, std::size_t N);

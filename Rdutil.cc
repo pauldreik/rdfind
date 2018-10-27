@@ -430,7 +430,7 @@ Rdutil::cleanup()
 
   return size_before - size_after;
 }
-
+#if 0
 std::size_t
 Rdutil::remove_small_files(Fileinfo::filesizetype minsize)
 {
@@ -449,7 +449,7 @@ Rdutil::remove_small_files(Fileinfo::filesizetype minsize)
   m_list.erase(it, end);
   return size_before - m_list.size();
 }
-
+#endif
 Fileinfo::filesizetype
 Rdutil::totalsizeinbytes(int opmode) const
 {
@@ -485,7 +485,7 @@ calcrange(Fileinfo::filesizetype& size)
 
   // round up if necessary
   if (tmp & 0x1) {
-    size++;
+    ++size;
   }
 
   return range;
