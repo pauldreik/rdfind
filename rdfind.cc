@@ -385,7 +385,7 @@ main(int narg, const char* argv[])
   if (o.makehardlinks) {
     std::cout << dryruntext << "Now making hard links." << std::endl;
     const auto tmp = gswd.makehardlinks(o.dryrun);
-    std::cout << "Making " << tmp << " links." << std::endl;
+    std::cout << dryruntext << "Making " << tmp << " links." << std::endl;
     return 0;
   }
 
@@ -393,7 +393,7 @@ main(int narg, const char* argv[])
   if (o.deleteduplicates) {
     std::cout << dryruntext << "Now deleting duplicates:" << std::endl;
     const auto tmp = gswd.deleteduplicates(o.dryrun);
-    std::cout << "Deleted " << tmp << " files." << std::endl;
+    std::cout << dryruntext << "Deleted " << tmp << " files." << std::endl;
     return 0;
   }
   return 0;

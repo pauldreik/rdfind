@@ -120,7 +120,7 @@ public:
   /// Mimic the return value of makeHardlinks etc. - pretend success
   int operator()(const Fileinfo& A, const Fileinfo& B) const
   {
-    std::cout << m_m1 << A.name();
+    std::cout << "(DRYRUN MODE) " << m_m1 << A.name();
     if (m_m2) {
       std::cout << m_m2;
     }
