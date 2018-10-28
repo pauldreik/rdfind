@@ -25,7 +25,7 @@ Rdfind is a command line tool that finds duplicate files. It is useful for compr
 
 ### Mac
 
-If you are on Mac, you can install through MacPorts. If you want to compile the source yourself, that is fine. Rdfind is written in C++11 and should compile under any \*nix.
+If you are on Mac, you can install through [MacPorts](https://www.macports.org/) (direct link to [Portfile](https://github.com/macports/macports-ports/blob/master/sysutils/rdfind/Portfile)). If you want to compile the source yourself, that is fine. Rdfind is written in C++11 and should compile under any \*nix.
 
 ### Windows
 
@@ -88,7 +88,7 @@ Rdfind uses the following algorithm. If N is the number of files to search throu
 11. Sort on device and inode(speeds up file reading). Perform a checksum calculation for each file.
 12. Only keep files on the list with the same size and checksum. These are duplicates.
 13. Sort list on size, priority number, and depth. The first file for every set of duplicates is considered to be the original.
-14. If flag ”-makeresultsfile true”, then print results file (default). Exit.(?)
+14. If flag ”-makeresultsfile true”, then print results file (default). 
 15. If flag ”-deleteduplicates true”, then delete (unlink) duplicate files. Exit.
 16. If flag ”-makesymlinks true”, then replace duplicates with a symbolic link to the original. Exit.
 17. If flag ”-makehardlinks true”, then replace duplicates with a hard link to the original. Exit.
@@ -97,7 +97,7 @@ Rdfind uses the following algorithm. If N is the number of files to search throu
 
 ### Building
 
-To build this utility, you need libnettle (on debian based distros: `libnettle6`).
+To build this utility, you need [nettle](https://www.lysator.liu.se/~nisse/nettle/) (on Debian based distros: `apt install nettle-dev`).
 
 ### Install from source
 
@@ -130,6 +130,7 @@ The following methods are used to maintain code quality:
  - builds are made with both libstdc++ (gcc) and libc++ (llvm)
  - clang format is used, issue make format to execute it
  - cppcheck has been run manually and relevant issues are fixed
+ - [disorderfs](https://packages.debian.org/sid/disorderfs) is used (if available) to verify independence of file system ordering
  
  There is a helper script that does the test build variants, see do_quality_checks.sh in the project root.
  
