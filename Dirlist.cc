@@ -120,7 +120,6 @@ splitfilename(std::string& path,
 int
 Dirlist::handlepossiblefile(const std::string& possiblefile, int recursionlevel)
 {
-  struct stat info;
 
   RDDEBUG("Now in handlepossiblefile with name "
           << possiblefile.c_str() << " and recursionlevel " << recursionlevel
@@ -135,6 +134,7 @@ Dirlist::handlepossiblefile(const std::string& possiblefile, int recursionlevel)
 
   // investigate what kind of file it is, dont follow symlink
   int statval = 0;
+  struct stat info;
   do {
     statval = lstat(possiblefile.c_str(), &info);
   } while (statval < 0 && errno == EINTR);

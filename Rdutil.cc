@@ -95,7 +95,7 @@ applyactiononfile(std::vector<Fileinfo>& m_list, Function f)
       } break;
 
       default:
-        assert("file with bad duptype at this stage. Programming error!" !=
+        assert("file with bad duptype at this stage. Programming error!" ==
                nullptr);
     }
   }

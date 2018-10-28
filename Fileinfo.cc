@@ -144,7 +144,7 @@ Fileinfo::getduptypestring(const Fileinfo& A)
     case duptype::DUPTYPE_OUTSIDE_TREE:
       return "DUPTYPE_OUTSIDE_TREE";
     default:
-      assert("we should not get here!" != nullptr);
+      assert("we should not get here!" == nullptr);
   }
 
   return "error-error";
