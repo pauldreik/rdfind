@@ -4,9 +4,9 @@ dnl Distributed under GPL v 2.0 or later, at your option.
 dnl See LICENSE for further details.
 
 VERSION="1.4.0-alpha0"
-AC_INIT(1.4.0-alpha0)
-AC_CONFIG_SRCDIR(rdfind.cc)
-AC_CONFIG_HEADERS(config.h)       
+AC_INIT([rdfind],[1.4.0-alpha0])
+AC_CONFIG_SRCDIR([rdfind.cc])
+AC_CONFIG_HEADERS([config.h])       
 
 AM_INIT_AUTOMAKE
 
