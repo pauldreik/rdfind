@@ -183,6 +183,32 @@ compile_and_test_standard $latestclang c++11 "-stdlib=libc++ -D_LIBCPP_DEBUG=1"
 }
 ###############################################################################
 
+verify_packaging() {
+#make sure the packaging works as intended.
+ echo "trying to make a tar ball for release and building it..."
+ log="$(pwd)/packagetest.log"
+ ./bootstrap.sh >$log
+ ./configure  >>$log
+
+ touch dummy
+ make dist  >>$log
+ TARGZ=$(find "$(pwd)" -newer dummy -name "rdfind*gz" -type f |head -n1)
+ temp=$(mktemp -d)
+ cp "$TARGZ" "$temp"
+ cd "$temp"
+ tar xzf $(basename "$TARGZ")  >>$log
+ cd $(basename "$TARGZ" .tar.gz)
+ ./configure --prefix=$temp  >>$log
+ make  >>$log
+ make check  >>$log
+ make install  >>$log
+ $temp/bin/rdfind --version   >>$log
+ #coming here means all went fine, go back to the source dir.
+ cd $(dirname "$TARGZ")
+ rm -rf "$temp"
+}
+###############################################################################
+
 #keep track of which compilers have already been tested
 echo "">inodes_for_tested_compilers.txt
 
@@ -241,6 +267,11 @@ if which valgrind >/dev/null; then
   compile_and_test_standard g++ c++11 "-O3"
   VALGRIND=valgrind make check >make-check.log
 fi
+
+#make sure it is possible to build a tar ball,
+#unpack it, build and execute tests, then finally
+#installing and running the program.
+verify_packaging
 
 echo "$(basename $0): congratulations, all tests that were possible to run passed!"
 
