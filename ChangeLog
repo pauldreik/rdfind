@@ -1,5 +1,5 @@
-2018-10-xx Paul Dreik <rdfind@pauldreik.se>
-	* placeholder for 1.4.0
+2018-10-28 Paul Dreik <rdfind@pauldreik.se>
+	* release of 1.4.0-alpha0
 	* cleanup of source to remove compiler warnings
 	  and switch to c++11
 	* failure of making hard links will not delete the deduplicated
