@@ -23,6 +23,9 @@ them is the original and the rest are considered duplicates. This
 is done by ranking the files to each other and deciding which has the
 highest rank. See section RANKING for details.
 
+By default, no action is taken besides creating a file with the
+detected files and showing the possible amount of saved space. 
+
 If you need better control over the ranking than given, you can use
 some preprocessor which sorts the file names in desired order and then
 run the program using xargs. See examples below for how to use find
@@ -66,7 +69,7 @@ are ignored.
 Follow symlinks. Default is false.
 .TP
 .BR \-removeidentinode " " \fItrue\fR|\fIfalse\fR
-removes items found which have identical inode and device ID. Default
+Removes items found which have identical inode and device ID. Default
 is true.
 .TP
 .BR \-checksum " " \fImd5\fR|\fIsha1\fR|\fIsha256\fR
@@ -87,10 +90,12 @@ Replace duplicate files with symbolic links. Default is false.
 Replace duplicate files with hard links. Default is false.
 .TP
 .BR \-makeresultsfile " " \fItrue\fR|\fIfalse\fR
-Make a results file in the current directory. Default is true.
+Make a results file in the current directory. Default is true. If the
+file exists, it is overwritten.
 .TP
 .BR \-outputname " " \fIname\fR
-Make the results file name to be "name" instead of the default results.txt.
+Make the results file name to be "name" instead of the default
+results.txt.
 .TP
 .BR \-deleteduplicates " " \fItrue\fR|\fIfalse\fR
 Delete (unlink) files. Default is false.
@@ -98,19 +103,19 @@ Delete (unlink) files. Default is false.
 General options:
 .TP
 .BR \-sleep " " \fIX\fRms
-sleeps X milliseconds between reading each file, to reduce
+Sleeps X milliseconds between reading each file, to reduce
 load. Default is 0 (no sleep). Note that only a few values are
 supported at present: 0,1-5,10,25,50,100 milliseconds. 
 .TP
 .BR \-n ", " \-dryrun " " \fItrue\fR|\fIfalse\fR
-displays what should have been done, don't actually delete or link
+Displays what should have been done, don't actually delete or link
 anything. Default is false.
 .TP
 .BR \-h ", " \-help ", " \-\-help
-displays a brief help message.
+Displays a brief help message.
 .TP
 .BR \-v ", " \-version ", " \-\-version
-displays the version number.
+Displays the version number.
 .SH EXAMPLES
 .TP
 Search for duplicate files in the home directory and a backup directory:

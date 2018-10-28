@@ -41,7 +41,7 @@ usage()
     << "rdfind [options] FILE ...\n"
     << '\n'
     << "Finds duplicate files recursively in the given FILEs (directories),\n"
-    << "and takes appropriate action (default nothing).\n"
+    << "and takes appropriate action (by default, nothing).\n"
     << "Directories listed first are ranked higher, meaning that if a\n"
     << "file is found on several places, the file found in the directory "
        "first\n"
