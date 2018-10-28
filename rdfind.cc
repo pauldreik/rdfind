@@ -169,25 +169,25 @@ parseOptions(Parser& parser)
       }
     } else if (parser.try_parse_string("-sleep")) {
       const auto nextarg = std::string(parser.get_parsed_string());
-      if (nextarg == "1ms")
+      if (nextarg == "1ms") {
         o.nsecsleep = 1000000;
-      else if (nextarg == "2ms")
+      } else if (nextarg == "2ms") {
         o.nsecsleep = 2000000;
-      else if (nextarg == "3ms")
+      } else if (nextarg == "3ms") {
         o.nsecsleep = 3000000;
-      else if (nextarg == "4ms")
+      } else if (nextarg == "4ms") {
         o.nsecsleep = 4000000;
-      else if (nextarg == "5ms")
+      } else if (nextarg == "5ms") {
         o.nsecsleep = 5000000;
-      else if (nextarg == "10ms")
+      } else if (nextarg == "10ms") {
         o.nsecsleep = 10000000;
-      else if (nextarg == "25ms")
+      } else if (nextarg == "25ms") {
         o.nsecsleep = 25000000;
-      else if (nextarg == "50ms")
+      } else if (nextarg == "50ms") {
         o.nsecsleep = 50000000;
-      else if (nextarg == "100ms")
+      } else if (nextarg == "100ms") {
         o.nsecsleep = 100000000;
-      else {
+      } else {
         std::cerr << "sorry, can only understand a few sleep values for "
                      "now. \""
                   << nextarg << "\" is not among them.\n";

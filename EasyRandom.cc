@@ -60,7 +60,7 @@ getGlobalObject()
   static EasyRandom::GlobalRandom global{};
   return global;
 }
-}
+} // namespace
 
 EasyRandom::EasyRandom()
   : m_rand(getGlobalObject())

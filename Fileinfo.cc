@@ -76,8 +76,9 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
 
   if (checksumtype != Checksum::NOTSET) {
     Checksum chk;
-    if (chk.init(checksumtype))
+    if (chk.init(checksumtype)) {
       std::cerr << "error in checksum init" << std::endl;
+    }
     char buffer[4096];
     while (f1) {
       f1.read(buffer, sizeof(buffer));
@@ -258,7 +259,7 @@ transactional_operation(const std::string& filename, const Func& f)
 
   return 0;
 }
-} // anon. namespace
+} // namespace
 
 // makes a symlink that points to A
 int

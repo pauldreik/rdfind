@@ -132,7 +132,7 @@ public:
     return 0;
   }
 }; // class
-} // anon. namespace
+} // namespace
 
 std::size_t
 Rdutil::deleteduplicates(bool dryrun) const
@@ -171,8 +171,9 @@ Rdutil::makehardlinks(bool dryrun) const
     const auto ret = applyactiononfile(m_list, obj);
     std::cout.flush();
     return ret;
-  } else
+  } else {
     return applyactiononfile(m_list, &Fileinfo::static_makehardlink);
+  }
 }
 
 // mark files with a unique number
@@ -279,7 +280,7 @@ apply_on_range(Iterator first, Iterator last, Cmp cmp, Callback callback)
     }
   }
 }
-} // anon. namespace
+} // namespace
 int
 Rdutil::sortOnDeviceAndInode()
 {
@@ -515,7 +516,7 @@ byteprefix(int range)
       return "!way too much!";
   }
 }
-}
+} // namespace littlehelper
 
 std::ostream&
 Rdutil::totalsize(std::ostream& out, int opmode) const
