@@ -4,6 +4,9 @@
    See LICENSE for further details.
 */
 
+#ifndef RDFINDDEBUG_HH_INCLUDED
+#define RDFINDDEBUG_HH_INCLUDED
+
 #include "config.h"
 
 // debug macros. pass  --enable-debug=yes to configure to enable it
@@ -18,3 +21,5 @@
   if (0) {                                                                     \
   }
 #endif
+
+#endif //RDFINDDEBUG_HH_INCLUDED
