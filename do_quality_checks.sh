@@ -206,6 +206,24 @@ verify_packaging() {
   rm -rf "$temp"
 }
 ###############################################################################
+verify_self_contained_headers() {
+  /bin/echo -n "verify all header files are self contained..."
+  if [ ! -e config.h ]; then
+    ./configure >configure.log
+  fi
+  for header in *.hh ; do
+    if ! g++ -std=c++11 -I. $header -o /dev/null >header.log 2>&1 ; then
+      echo "found a header which is not self contained: $header"
+      exit 1
+    fi
+  done
+  echo "OK!"
+}
+
+###############################################################################
+
+#this is pretty quick so start with it. 
+verify_self_contained_headers
 
 #keep track of which compilers have already been tested
 echo "">inodes_for_tested_compilers.txt
