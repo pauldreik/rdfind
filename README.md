@@ -3,15 +3,11 @@
 Rdfind is a command line tool that finds duplicate files. It is useful for compressing backup directories or just finding duplicate files. It compares files based on their content, NOT on their file names. 
 
 ## Continuous integration status
-| Description | Travis    | Appveyor
-|---|-----------|---------
-| master | [![Build Status](https://travis-ci.org/pauldreik/rdfind.svg?branch=master)](https://travis-ci.org/pauldreik/rdfind) | [![Build status](https://ci.appveyor.com/api/projects/status/9crp181omyugf8xk/branch/master?svg=true)](https://ci.appveyor.com/project/pauldreik/rdfind/branch/master)
-| OS | Ubuntu 14.04 | Ubuntu 18.04
-| compiler | gcc | gcc
-|       | clang | clang
-| extra tests |       | valgrind
-|             |       | address sanitizer
-|             |       | undefined behaviour sanitizer
+| Status | Description
+|-------------|------------------
+| [![Total alerts](https://img.shields.io/lgtm/alerts/g/pauldreik/rdfind.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/pauldreik/rdfind/alerts/) | Static analyzer
+| [![Build Status](https://travis-ci.org/pauldreik/rdfind.svg?branch=master)](https://travis-ci.org/pauldreik/rdfind) | Builds and executes tests on Ubuntu 14.04 with gcc and clang
+| [![Build status](https://ci.appveyor.com/api/projects/status/9crp181omyugf8xk/branch/master?svg=true)](https://ci.appveyor.com/project/pauldreik/rdfind/branch/master) | Builds and executes test on Ubuntu 18.04 with gcc and clang. Also runs address/undefined sanitizers and valgrind.
 
 ## Install
 
