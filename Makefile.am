@@ -19,6 +19,12 @@ TESTS=testcases/largefilesupport.sh \
       testcases/md5collisions.sh \
       testcases/sha1collisions.sh
 
+AUXFILES=testcases/common_funcs.sh \
+         testcases/md5collisions/letter_of_rec.ps \
+         testcases/md5collisions/order.ps \
+         testcases/sha1collisions/coll.tar.bz2.b64 \
+         testcases/sha1collisions/README.txt
+
 
 #valgrind support. unfortunately it makes checking much slower
 #even if valgrind is not used, so leave it inactive.
@@ -32,6 +38,7 @@ EXTRA_DIST = \
   Rdutil.hh bootstrap.sh RdfindDebug.hh EasyRandom.hh UndoableUnlink.hh \
   CmdlineParser.hh \
   $(TESTS) \
+  $(AUXFILES) \
   rdfind.1 LICENSE \
   ./do_clang_format.sh .clang-format
 
