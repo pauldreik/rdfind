@@ -37,7 +37,7 @@ UndoableUnlink::UndoableUnlink(const std::string& filename)
   // move the file to a temporary name
   if (0 != rename(m_filename.c_str(), m_tempfilename.c_str())) {
     // failed rename.
-    std::cerr << "failed moving file " + m_filename + " to a temporary\n";
+    std::cerr << "Failed moving file " + m_filename + " to a temporary\n";
     m_state = state::FAILED_MOVE_TO_TEMPORARY;
   } else {
     m_state = state::MOVED_TO_TEMPORARY;
@@ -55,7 +55,7 @@ UndoableUnlink::undo()
   if (0 != rename(m_tempfilename.c_str(), m_filename.c_str())) {
     // failed rename.
     m_state = state::FAILED_UNDO;
-    std::cerr << "failed moving file from temporary back to " + m_filename +
+    std::cerr << "Failed moving file from temporary back to " + m_filename +
                    '\n';
     return 1;
   }
@@ -72,7 +72,7 @@ UndoableUnlink::unlink()
       "api misuse - calling unlink() now is a programming error");
   }
   if (0 != ::unlink(m_tempfilename.c_str())) {
-    std::cerr << "failed unlinking temporary file made from " + m_filename +
+    std::cerr << "Failed unlinking temporary file made from " + m_filename +
                    '\n';
     m_state = state::FAILED_UNLINK;
     return 1;

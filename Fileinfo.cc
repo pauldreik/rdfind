@@ -163,7 +163,11 @@ Fileinfo::Fileinfostat::Fileinfostat()
 int
 Fileinfo::deletefile()
 {
-  return unlink(name().c_str());
+  const int ret = unlink(name().c_str());
+  if (ret) {
+    std::cerr << "Failed deleting file " << name() << '\n';
+  }
+  return ret;
 }
 
 namespace {
@@ -274,7 +278,7 @@ Fileinfo::makesymlink(const Fileinfo& A)
     });
 
   if (retval) {
-    std::cerr << "failed to make symlink " << name() << " to " << A.name()
+    std::cerr << "Failed to make symlink " << name() << " to " << A.name()
               << '\n';
   }
   return retval;
@@ -288,7 +292,7 @@ Fileinfo::makehardlink(const Fileinfo& A)
     // make a hardlink.
     const int retval = link(A.name().c_str(), filename.c_str());
     if (retval) {
-      std::cerr << "failed to make hardlink " << filename << " to " << A.name()
+      std::cerr << "Failed to make hardlink " << filename << " to " << A.name()
                 << '\n';
     }
     return retval;
