@@ -48,7 +48,7 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
     return -1;
   }
 
-  int checksumtype = Checksum::NOTSET;
+  auto checksumtype = Checksum::NOTSET;
   // read some bytes
   switch (filltype) {
     case readtobuffermode::READ_FIRST_BYTES:
@@ -75,10 +75,8 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
   }
 
   if (checksumtype != Checksum::NOTSET) {
-    Checksum chk;
-    if (chk.init(checksumtype)) {
-      std::cerr << "error in checksum init" << std::endl;
-    }
+    Checksum chk(checksumtype);
+
     char buffer[4096];
     while (f1) {
       f1.read(buffer, sizeof(buffer));

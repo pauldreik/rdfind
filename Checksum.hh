@@ -27,10 +27,7 @@ public:
     SHA256,
   };
 
-  // hmm, why not a constructor?
-
-  // init the object
-  int init(int checksumtype);
+  explicit Checksum(checksumtypes type);
 
   int update(std::size_t length, const unsigned char* buffer);
   int update(std::size_t length, const char* buffer);
@@ -50,7 +47,7 @@ public:
 
 private:
   // to know what type of checksum we are doing
-  int m_checksumtype = NOTSET;
+  const int m_checksumtype = NOTSET;
   // the checksum calculation internal state
   union ChecksumStruct
   {

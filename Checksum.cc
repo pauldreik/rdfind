@@ -15,17 +15,9 @@
 // project
 #include "Checksum.hh"
 
-int
-Checksum::init(int checksumtype)
+Checksum::Checksum(checksumtypes type)
+  : m_checksumtype(type)
 {
-
-  m_checksumtype = checksumtype;
-
-  // one may not init to something stupid
-  if (m_checksumtype == NOTSET) {
-    return -2;
-  }
-
   switch (m_checksumtype) {
     case SHA1: {
       sha1_init(&m_state.sha1);
@@ -38,9 +30,8 @@ Checksum::init(int checksumtype)
     } break;
     default:
       // not allowed to have something that is not recognized.
-      return -1;
+      throw std::runtime_error("wrong checksum type - programming error");
   }
-  return 0;
 }
 
 int
@@ -114,6 +105,7 @@ Checksum::print()
   return 0;
 }
 #endif
+
 int
 Checksum::getDigestLength() const
 {

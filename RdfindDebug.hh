@@ -22,4 +22,4 @@
   }
 #endif
 
-#endif //RDFINDDEBUG_HH_INCLUDED
+#endif // RDFINDDEBUG_HH_INCLUDED
