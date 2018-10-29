@@ -10,7 +10,6 @@
 #include <array>
 #include <cassert>
 #include <cstdio>
-#include <cstring> //for memcpy
 
 // project
 #include "Checksum.hh"

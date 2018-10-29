@@ -207,9 +207,12 @@ verify_packaging() {
 }
 ###############################################################################
 verify_self_contained_headers() {
-  /bin/echo -n "verify all header files are self contained..."
+  /bin/echo -n "verify that all header files are self contained..."
+  if [ ! -e configure ]; then
+    ./bootstrap.sh >bootstrap.log 2>&1
+  fi
   if [ ! -e config.h ]; then
-    ./configure >configure.log
+    ./configure >configure.log 2>&1
   fi
   for header in *.hh ; do
     if ! g++ -std=c++11 -I. $header -o /dev/null >header.log 2>&1 ; then
