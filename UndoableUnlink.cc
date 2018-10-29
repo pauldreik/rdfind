@@ -37,7 +37,7 @@ UndoableUnlink::UndoableUnlink(const std::string& filename)
   // move the file to a temporary name
   if (0 != rename(m_filename.c_str(), m_tempfilename.c_str())) {
     // failed rename.
-    std::cerr << "Failed moving file " + m_filename + " to a temporary\n";
+    std::cerr << "Failed moving " + m_filename + " to a temporary file\n";
     m_state = state::FAILED_MOVE_TO_TEMPORARY;
   } else {
     m_state = state::MOVED_TO_TEMPORARY;
