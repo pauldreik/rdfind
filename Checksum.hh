@@ -34,7 +34,6 @@ public:
 
   int update(std::size_t length, const unsigned char* buffer);
   int update(std::size_t length, const char* buffer);
-  int update(long length, const char* buffer);
 
 #if 0
   /// prints the checksum on stdout
