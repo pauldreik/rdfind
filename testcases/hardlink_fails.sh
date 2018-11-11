@@ -45,6 +45,8 @@ reset_teststate
 system_file=$(which ls)
 cp $system_file .
 $rdfind -makehardlinks true $system_file . 2>&1 |tee rdfind.out
+#I think this test tests the wrong thing - fails because /usr/bin is on
+#another partition.
 grep -iq "failed to make hardlink" rdfind.out
 
 #make sure that our own copy is still there
