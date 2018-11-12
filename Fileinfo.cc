@@ -76,12 +76,14 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
 
   if (checksumtype != Checksum::NOTSET) {
     Checksum chk;
-    if (chk.init(checksumtype))
+    if (chk.init(checksumtype)) {
       std::cerr << "error in checksum init" << std::endl;
+    }
     char buffer[4096];
     while (f1) {
       f1.read(buffer, sizeof(buffer));
-      chk.update(f1.gcount(), buffer);
+      // gcount is never negative, the cast is safe.
+      chk.update(static_cast<std::size_t>(f1.gcount()), buffer);
     }
 
     // store the result of the checksum calculation in somebytes
