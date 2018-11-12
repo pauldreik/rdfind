@@ -206,6 +206,35 @@ verify_packaging() {
   rm -rf "$temp"
 }
 ###############################################################################
+build_32bit() {
+#compiling to 32 bit, on amd64.
+#apt install libc6-i386 gcc-multilib g++-multilib
+#
+if [ $(uname -m) != x86_64 ] ; then
+  return;
+fi
+ echo "trying to compile in 32 bit mode..."
+ configureflags="--build=i686-pc-linux-gnu CFLAGS=-m32 CXXFLAGS=-m32 LDFLAGS=-m32"
+ here=$(pwd)
+ nettleinstall=$here/nettle32bit 
+ if [ ! -d "$nettleinstall" ] ; then
+ mkdir "$nettleinstall"
+ cd "$nettleinstall"
+ nettleversion=3.4
+ wget https://ftp.gnu.org/gnu/nettle/nettle-$nettleversion.tar.gz
+ echo "ae7a42df026550b85daca8389b6a60ba6313b0567f374392e54918588a411e94  nettle-$nettleversion.tar.gz" >checksum
+ sha256sum -c checksum
+ tar xzf nettle-$nettleversion.tar.gz
+ cd nettle-$nettleversion
+ ./configure $configureflags --prefix="$nettleinstall"
+ make install
+ fi
+ ./bootstrap.sh >bootstrap.log
+ ./configure --build=i686-pc-linux-gnu CFLAGS=-m32 CXXFLAGS="-m32 -I$nettleinstall/include" LDFLAGS="-m32 -L$nettleinstall/lib"
+ make |tee make.log
+ make check
+}
+###############################################################################
 
 #keep track of which compilers have already been tested
 echo "">inodes_for_tested_compilers.txt
@@ -270,6 +299,10 @@ fi
 #unpack it, build and execute tests, then finally
 #installing and running the program.
 verify_packaging
+
+#try to compile to 32 bit (downloads nettle and builds it
+# in 32 bit mode)
+build_32bit
 
 echo "$(basename $0): congratulations, all tests that were possible to run passed!"
 
