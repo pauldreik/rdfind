@@ -234,7 +234,7 @@ fi
  echo "local nettle install went ok"
  cd $here
  fi
- ./bootstrap.sh 2>&1 |bootstrap.log
+ ./bootstrap.sh 2>&1 |tee bootstrap.log
  ./configure --build=i686-pc-linux-gnu CFLAGS=-m32 CXXFLAGS="-m32 -I$nettleinstall/include" LDFLAGS="-m32 -L$nettleinstall/lib" 2>&1 |tee configure.log
  make 2>&1 |tee make.log
  make check 2>&1 |tee make-check.log
