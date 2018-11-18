@@ -7,7 +7,7 @@ Rdfind is a command line tool that finds duplicate files. It is useful for compr
 |-------------|------------------
 | [![Total alerts](https://img.shields.io/lgtm/alerts/g/pauldreik/rdfind.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/pauldreik/rdfind/alerts/) | Static analyzer
 | [![Build Status](https://travis-ci.org/pauldreik/rdfind.svg?branch=master)](https://travis-ci.org/pauldreik/rdfind) | Builds and executes tests on Ubuntu 14.04 with gcc and clang
-| [![Build status](https://ci.appveyor.com/api/projects/status/9crp181omyugf8xk/branch/master?svg=true)](https://ci.appveyor.com/project/pauldreik/rdfind/branch/master) | Builds and executes test on Ubuntu 18.04 with multiple versions of gcc and clang. Runs builds with address/undefined sanitizers and valgrind. Also performas the tests with a binary compiled in 32 bit mode.
+| [![Build status](https://ci.appveyor.com/api/projects/status/9crp181omyugf8xk/branch/master?svg=true)](https://ci.appveyor.com/project/pauldreik/rdfind/branch/master) | Builds and executes test on Ubuntu 18.04 with multiple versions of gcc and clang. Runs builds with address/undefined sanitizers and valgrind. Also performs the tests with a binary compiled in 32 bit mode.
 
 ## Install
 
