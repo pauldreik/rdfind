@@ -211,13 +211,16 @@ build_32bit() {
 #apt install libc6-i386 gcc-multilib g++-multilib
 #
 if [ $(uname -m) != x86_64 ] ; then
+  echo "not on x64, won't cross compile with -m32"
   return;
 fi
- echo "trying to compile in 32 bit mode..."
+ echo "trying to compile in 32 bit mode with -m32..."
  configureflags="--build=i686-pc-linux-gnu CFLAGS=-m32 CXXFLAGS=-m32 LDFLAGS=-m32"
  here=$(pwd)
  nettleinstall=$here/nettle32bit 
- if [ ! -d "$nettleinstall" ] ; then
+ if [ -d "$nettleinstall" ] ; then
+ echo "local nettle already seems to be installed"
+ else
  mkdir "$nettleinstall"
  cd "$nettleinstall"
  nettleversion=3.4
@@ -226,15 +229,21 @@ fi
  sha256sum -c checksum
  tar xzf nettle-$nettleversion.tar.gz
  cd nettle-$nettleversion
- ./configure $configureflags --prefix="$nettleinstall"
- make install
+ ./configure $configureflags --prefix="$nettleinstall" >$here/nettle.configure.log 2>&1
+ make install >$here/nettle.install.log 2>&1
+ echo "local nettle install went ok"
+ cd $here
  fi
- ./bootstrap.sh >bootstrap.log
- ./configure --build=i686-pc-linux-gnu CFLAGS=-m32 CXXFLAGS="-m32 -I$nettleinstall/include" LDFLAGS="-m32 -L$nettleinstall/lib"
- make |tee make.log
- make check
+ ./bootstrap.sh 2>&1 |bootstrap.log
+ ./configure --build=i686-pc-linux-gnu CFLAGS=-m32 CXXFLAGS="-m32 -I$nettleinstall/include" LDFLAGS="-m32 -L$nettleinstall/lib" 2>&1 |tee configure.log
+ make 2>&1 |tee make.log
+ make check 2>&1 |tee make-check.log
 }
 ###############################################################################
+
+#try to compile to 32 bit (downloads nettle and builds it
+# in 32 bit mode)
+build_32bit
 
 #keep track of which compilers have already been tested
 echo "">inodes_for_tested_compilers.txt
@@ -300,9 +309,7 @@ fi
 #installing and running the program.
 verify_packaging
 
-#try to compile to 32 bit (downloads nettle and builds it
-# in 32 bit mode)
-build_32bit
+
 
 echo "$(basename $0): congratulations, all tests that were possible to run passed!"
 
