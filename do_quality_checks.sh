@@ -234,16 +234,12 @@ fi
  echo "local nettle install went ok"
  cd $here
  fi
- ./bootstrap.sh 2>&1 |tee bootstrap.log
- ./configure --build=i686-pc-linux-gnu CFLAGS=-m32 CXXFLAGS="-m32 -I$nettleinstall/include" LDFLAGS="-m32 -L$nettleinstall/lib" 2>&1 |tee configure.log
- make 2>&1 |tee make.log
- make check 2>&1 |tee make-check.log
+ ./bootstrap.sh >bootstrap.log 2>&1 
+ ./configure --build=i686-pc-linux-gnu CFLAGS=-m32 CXXFLAGS="-m32 -I$nettleinstall/include" LDFLAGS="-m32 -L$nettleinstall/lib" >configure.log 2>&1
+ make >make.log 2>&1
+ make check >make-check.log 2>&1
 }
 ###############################################################################
-
-#try to compile to 32 bit (downloads nettle and builds it
-# in 32 bit mode)
-build_32bit
 
 #keep track of which compilers have already been tested
 echo "">inodes_for_tested_compilers.txt
@@ -309,7 +305,9 @@ fi
 #installing and running the program.
 verify_packaging
 
-
+#try to compile to 32 bit (downloads nettle and builds it
+# in 32 bit mode)
+build_32bit
 
 echo "$(basename $0): congratulations, all tests that were possible to run passed!"
 
