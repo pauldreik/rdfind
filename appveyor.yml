@@ -11,16 +11,19 @@ build_script:
       echo all good!
     else
       echo failed.
-      for f in *.log; do
+      for f in $(find . -maxdepth 1 -type f -name "*.log" -printf "%T@\t%p\n"| sort -n |cut -f2); do
         echo ===========================================
-        echo file $f:
+        echo ===========================================
+        echo =========== file $f: ===
+        echo ===========================================
+        echo ===========================================
         cat $f
         echo ===========================================
       done
       exit 1
     fi
 
-# artifacts are not save on failure, so no point in saving them
+# artifacts are not saved on failure, so there is no point in saving them
 # for trouble shooting purposes.
 artifacts:
 - path: '**/*.log'
