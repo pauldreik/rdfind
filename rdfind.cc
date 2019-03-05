@@ -319,7 +319,7 @@ main(int narg, const char* argv[])
   gswd.totalsize(std::cout) << std::endl;
 
   std::cout << "Removed " << gswd.removeUniqueSizes()
-            << " files due to unique sizes from list.";
+            << " files due to unique sizes from list. ";
   std::cout << filelist.size() << " files left." << std::endl;
 
   // ok. we now need to do something stronger to disambiguate the duplicate
@@ -344,14 +344,14 @@ main(int narg, const char* argv[])
 
   for (auto it = modes.begin() + 1; it != modes.end(); ++it) {
     std::cout << dryruntext << "Now eliminating candidates based on "
-              << it->second << ":" << std::flush;
+              << it->second << ": " << std::flush;
 
     // read bytes (destroys the sorting, for disk reading efficiency)
     gswd.fillwithbytes(it[0].first, it[-1].first, o.nsecsleep);
 
     // remove non-duplicates
     std::cout << "removed " << gswd.removeUniqSizeAndBuffer()
-              << " files from list.";
+              << " files from list. ";
     std::cout << filelist.size() << " files left." << std::endl;
   }
 
