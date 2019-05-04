@@ -147,6 +147,7 @@ MAX_SIZE=$(( 1000 * 1000000 ))	# 1000 megabytes = 1 gig
 for i in 250 10 2 1 0.5 0.25 0; do
     MIN_SIZE=$( echo "scale=0; ($i * 1000000)/1" | bc)  # i * megabyte
     DATESTR=$(date +%Y%m%d_%H:%M:%S)
+    # The following command can be dispatched to multiple machines or cores to run in parallel
     { time rdfind -outputname results_min_${MIN_SIZE}_max_${MAX_SIZE}_${DATESTR}.txt -minFileSize ${MIN_SIZE} -maxFileSize ${MAX_SIZE} ./dir1 ./dir2 ./dir3 ; } 2>&1 | tee -a results_min_${MIN_SIZE}_max_${MAX_SIZE}_${DATESTR}.log
     MAX_SIZE=$MIN_SIZE
 done
@@ -209,7 +210,7 @@ Several persons have helped with suggestions and improvements:
 Niels Möller, Carl Payne and Salvatore Ansani. Thanks also to you
 who tested the program and sent me feedback.
 .SH VERSION
-1.4.next (release date 2019-05-03)
+1.4.next (release date 2018-xx-xx)
 .SH COPYRIGHT
 This program is distributed under GPLv2 or later, at your option.
 .SH "SEE ALSO"
