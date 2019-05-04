@@ -11,6 +11,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <climits>
 
 // project
 #include "CmdlineParser.hh"
@@ -74,6 +75,9 @@ usage()
        "file reads.\n"
     << "                                  Default is 0. Only a few values\n"
     << "                                  are supported; 0,1-5,10,25,50,100\n"
+    << " -maxFileSize integerSizeInBytes  ignores files larger than size\n"
+    << " -minFileSize integerSizeInBytes  ignores files smaller than size\n"
+    << "\n"
     << " -dryrun|-n         true |(false) print to stdout instead of "
        "changing anything\n"
     << " -h|-help|--help                  show this help and exit\n"
@@ -104,6 +108,12 @@ struct Options
   bool deterministic = true; // be independent of filesystem order
   long nsecsleep = 0; // number of nanoseconds to sleep between each file read.
   std::string resultsfile = "results.txt"; // results file name.
+  // Size filtering additions (Note reverse of normal values so filters are not active
+  // Fileinfo::filesizetype 
+unsigned long minfilesizefilter = 0;	// files below this size are filtered out
+  // below may be OS and architecture dependent
+  // Fileinfo::filesizetype 
+  unsigned long maxfilesizefilter = ULONG_MAX; // files above this size are filtered out
 };
 
 Options
@@ -144,6 +154,20 @@ parseOptions(Parser& parser)
         throw std::runtime_error("negative value of minsize not allowed");
       }
       o.minimumfilesize = minsize;
+    } else if (parser.try_parse_string("-minFileSize")) {
+      const long long minfilesizefilter = std::stoll(parser.get_parsed_string());
+      if (minfilesizefilter < 0) {
+        throw std::runtime_error("negative value of minFileSize not allowed");
+      }
+      std::cout << "Min FileSize Filter set to: " << minfilesizefilter;
+      o.minfilesizefilter = minfilesizefilter;
+    } else if (parser.try_parse_string("-maxFileSize")) {
+      const long long maxfilesizefilter = std::stoll(parser.get_parsed_string());
+      if (maxfilesizefilter > ULONG_MAX) {
+        throw std::runtime_error("negative value of minsize not allowed");
+      }
+      std::cout << "Max FileSize Filter set to: " << maxfilesizefilter;
+      o.maxfilesizefilter = maxfilesizefilter;
     } else if (parser.try_parse_bool("-deleteduplicates")) {
       o.deleteduplicates = parser.get_parsed_bool();
     } else if (parser.try_parse_bool("-followsymlinks")) {
@@ -220,7 +244,9 @@ parseOptions(Parser& parser)
 
 // function to add items to the list of all files
 static int
-report(const std::string& path, const std::string& name, int depth)
+report(const std::string& path, const std::string& name,
+       const unsigned long minfilesizefilter, const unsigned long maxfilesizefilter,
+       int depth)
 {
 
   RDDEBUG("report(" << path.c_str() << "," << name.c_str() << "," << depth
@@ -232,7 +258,13 @@ report(const std::string& path, const std::string& name, int depth)
   Fileinfo tmp(std::move(expandedname), current_cmdline_index, depth);
   if (tmp.readfileinfo()) {
     if (tmp.isRegularFile()) {
-      if (tmp.size() >= global_options->minimumfilesize) {
+      if (
+	  tmp.size() >= global_options->minimumfilesize
+	  &&
+	  tmp.size() >= minfilesizefilter  // djhejna:  This collides with minimumfilesize test and needs to be resolved
+	  &&
+	  tmp.size() <= maxfilesizefilter
+	  ) {
         filelist.emplace_back(std::move(tmp));
       }
     }
@@ -240,6 +272,28 @@ report(const std::string& path, const std::string& name, int depth)
     std::cerr << "failed to read file info on file \"" << tmp.name() << '\n';
     return -1;
   }
+
+  // The following is *faster* in that the files are culled on first failure
+  // Fileinfo tmp(std::move(expandedname), current_cmdline_index, depth);
+  // if (tmp.readfileinfo()) {
+  //   if (tmp.isRegularFile()) {
+  //     ## Cull on sizes
+  // 	if ( tmp.size() < global_options->minimumfilesize ) {
+  // 	  ;
+  // 	} else if ( tmp.size() < minfilesizefilter ) { // djhejna:  This collides with minimumfilesize test and needs to be resolved
+  // 	  ;
+  // 	} else if ( tmp.size() > maxfilesizefilter ) {
+  // 	  ;
+  // 	} else {
+  // 	  filelist.emplace_back(std::move(tmp));
+  // 	}
+  //   }
+  // } else {
+  //   std::cerr << "failed to read file info on file \"" << tmp.name() << '\n';
+  //   return -1;
+  // }
+
+
   return 0;
 }
 
@@ -289,7 +343,7 @@ main(int narg, const char* argv[])
     std::cout << dryruntext << "Now scanning \"" << file_or_dir << "\"";
     std::cout.flush();
     current_cmdline_index = parser.get_current_index();
-    dirlist.walk(file_or_dir, 0);
+    dirlist.walk(file_or_dir, o.minfilesizefilter, o.maxfilesizefilter, 0);
     std::cout << ", found " << filelist.size() - lastsize << " files."
               << std::endl;
 

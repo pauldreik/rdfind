@@ -65,6 +65,16 @@ Ignore empty files. Setting this to true (the default) is equivalent to
 Ignores files with less than N bytes. Default is 1, meaning empty files
 are ignored.
 .TP
+.BR \-minFileSize " "\fIN\fR
+Ignores files with less than N bytes. Default is 1, meaning empty files
+are ignored.
+.TP
+.BR \-maxFileSize " "\fIN\fR
+Ignores files with more than N bytes. Default is ULONG_MAX, meaning no files
+are ignored. When used in conjunction with -minFileSize only files within the
+range of sizes are operated upon.  This allows for parallelization and dividing
+deduplication runs into smaller jobs. (See Examples)
+.TP
 .BR \-followsymlinks " " \fItrue\fR|\fIfalse\fR
 Follow symlinks. Default is false.
 .TP
@@ -126,6 +136,26 @@ Delete duplicates in a backup directory:
 .TP
 Search for duplicate files in directories called foo:
 .B find . -type d -name foo -print0 |xargs -0 rdfind
+.TP
+Run in parallel using size partitioning to break-down a large deduplication job into smaller sub-jobs
+.B
+.PP
+.nf
+.RS
+#! /bin/bash
+MAX_SIZE=$(( 1000 * 1000000 ))	# 1000 megabytes = 1 gig
+for i in 250 10 2 1 0.5 0.25 0; do
+    MIN_SIZE=$( echo "scale=0; ($i * 1000000)/1" | bc)  # i * megabyte
+    DATESTR=$(date +%Y%m%d_%H:%M:%S)
+    { time rdfind -outputname results_min_${MIN_SIZE}_max_${MAX_SIZE}_${DATESTR}.txt -minFileSize ${MIN_SIZE} -maxFileSize ${MAX_SIZE} ./dir1 ./dir2 ./dir3 ; } 2>&1 | tee -a results_min_${MIN_SIZE}_max_${MAX_SIZE}_${DATESTR}.log
+    MAX_SIZE=$MIN_SIZE
+done
+exit
+.RE
+.fi
+.PP
+
+
 .SH FILES
 .I results.txt
 (the default name is results.txt and can be changed with option outputname,
@@ -142,6 +172,7 @@ the directory in the same input argument as the original)
 
 DUPTYPE_OUTSIDE_TREE the file is found during processing another input
 argument than the original. 
+
 .SH ENVIRONMENT
 .SH DIAGNOSTICS
 .SH EXIT VALUES
@@ -171,12 +202,14 @@ Rdfind can be found at https://rdfind.pauldreik.se/
 Do you find rdfind useful? Drop me a line! It is always fun to
 hear from people who actually use it and what data collections
 they run it on.
+
+Size partitioning options and scripts by Don Hejna
 .SH THANKS
 Several persons have helped with suggestions and improvements:
 Niels Möller, Carl Payne and Salvatore Ansani. Thanks also to you
 who tested the program and sent me feedback.
 .SH VERSION
-1.4.next (release date 2018-xx-xx)
+1.4.next (release date 2019-05-03)
 .SH COPYRIGHT
 This program is distributed under GPLv2 or later, at your option.
 .SH "SEE ALSO"

@@ -25,7 +25,9 @@
 static const int maxdepth = 50;
 
 int
-Dirlist::walk(const std::string& dir, const int recursionlevel)
+Dirlist::walk(const std::string& dir, 
+	      const unsigned long minfilesizefilter, const unsigned long maxfilesizefilter,
+	      const int recursionlevel)
 {
 
   RDDEBUG("Now in walk with dir=" << dir.c_str() << " and recursionlevel="
@@ -42,7 +44,7 @@ Dirlist::walk(const std::string& dir, const int recursionlevel)
     // failed to open directory
     RDDEBUG("failed to open directory" << std::endl);
     // this can be due to rights, or some other error.
-    handlepossiblefile(dir, recursionlevel);
+    handlepossiblefile(dir, minfilesizefilter, maxfilesizefilter, recursionlevel);
     return 1; // its a file (or something else)
   }
 
@@ -70,7 +72,7 @@ Dirlist::walk(const std::string& dir, const int recursionlevel)
     if (S_ISLNK(info.st_mode)) {
       // symlink
       if (m_followsymlinks) {
-        (*m_callback)(dir, std::string(dp->d_name), recursionlevel);
+        (*m_callback)(dir, std::string(dp->d_name), minfilesizefilter, maxfilesizefilter, recursionlevel);
       }
       if (m_followsymlinks) {
         dowalk = true;
@@ -80,12 +82,12 @@ Dirlist::walk(const std::string& dir, const int recursionlevel)
       dowalk = true;
     } else if (S_ISREG(info.st_mode)) {
       // regular file
-      (*m_callback)(dir, std::string(dp->d_name), recursionlevel);
+      (*m_callback)(dir, std::string(dp->d_name), minfilesizefilter, maxfilesizefilter, recursionlevel);
     }
 
     // try to open directory
     if (dowalk) {
-      walk(dir + "/" + dp->d_name, recursionlevel + 1);
+      walk(dir + "/" + dp->d_name, minfilesizefilter, maxfilesizefilter, recursionlevel + 1);
     }
 
   } // while
@@ -118,7 +120,10 @@ splitfilename(std::string& path,
 // this function is called for files that were believed to be directories,
 // or failed re
 int
-Dirlist::handlepossiblefile(const std::string& possiblefile, int recursionlevel)
+Dirlist::handlepossiblefile(const std::string& possiblefile,
+			    const unsigned long minfilesizefilter, const unsigned long maxfilesizefilter,
+			    int recursionlevel)
+
 {
   struct stat info;
 
@@ -151,7 +156,7 @@ Dirlist::handlepossiblefile(const std::string& possiblefile, int recursionlevel)
   if (S_ISLNK(info.st_mode)) {
     RDDEBUG("found symlink" << std::endl);
     if (m_followsymlinks) {
-      (*m_callback)(path, filename, recursionlevel);
+      (*m_callback)(path, filename, minfilesizefilter, maxfilesizefilter, recursionlevel);
     }
     return 0;
   } else {
@@ -173,7 +178,7 @@ Dirlist::handlepossiblefile(const std::string& possiblefile, int recursionlevel)
 
   if (S_ISREG(info.st_mode)) {
     RDDEBUG("it is a regular file" << std::endl);
-    (*m_callback)(path, filename, recursionlevel);
+    (*m_callback)(path, filename, minfilesizefilter, maxfilesizefilter, recursionlevel);
     return 0;
   } else {
     RDDEBUG("not a regular file" << std::endl);
