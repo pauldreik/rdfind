@@ -152,12 +152,8 @@ parseOptions(Parser& parser)
       const long long maxsize = std::stoll(parser.get_parsed_string());
       if (maxsize < 0) {
         throw std::runtime_error("negative value of maxsize not allowed");
-      } else if (maxsize == 0) {
-        o.maximumfilesize =
-          std::numeric_limits<decltype(o.maximumfilesize)>::max();
-      } else {
-        o.maximumfilesize = maxsize;
       }
+      o.maximumfilesize = maxsize;
     } else if (parser.try_parse_bool("-deleteduplicates")) {
       o.deleteduplicates = parser.get_parsed_bool();
     } else if (parser.try_parse_bool("-followsymlinks")) {
@@ -224,9 +220,16 @@ parseOptions(Parser& parser)
     }
   }
 
+  // fix default values
+  if (o.maximumfilesize == 0) {
+    o.maximumfilesize = std::numeric_limits<decltype(o.maximumfilesize)>::max();
+  }
+
   // verify conflicting arguments
   if (!(o.minimumfilesize < o.maximumfilesize)) {
-    std::cerr << "maximum filesize must be larger than minimum filesize\n";
+    std::cerr << "maximum filesize " << o.maximumfilesize
+              << " must be larger than minimum filesize " << o.minimumfilesize
+              << "\n";
     std::exit(EXIT_FAILURE);
   }
 
