@@ -55,6 +55,8 @@ usage()
     << "                                  false implies -minsize 0)\n"
     << " -minsize N        (N=1)          ignores files with size less than N "
        "bytes\n"
+    << " -maxsize N        (N=0)          ignores files with size N "
+       "bytes and larger (use 0 to disable this check).\n"
     << " -followsymlinks    true |(false) follow symlinks\n"
     << " -removeidentinode (true)| false  ignore files with nonunique "
        "device and inode\n"
@@ -94,6 +96,8 @@ struct Options
   bool makeresultsfile = true; // write a results file
   Fileinfo::filesizetype minimumfilesize =
     1; // minimum file size to be noticed (0 - include empty files)
+  Fileinfo::filesizetype maximumfilesize =
+    0; // if nonzero, files this size or larger are ignored
   bool deleteduplicates = false;      // delete duplicate files
   bool followsymlinks = false;        // follow symlinks
   bool dryrun = false;                // only dryrun, dont destroy anything
@@ -144,6 +148,12 @@ parseOptions(Parser& parser)
         throw std::runtime_error("negative value of minsize not allowed");
       }
       o.minimumfilesize = minsize;
+} else if (parser.try_parse_string("-maxsize")) {
+      const long long maxsize = std::stoll(parser.get_parsed_string());
+      if (maxsize < 0) {
+        throw std::runtime_error("negative value of maxsize not allowed");
+      }
+      o.maximumfilesize = maxsize;
     } else if (parser.try_parse_bool("-deleteduplicates")) {
       o.deleteduplicates = parser.get_parsed_bool();
     } else if (parser.try_parse_bool("-followsymlinks")) {
