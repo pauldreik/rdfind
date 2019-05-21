@@ -7,12 +7,6 @@ set -e
 . "$(dirname "$0")/common_funcs.sh"
 
 
-verify() {
-if ! $@ ; then
-  echo "failed asserting $@"
-  exit 1
-fi
-}
 
 makefiles() {
 #make pairs of files, with specific sizes

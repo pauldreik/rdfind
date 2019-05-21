@@ -148,7 +148,7 @@ parseOptions(Parser& parser)
         throw std::runtime_error("negative value of minsize not allowed");
       }
       o.minimumfilesize = minsize;
-} else if (parser.try_parse_string("-maxsize")) {
+    } else if (parser.try_parse_string("-maxsize")) {
       const long long maxsize = std::stoll(parser.get_parsed_string());
       if (maxsize < 0) {
         throw std::runtime_error("negative value of maxsize not allowed");
@@ -219,14 +219,14 @@ parseOptions(Parser& parser)
       std::exit(EXIT_FAILURE);
     }
   }
- 
- //verify conflicting arguments
- if(o.maximumfilesize>0) {
-  if(!(o.minimumfilesize<o.maximumfilesize)) {
-  std::cerr<<"maximum filesize must be larger than minimum filesize\n";
- std::exit(EXIT_FAILURE);
-}
-}
+
+  // verify conflicting arguments
+  if (o.maximumfilesize > 0) {
+    if (!(o.minimumfilesize < o.maximumfilesize)) {
+      std::cerr << "maximum filesize must be larger than minimum filesize\n";
+      std::exit(EXIT_FAILURE);
+    }
+  }
 
   // done with parsing of options. remaining arguments are files and dirs.
 
@@ -251,7 +251,16 @@ report(const std::string& path, const std::string& name, int depth)
   Fileinfo tmp(std::move(expandedname), current_cmdline_index, depth);
   if (tmp.readfileinfo()) {
     if (tmp.isRegularFile()) {
-      if (tmp.size() >= global_options->minimumfilesize) {
+      const auto size = tmp.size();
+      static const auto minsize = global_options->minimumfilesize;
+      static const auto maxsize = []() {
+        auto ret = global_options->maximumfilesize;
+        if (ret <= 0) {
+          ret = std::numeric_limits<decltype(ret)>::max();
+        }
+        return ret;
+      }();
+      if (size >= minsize && size < maxsize) {
         filelist.emplace_back(std::move(tmp));
       }
     }
