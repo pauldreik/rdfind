@@ -7,6 +7,12 @@ set -e
 . "$(dirname "$0")/common_funcs.sh"
 
 
+verify() {
+if ! $@ ; then
+  echo "failed asserting $@"
+  exit 1
+fi
+}
 
 makefiles() {
 #make pairs of files, with specific sizes
@@ -21,22 +27,33 @@ done
 reset_teststate
 makefiles
 if $rdfind -deleteduplicates true -maxsize -1 a* b* ; then
-  dbgecho "that should have failed"
+  dbgecho "negative value should have been detected"
+  exit 1
 fi
 dbgecho "passed negative value test"
+
+#conflict between min and max should be reported as misusage
+reset_teststate
+makefiles
+if $rdfind -deleteduplicates true -minsize 123 -maxsize 123 a* b* ; then
+  dbgecho "conflicting values should have been detected"
+  exit 1
+fi
+dbgecho "passed conflicting value test"
+
 
 reset_teststate
 makefiles
 #try eliminate them, but they are correctly ignored.
-$rdfind -ignoreempty false -deleteduplicates true a* b*
-[ -e a0 ]
-[ -e b0 ]
-for i in $(seq 1 4) ; do
-  [ -e a$i ]
-  [ ! -e b$i ]
+$rdfind -deleteduplicates true -minsize 2 -maxsize 3 a* b*
+verify [ -e a2 ]
+verify [ ! -e b2 ]
+for i in $(seq 0 1) $(seq 3 4); do
+  verify [ -e a$i ]
+  verify [ -e b$i ]
 done
 
-dbgecho "passed ignoreempty true test case"
+dbgecho "passed specific size test"
 
 
 dbgecho "all is good for the max filesize test!"

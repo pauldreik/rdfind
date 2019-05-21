@@ -219,6 +219,15 @@ parseOptions(Parser& parser)
       std::exit(EXIT_FAILURE);
     }
   }
+ 
+ //verify conflicting arguments
+ if(o.maximumfilesize>0) {
+  if(!(o.minimumfilesize<o.maximumfilesize)) {
+  std::cerr<<"maximum filesize must be larger than minimum filesize\n";
+ std::exit(EXIT_FAILURE);
+}
+}
+
   // done with parsing of options. remaining arguments are files and dirs.
 
   // decide what checksum to use - if no checksum is set, force sha1!
