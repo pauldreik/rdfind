@@ -60,4 +60,10 @@ reset_teststate() {
 }
 
 
+verify() {
+if ! $@ ; then
+  echo "failed asserting $@"
+  exit 1
+fi
+}
 

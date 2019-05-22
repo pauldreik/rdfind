@@ -99,12 +99,11 @@ To build this utility, you need [nettle](https://www.lysator.liu.se/~nisse/nettl
 
 Here is how to get and install nettle from source. Please check for the current version before copying the instructions below:
 
-    wget ftp://ftp.lysator.liu.se/pub/security/lsh/nettle-1.14.tar.gz -nc
-    wget ftp://ftp.lysator.liu.se/pub/security/lsh/nettle-1.14.tar.gz.asc -nc
-    wget ftp://ftp.lysator.liu.se/pub/security/lsh/distribution-key.gpg -nc
-    gpg --fast-import distribution-key.gpg                    # omit if you do not want to verify
-    gpg --verify nettle-1.14.tar.gz.asc --nettle-1.14.tar.gz  # omit if you do not want to verify
-    tar -xzvf nettle-1.14.tar.gz
+    wget https://ftp.gnu.org/gnu/nettle/nettle-3.4.1.tar.gz
+    wget https://ftp.gnu.org/gnu/nettle/nettle-3.4.1.tar.gz.sig
+    gpg --recv-keys 28C67298                # omit if you do not want to verify
+    gpg --verify nettle-3.4.1.tar.gz{.sig,} # omit if you do not want to verify
+    tar -xf nettle-3.4.1.tar.gz
     ./configure
     make
     sudo make install

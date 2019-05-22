@@ -12,6 +12,7 @@ TESTS=testcases/largefilesupport.sh \
       testcases/hardlink_fails.sh \
       testcases/symlinking_action.sh \
       testcases/verify_filesize_option.sh \
+      testcases/verify_maxfilesize_option.sh \
       testcases/verify_dryrun_option.sh \
       testcases/verify_ranking.sh \
       testcases/verify_deterministic_operation.sh \

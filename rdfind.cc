@@ -55,6 +55,8 @@ usage()
     << "                                  false implies -minsize 0)\n"
     << " -minsize N        (N=1)          ignores files with size less than N "
        "bytes\n"
+    << " -maxsize N        (N=0)          ignores files with size N "
+       "bytes and larger (use 0 to disable this check).\n"
     << " -followsymlinks    true |(false) follow symlinks\n"
     << " -removeidentinode (true)| false  ignore files with nonunique "
        "device and inode\n"
@@ -94,6 +96,8 @@ struct Options
   bool makeresultsfile = true; // write a results file
   Fileinfo::filesizetype minimumfilesize =
     1; // minimum file size to be noticed (0 - include empty files)
+  Fileinfo::filesizetype maximumfilesize =
+    0; // if nonzero, files this size or larger are ignored
   bool deleteduplicates = false;      // delete duplicate files
   bool followsymlinks = false;        // follow symlinks
   bool dryrun = false;                // only dryrun, dont destroy anything
@@ -144,6 +148,12 @@ parseOptions(Parser& parser)
         throw std::runtime_error("negative value of minsize not allowed");
       }
       o.minimumfilesize = minsize;
+    } else if (parser.try_parse_string("-maxsize")) {
+      const long long maxsize = std::stoll(parser.get_parsed_string());
+      if (maxsize < 0) {
+        throw std::runtime_error("negative value of maxsize not allowed");
+      }
+      o.maximumfilesize = maxsize;
     } else if (parser.try_parse_bool("-deleteduplicates")) {
       o.deleteduplicates = parser.get_parsed_bool();
     } else if (parser.try_parse_bool("-followsymlinks")) {
@@ -209,6 +219,20 @@ parseOptions(Parser& parser)
       std::exit(EXIT_FAILURE);
     }
   }
+
+  // fix default values
+  if (o.maximumfilesize == 0) {
+    o.maximumfilesize = std::numeric_limits<decltype(o.maximumfilesize)>::max();
+  }
+
+  // verify conflicting arguments
+  if (!(o.minimumfilesize < o.maximumfilesize)) {
+    std::cerr << "maximum filesize " << o.maximumfilesize
+              << " must be larger than minimum filesize " << o.minimumfilesize
+              << "\n";
+    std::exit(EXIT_FAILURE);
+  }
+
   // done with parsing of options. remaining arguments are files and dirs.
 
   // decide what checksum to use - if no checksum is set, force sha1!
@@ -232,7 +256,9 @@ report(const std::string& path, const std::string& name, int depth)
   Fileinfo tmp(std::move(expandedname), current_cmdline_index, depth);
   if (tmp.readfileinfo()) {
     if (tmp.isRegularFile()) {
-      if (tmp.size() >= global_options->minimumfilesize) {
+      const auto size = tmp.size();
+      if (size >= global_options->minimumfilesize &&
+          size < global_options->maximumfilesize) {
         filelist.emplace_back(std::move(tmp));
       }
     }
@@ -319,7 +345,7 @@ main(int narg, const char* argv[])
   gswd.totalsize(std::cout) << std::endl;
 
   std::cout << "Removed " << gswd.removeUniqueSizes()
-            << " files due to unique sizes from list.";
+            << " files due to unique sizes from list. ";
   std::cout << filelist.size() << " files left." << std::endl;
 
   // ok. we now need to do something stronger to disambiguate the duplicate
@@ -344,20 +370,21 @@ main(int narg, const char* argv[])
 
   for (auto it = modes.begin() + 1; it != modes.end(); ++it) {
     std::cout << dryruntext << "Now eliminating candidates based on "
-              << it->second << ":" << std::flush;
+              << it->second << ": " << std::flush;
 
     // read bytes (destroys the sorting, for disk reading efficiency)
     gswd.fillwithbytes(it[0].first, it[-1].first, o.nsecsleep);
 
     // remove non-duplicates
     std::cout << "removed " << gswd.removeUniqSizeAndBuffer()
-              << " files from list.";
+              << " files from list. ";
     std::cout << filelist.size() << " files left." << std::endl;
   }
 
   // What is left now is a list of duplicates, ordered on size.
-  // We also know the list is ordered on size, then bytes, and all unique files
-  // are gone so it contains sequences of duplicates. Go ahead and mark them.
+  // We also know the list is ordered on size, then bytes, and all unique
+  // files are gone so it contains sequences of duplicates. Go ahead and mark
+  // them.
   gswd.markduplicates();
 
   std::cout << dryruntext << "It seems like you have " << filelist.size()
