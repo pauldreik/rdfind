@@ -6,14 +6,18 @@
 set -e
 . "$(dirname "$0")/common_funcs.sh"
 
-
-DISORDERED_MNT=$datadir/disordered_mnt
-DISORDERED_ROOT=$datadir/disordered_root
+if $hasdisorderfs ; then
+    echo "$me: found a working disorderfs setup. unit test will be properly executed"
+else
+    echo "$me: please install disorderfs to execute this test properly!"
+    echo "$me: falsely exiting with success now"
+    exit 0
+fi
 
 #unmount disordered
 unmount_disordered() {
   if [ -d $DISORDERED_MNT ]; then
-    if ! fusermount -u $DISORDERED_MNT ; then
+    if ! fusermount --quiet -u $DISORDERED_MNT ; then
       dbgecho failed unmounting disordered
     fi	
   fi
@@ -39,13 +43,9 @@ cr8() {
   done
 }
 local_reset() {
-  if which disorderfs >/dev/null ; then
     unmount_disordered
     reset_teststate
     mount_disordered
-  else
-    reset_teststate
-  fi
   cr8 $@
 }
 
@@ -63,12 +63,6 @@ run_outcome() {
     exit 1
   fi
 }
-
-
-if ! which disorderfs >/dev/null ; then
-  dbgecho "could not execute tests for deterministic behaviour - please install disorderfs"
-  exit 0
-fi
 
 trap "unmount_disordered;cleanup" INT QUIT EXIT
 

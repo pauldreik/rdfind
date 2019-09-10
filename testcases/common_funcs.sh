@@ -42,6 +42,9 @@ echo " OK."
 datadir=$(mktemp -d -t rdfindtestcases.d.XXXXXXXXXXXX)
 dbgecho "temp dir is $datadir"
 
+
+
+
 cleanup () {
 cd /
 rm -rf "$datadir"
@@ -68,4 +71,19 @@ if ! $@ ; then
   exit 1
 fi
 }
+
+# where to mount disorderfs for the determinism tests
+DISORDERED_MNT=$datadir/disordered_mnt
+DISORDERED_ROOT=$datadir/disordered_root
+
+# do we have a working disorder fs?
+hasdisorderfs=false
+if which disorderfs fusermount >/dev/null 2>&1; then
+    mkdir -p $DISORDERED_MNT $DISORDERED_ROOT
+    if disorderfs $DISORDERED_ROOT $DISORDERED_MNT >/dev/null 2>&1 ; then
+        # "Sälj inte skinnet förrän björnen är skjuten - Don't count your chickens until they're hatched"
+        fusermount -z -u $DISORDERED_MNT
+        hasdisorderfs=true
+    fi
+fi
 
