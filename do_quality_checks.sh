@@ -216,7 +216,7 @@ verify_packaging() {
 
 ###############################################################################
 verify_self_contained_headers() {
-  /bin/echo -n "verify that all header files are self contained..."
+  /bin/echo -n "$me: verify that all header files are self contained..."
   if [ ! -e configure ]; then
     ./bootstrap.sh >bootstrap.log 2>&1
   fi
@@ -229,7 +229,7 @@ verify_self_contained_headers() {
       exit 1
     fi
   done
-  echo $me: "OK!"
+  echo "OK!"
 }
 
 ###############################################################################
@@ -251,9 +251,10 @@ fi
  mkdir "$nettleinstall"
  cd "$nettleinstall"
  nettleversion=3.4
+ echo "$me: downloading nettle from gnu.org..."
  wget --quiet https://ftp.gnu.org/gnu/nettle/nettle-$nettleversion.tar.gz
  echo "ae7a42df026550b85daca8389b6a60ba6313b0567f374392e54918588a411e94  nettle-$nettleversion.tar.gz" >checksum
- sha256sum -c checksum
+ sha256sum --strict --quiet -c checksum
  tar xzf nettle-$nettleversion.tar.gz
  cd nettle-$nettleversion
  echo $me: trying to configure nettle
@@ -263,12 +264,13 @@ fi
  cd $here
  fi
  ./bootstrap.sh >bootstrap.log 2>&1 
- echo "$me: attempting configure with 32 bit flags... (see configure.log if it fails	)	"
+ echo "$me: attempting configure with 32 bit flags... (see configure.log if it fails)"
  ./configure --build=i686-pc-linux-gnu CFLAGS=-m32 CXXFLAGS="-m32 -I$nettleinstall/include" LDFLAGS="-m32 -L$nettleinstall/lib" >configure.log 2>&1
  echo "$me: building with 32 bit flags... (check make.log if it fails)"
  make >make.log 2>&1
  echo "$me: make check with 32 bit flags... (check make-check.log if it fails)"
  LD_LIBRARY_PATH=$nettleinstall/lib make check >make-check.log 2>&1
+ echo "$me: 32 bit tests went fine!"
 }
 ###############################################################################
 
