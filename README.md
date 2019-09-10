@@ -3,11 +3,11 @@
 Rdfind is a command line tool that finds duplicate files. It is useful for compressing backup directories or just finding duplicate files. It compares files based on their content, NOT on their file names. 
 
 ## Continuous integration status
-| Status | Description
-|-------------|------------------
-| [![Total alerts](https://img.shields.io/lgtm/alerts/g/pauldreik/rdfind.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/pauldreik/rdfind/alerts/) | Static analyzer
-| [![Build Status](https://travis-ci.org/pauldreik/rdfind.svg?branch=master)](https://travis-ci.org/pauldreik/rdfind) | Builds and executes tests on Ubuntu 14.04 with gcc and clang
-| [![Build status](https://ci.appveyor.com/api/projects/status/9crp181omyugf8xk/branch/master?svg=true)](https://ci.appveyor.com/project/pauldreik/rdfind/branch/master) | Builds and executes test on Ubuntu 18.04 with multiple versions of gcc and clang. Runs builds with address/undefined sanitizers and valgrind. Also performs the tests with a binary compiled in 32 bit mode.
+| Status (master) | Status (devel)| Description
+|-------------|-------------|------------------
+| [![Total alerts](https://img.shields.io/lgtm/alerts/g/pauldreik/rdfind.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/pauldreik/rdfind/alerts/) | N/A | Static analyzer
+| [![Build Status](https://travis-ci.org/pauldreik/rdfind.svg?branch=master)](https://travis-ci.org/pauldreik/rdfind) | [![Build Status](https://travis-ci.org/pauldreik/rdfind.svg?branch=devel)](https://travis-ci.org/pauldreik/rdfind) | Builds and executes tests on Ubuntu 14.04 with gcc and clang
+| [![Build status](https://ci.appveyor.com/api/projects/status/9crp181omyugf8xk/branch/master?svg=true)](https://ci.appveyor.com/project/pauldreik/rdfind/branch/master) | [![Build status](https://ci.appveyor.com/api/projects/status/9crp181omyugf8xk/branch/devel?svg=true)](https://ci.appveyor.com/project/pauldreik/rdfind/branch/devel) | Builds and executes test on Ubuntu 18.04 with multiple versions of gcc and clang. Runs builds with address/undefined sanitizers and valgrind. Also performs the tests with a binary compiled in 32 bit mode.
 
 ## Install
 
