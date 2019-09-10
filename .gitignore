@@ -20,3 +20,6 @@ stamp-h1
 
 compile
 test-driver
+nettle32bit/
+*.log
+rdfind-*.tar.gz

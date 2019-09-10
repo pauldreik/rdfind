@@ -121,6 +121,8 @@ compile_and_test() {
       compile_and_test_standard $1 c++$std "-Os"
     fi
   done
+
+  rm x.cpp
 }
 ###############################################################################
 run_with_sanitizer() {
@@ -196,6 +198,7 @@ verify_packaging() {
   touch dummy
   make dist  >>$log
   TARGZ=$(find "$(pwd)" -newer dummy -name "rdfind*gz" -type f |head -n1)
+  rm dummy
   temp=$(mktemp -d)
   cp "$TARGZ" "$temp"
   cd "$temp"
@@ -303,6 +306,8 @@ if which clang++ >/dev/null ; then
     fi
   done
 fi
+
+rm inodes_for_tested_compilers.txt
 
 #run unit tests with sanitizers enabled
 ASSERT="--enable-assert"
