@@ -13,8 +13,8 @@ reset_teststate
 files="a subdir/b c some/deeply/nested/subdir/d"
 nfiles=4
 for n in $files ; do
-    mkdir -p $(dirname $datadir/$n)
-    echo "hello hardlink" > $datadir/$n
+   mkdir -p $(dirname $datadir/$n)
+   echo "hello hardlink" > $datadir/$n
 done
 
 #eliminate them.
@@ -22,11 +22,11 @@ $rdfind -makehardlinks true $datadir/
 
 #make sure one is a hard link to the other.
 for n in $files ; do
-    nhardlinks=$(stat -c %h $datadir/$n)
-    if [ $nhardlinks -ne $nfiles ] ; then
-	dbgecho "expected $nfiles hardlinks, got $nhardlinks"
-	exit 1
-    fi
+   nhardlinks=$(stat -c %h $datadir/$n)
+   if [ $nhardlinks -ne $nfiles ] ; then
+      dbgecho "expected $nfiles hardlinks, got $nhardlinks"
+      exit 1
+   fi
 done
 dbgecho passed the happy path
 
@@ -37,8 +37,8 @@ dbgecho passed the happy path
 #trying to hardlink something we do not have access to.
 #unless run as root which would be horrible.
 if [ "$(id -u)" -eq 0 ]; then
-    dbgecho "running as root or through sudo, dangerous! Will not proceed with this unit tests."
-    exit 1
+   dbgecho "running as root or through sudo, dangerous! Will not proceed with this unit tests."
+   exit 1
 fi
 
 reset_teststate
@@ -52,8 +52,8 @@ fi
 
 #make sure that our own copy is still there
 if [ ! -e $(basename $system_file) ] ; then
-    dbgecho file is missing, rdfind should not have removed it!
-    exit 1
+   dbgecho file is missing, rdfind should not have removed it!
+   exit 1
 fi
 
 dbgecho "all is good in this test!"

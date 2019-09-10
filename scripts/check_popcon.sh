@@ -13,4 +13,3 @@ echo $debian_row
 
 echo "status on ubuntu is "
 echo $ubuntu_row
-
