@@ -17,7 +17,8 @@ class Rdutil
 {
 public:
   explicit Rdutil(std::vector<Fileinfo>& list)
-    : m_list(list){};
+    : m_list(list)
+  {}
 
   /**
    * print file names to a file, with extra information.
@@ -105,7 +106,7 @@ public:
    * m_duptype=Fileinfo::DUPTYPE_FIRST_OCCURRENCE
    * @return
    */
-  Fileinfo::filesizetype totalsizeinbytes(int opmode = 0) const;
+  [[gnu::pure]] Fileinfo::filesizetype totalsizeinbytes(int opmode = 0) const;
 
   /**
    * outputs a nicely formatted string "45 bytes" or "3 Gibytes"

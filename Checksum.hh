@@ -42,7 +42,7 @@ public:
 
   // returns the number of bytes that the buffer needs to be
   // returns negative if something is wrong.
-  int getDigestLength() const;
+  [[gnu::pure]] int getDigestLength() const;
 
 private:
   // to know what type of checksum we are doing

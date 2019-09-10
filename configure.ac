@@ -133,13 +133,16 @@ if test "x$set_more_warnings" != xno; then
                          -Wsuggest-final-types \
                          -Wsuggest-final-methods \
                          -Wsuggest-override \
-                         -Wunsafe-loop-optimizations \
                          -Wcast-qual -Wcast-align=strict \
                          -Wzero-as-null-pointer-constant \
                          -Wparentheses \
                          -Wdate-time \
                          -Wextra-semi \ 
                          -Wbiznafronck" 
+
+        #these warnings were tried but deemed unuseful for this project:
+        #                -Wunsafe-loop-optimizations \
+
         for option in $warning_options ; do
                 SAVE_CXXFLAGS="$CXXFLAGS"
                 CXXFLAGS="$CXXFLAGS $uwoption $option"

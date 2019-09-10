@@ -62,12 +62,12 @@ public:
    * @param A
    * @return
    */
-  static const char* getduptypestring(const Fileinfo& A);
+  [[gnu::pure]] static const char* getduptypestring(const Fileinfo& A);
   void setduptype(enum duptype duptype_) { m_duptype = duptype_; }
 
   std::int64_t getidentity() const { return m_identity; }
   static std::int64_t identity(const Fileinfo& A) { return A.getidentity(); }
-  void setidentity(std::int64_t id) { m_identity = id; };
+  void setidentity(std::int64_t id) { m_identity = id; }
 
   /**
    * reads info about the file, by querying the filesystem.
@@ -75,7 +75,7 @@ public:
    */
   bool readfileinfo();
 
-  duptype getduptype() const { return m_duptype; };
+  duptype getduptype() const { return m_duptype; }
 
   /// makes a symlink of "this" that points to A.
   int makesymlink(const Fileinfo& A);

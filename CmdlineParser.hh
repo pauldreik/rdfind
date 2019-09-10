@@ -36,7 +36,7 @@ public:
   bool try_parse_string(const char* arg);
   bool get_parsed_bool() const { return m_last_bool_result; }
   const char* get_parsed_string() const { return m_last_str_result; }
-  bool parsed_string_is(const char* value) const;
+  [[gnu::pure]] bool parsed_string_is(const char* value) const;
   /**
    * advances to the next argument
    * @return

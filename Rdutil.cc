@@ -112,7 +112,8 @@ public:
   /// @param m2 may be null
   explicit dryrun_helper(const char* m1, const char* m2 = nullptr)
     : m_m1(m1)
-    , m_m2(m2){};
+    , m_m2(m2)
+  {}
 
   const char* const m_m1;
   const char* const m_m2;
@@ -451,6 +452,7 @@ Rdutil::remove_small_files(Fileinfo::filesizetype minsize)
   return size_before - m_list.size();
 }
 #endif
+
 Fileinfo::filesizetype
 Rdutil::totalsizeinbytes(int opmode) const
 {

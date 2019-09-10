@@ -38,7 +38,7 @@ Dirlist::walk(const std::string& dir, const int recursionlevel)
 
   // open the directory
   DIR* dirp = opendir(dir.c_str());
-  if (dirp == NULL) {
+  if (dirp == nullptr) {
     // failed to open directory
     RDDEBUG("failed to open directory" << std::endl);
     // this can be due to rights, or some other error.
@@ -48,8 +48,8 @@ Dirlist::walk(const std::string& dir, const int recursionlevel)
 
   // we opened the directory. let us read the content.
   RDDEBUG("opened directory" << std::endl);
-  struct dirent* dp = NULL;
-  while (NULL != (dp = readdir(dirp))) {
+  struct dirent* dp{};
+  while (nullptr != (dp = readdir(dirp))) {
     // is the directory . or ..?
     if (0 == strcmp(".", dp->d_name) || 0 == strcmp("..", dp->d_name)) {
       continue;
