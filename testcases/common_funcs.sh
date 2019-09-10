@@ -6,6 +6,8 @@
 #bail out on the first error
 set -e
 
+me=$(basename $0)
+
 /bin/echo -n "checking for rdfind ..."
 rdfind=$(readlink -f $(dirname $0)/../rdfind)
 if [ ! -x "$rdfind" ]; then
