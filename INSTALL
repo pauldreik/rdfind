@@ -1,33 +1,19 @@
-INSTALL for rdfind. By Paul Dreik.
+You will need nettle (https://www.lysator.liu.se/~nisse/nettle/).
 
-To install rdfind:
-rdfind needs the library nettle by Niels Möller. 
-
-If you alread have nettle installed properly and on a standard place, 
-the installation goes quite smooth. Proceed to section 2 below.
-
-1)
-If you have nettle installed somewhere else (non-standard place, maybe
-because you do not have root access), you have to supply the
-paths to configure, for instance:
-./configure CPPFLAGS=-I../nettle/  LDFLAGS=-L../nettle/nettle 
-
-If you do not have nettle installed, you may install it either the
-standard way (going to https://www.lysator.liu.se/~nisse/nettle/,
-downloading and installing after instructions found there), or 
-with the small helper scripts in directory nettle provided with this
-package. See the INSTALL file in that directory.
-
-2)
-compile rdfind with 
-./configure (or ./configure CPPFLAGS=-I./nettle/  LDFLAGS=-L./nettle/nettle)
+If you are building from a tarball and have nettle installed system wide,
+building and installing should be as easy as
+./configure
 make
-make install (optionally)
+make install
 
-3)
-rdfind should now work properly. Try man rdfind to check that the installation
-was succesful.
+If you are building from git you may need to install autotools and autoconf-archive.
+On a debian or ubuntu system, please install the following packages:
+nettle-dev autoconf-archive build-essential
 
-Author Paul Dreik 2006
-see LICENSE for details.
+after that,
+./bootstrap.sh && ./configure && make
+
+should do the trick
+
+
 

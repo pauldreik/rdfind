@@ -3,7 +3,7 @@
 .\"
 .\" Author Paul Dreik 2006
 .\" see LICENSE for details.
-.TH rdfind "1" 1.4.0-alpha0 "Oct 2018" rdfind
+.TH rdfind "1" 1.4.next "Nov 2018" rdfind
 .SH NAME
 rdfind \- finds duplicate files
 .SH SYNOPSIS
@@ -64,6 +64,10 @@ Ignore empty files. Setting this to true (the default) is equivalent to
 .BR \-minsize " "\fIN\fR
 Ignores files with less than N bytes. Default is 1, meaning empty files
 are ignored.
+.TP
+.BR \-maxsize " "\fIN\fR
+Ignores files with N bytes or more. Default is 0, which means this check
+is disabled.
 .TP
 .BR \-followsymlinks " " \fItrue\fR|\fIfalse\fR
 Follow symlinks. Default is false.
@@ -152,7 +156,7 @@ encountered as the most important (original), and the rest as
 duplicates. This might not be what you want.
 
 The symlink creates absolute links. This might not be what you
-want. To create relative links instead, you may use the symlinks (2)
+want. To create relative links instead, you may use the symlink (2)
 command, which is able to convert absolute links to relative links.
 
 Older versions unfortunately contained a misspelling on the word
@@ -176,7 +180,7 @@ Several persons have helped with suggestions and improvements:
 Niels Möller, Carl Payne and Salvatore Ansani. Thanks also to you
 who tested the program and sent me feedback.
 .SH VERSION
-1.4.0-alpha0 (release date 2018-xx-xx)
+1.4.next (release date 2018-xx-xx)
 .SH COPYRIGHT
 This program is distributed under GPLv2 or later, at your option.
 .SH "SEE ALSO"

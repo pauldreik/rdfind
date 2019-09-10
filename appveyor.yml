@@ -3,7 +3,8 @@ version: appveyor.{build}
 image: Ubuntu1804
 
 init:
-- sh: sudo apt install --quiet --assume-yes nettle-dev autoconf-archive clang g++ valgrind libc++abi-dev libc++-dev
+- sh: sudo apt update
+- sh: sudo apt install --quiet --assume-yes nettle-dev autoconf-archive clang g++ valgrind libc++abi-dev libc++-dev gcc-multilib libc6-i386 gcc-multilib g++-multilib
 
 build_script:
  - sh: >-
@@ -11,16 +12,19 @@ build_script:
       echo all good!
     else
       echo failed.
-      for f in *.log; do
+      for f in $(find . -maxdepth 1 -type f -name "*.log" -printf "%T@\t%p\n"| sort -n |cut -f2); do
         echo ===========================================
-        echo file $f:
+        echo ===========================================
+        echo =========== file $f: ===
+        echo ===========================================
+        echo ===========================================
         cat $f
         echo ===========================================
       done
       exit 1
     fi
 
-# artifacts are not save on failure, so no point in saving them
+# artifacts are not saved on failure, so there is no point in saving them
 # for trouble shooting purposes.
 artifacts:
 - path: '**/*.log'

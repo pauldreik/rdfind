@@ -1,6 +1,31 @@
 version number exist in the following places:
-configure.ac
-rdfind.1 (multiple times)
+configure.ac (twice, at the top)
+rdfind.1 (both at the top and the bottom)
 VERSION
 Changelog
+
+make a (signed) git tag:
+git config user.signingkey 4CC8C397
+git tag -s releases/1.x.y
+
+release a tar ball:
+git clean -xdf .
+./bootstrap.sh
+./configure
+make dist-gzip
+
+make information for publishing the tar ball on https://rdfind.pauldreik.se/:
+key=$(git config user.signingkey)
+pkg=rdfind-$(cat VERSION).tar.gz
+gpg -u $key -a -b $pkg
+
+cat VERSION>table.txt
+git show-ref --hash=8 releases/$(cat VERSION) >>table.txt
+echo $pkg >>table.txt
+echo $pkg.asc >>table.txt
+echo 0x$key >>table.txt
+echo $(sha1sum < $pkg |cut -f1 -d' ')" (SHA1)" >>table.txt
+echo $(sha256sum < $pkg |cut -f1 -d' ')" (SHA256)" >>table.txt
+
+man2html rdfind.1 |tail -n +3 > rdfind.1.html
 

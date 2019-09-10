@@ -1,3 +1,11 @@
+2018-11-12 Paul Dreik <rdfind@pauldreik.se>
+        * release of 1.4.1
+        * fixes build failure on 32 bit platforms
+        * tests: fix bad test logic in hardlink fail test
+2018-11-09 Paul Dreik <rdfind@pauldreik.se>
+        * release of 1.4.0
+        * improve error message when failing to make symlink.
+          See Github bug #5.
 2018-10-28 Paul Dreik <rdfind@pauldreik.se>
 	* release of 1.4.0-alpha0
 	* cleanup of source to remove compiler warnings

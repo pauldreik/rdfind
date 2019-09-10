@@ -35,6 +35,7 @@ set -e
 export LANG=
 
 rootdir=$(dirname $0)
+me=$(basename $0)
 
 #flags to configure, for assert.
 ASSERT=
@@ -69,6 +70,10 @@ compile_and_test_standard() {
     exit 1
   fi
   #make sure it compiles
+  if [ ! -x /usr/bin/time ] ; then
+     echo "$me: please install /usr/bin/time (apt install time)"
+     exit 1
+  fi
   if ! /usr/bin/time --format=%e --output=time.log make >make.log 2>&1; then
     echo failed make
     exit 1
@@ -205,6 +210,7 @@ verify_packaging() {
   cd $(dirname "$TARGZ")
   rm -rf "$temp"
 }
+
 ###############################################################################
 verify_self_contained_headers() {
   /bin/echo -n "verify that all header files are self contained..."
@@ -224,6 +230,41 @@ verify_self_contained_headers() {
 }
 
 ###############################################################################
+build_32bit() {
+#compiling to 32 bit, on amd64.
+#apt install libc6-i386 gcc-multilib g++-multilib
+#
+if [ $(uname -m) != x86_64 ] ; then
+  echo "not on x64, won't cross compile with -m32"
+  return;
+fi
+ echo "trying to compile in 32 bit mode with -m32..."
+ configureflags="--build=i686-pc-linux-gnu CFLAGS=-m32 CXXFLAGS=-m32 LDFLAGS=-m32"
+ here=$(pwd)
+ nettleinstall=$here/nettle32bit 
+ if [ -d "$nettleinstall" ] ; then
+ echo "local nettle already seems to be installed"
+ else
+ mkdir "$nettleinstall"
+ cd "$nettleinstall"
+ nettleversion=3.4
+ wget https://ftp.gnu.org/gnu/nettle/nettle-$nettleversion.tar.gz
+ echo "ae7a42df026550b85daca8389b6a60ba6313b0567f374392e54918588a411e94  nettle-$nettleversion.tar.gz" >checksum
+ sha256sum -c checksum
+ tar xzf nettle-$nettleversion.tar.gz
+ cd nettle-$nettleversion
+ ./configure $configureflags --prefix="$nettleinstall" >$here/nettle.configure.log 2>&1
+ make install >$here/nettle.install.log 2>&1
+ echo "local nettle install went ok"
+ cd $here
+ fi
+ ./bootstrap.sh >bootstrap.log 2>&1 
+ ./configure --build=i686-pc-linux-gnu CFLAGS=-m32 CXXFLAGS="-m32 -I$nettleinstall/include" LDFLAGS="-m32 -L$nettleinstall/lib" >configure.log 2>&1
+ make >make.log 2>&1
+ make check >make-check.log 2>&1
+}
+###############################################################################
+
 
 #this is pretty quick so start with it. 
 verify_self_contained_headers
@@ -291,6 +332,10 @@ fi
 #unpack it, build and execute tests, then finally
 #installing and running the program.
 verify_packaging
+
+#try to compile to 32 bit (downloads nettle and builds it
+# in 32 bit mode)
+build_32bit
 
 echo "$(basename $0): congratulations, all tests that were possible to run passed!"
 

@@ -7,7 +7,7 @@ Rdfind is a command line tool that finds duplicate files. It is useful for compr
 |-------------|------------------
 | [![Total alerts](https://img.shields.io/lgtm/alerts/g/pauldreik/rdfind.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/pauldreik/rdfind/alerts/) | Static analyzer
 | [![Build Status](https://travis-ci.org/pauldreik/rdfind.svg?branch=master)](https://travis-ci.org/pauldreik/rdfind) | Builds and executes tests on Ubuntu 14.04 with gcc and clang
-| [![Build status](https://ci.appveyor.com/api/projects/status/9crp181omyugf8xk/branch/master?svg=true)](https://ci.appveyor.com/project/pauldreik/rdfind/branch/master) | Builds and executes test on Ubuntu 18.04 with gcc and clang. Also runs address/undefined sanitizers and valgrind.
+| [![Build status](https://ci.appveyor.com/api/projects/status/9crp181omyugf8xk/branch/master?svg=true)](https://ci.appveyor.com/project/pauldreik/rdfind/branch/master) | Builds and executes test on Ubuntu 18.04 with multiple versions of gcc and clang. Runs builds with address/undefined sanitizers and valgrind. Also performs the tests with a binary compiled in 32 bit mode.
 
 ## Install
 
@@ -99,12 +99,11 @@ To build this utility, you need [nettle](https://www.lysator.liu.se/~nisse/nettl
 
 Here is how to get and install nettle from source. Please check for the current version before copying the instructions below:
 
-    wget ftp://ftp.lysator.liu.se/pub/security/lsh/nettle-1.14.tar.gz -nc
-    wget ftp://ftp.lysator.liu.se/pub/security/lsh/nettle-1.14.tar.gz.asc -nc
-    wget ftp://ftp.lysator.liu.se/pub/security/lsh/distribution-key.gpg -nc
-    gpg --fast-import distribution-key.gpg                    # omit if you do not want to verify
-    gpg --verify nettle-1.14.tar.gz.asc --nettle-1.14.tar.gz  # omit if you do not want to verify
-    tar -xzvf nettle-1.14.tar.gz
+    wget https://ftp.gnu.org/gnu/nettle/nettle-3.4.1.tar.gz
+    wget https://ftp.gnu.org/gnu/nettle/nettle-3.4.1.tar.gz.sig
+    gpg --recv-keys 28C67298                # omit if you do not want to verify
+    gpg --verify nettle-3.4.1.tar.gz{.sig,} # omit if you do not want to verify
+    tar -xf nettle-3.4.1.tar.gz
     ./configure
     make
     sudo make install

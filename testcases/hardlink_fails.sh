@@ -44,8 +44,11 @@ fi
 reset_teststate
 system_file=$(which ls)
 cp $system_file .
-$rdfind -makehardlinks true $system_file . 2>&1 |tee rdfind.out
-grep -iq "failed to make hardlink" rdfind.out
+$rdfind -makehardlinks true . $system_file 2>&1 |tee rdfind.out
+if ! grep -iq "failed" rdfind.out ; then
+   dbgecho "expected failure when trying to make hardlink on system partition"
+   exit 1
+fi
 
 #make sure that our own copy is still there
 if [ ! -e $(basename $system_file) ] ; then
