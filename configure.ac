@@ -128,6 +128,17 @@ if test "x$set_more_warnings" != xno; then
 			 -Wdouble-promotion \
 			 -Wformat=2 \
 			 -Wlifetime \
+                         -Wsuggest-attribute=const \
+                         -Wsuggest-attribute=pure \
+                         -Wsuggest-final-types \
+                         -Wsuggest-final-methods \
+                         -Wsuggest-override \
+                         -Wunsafe-loop-optimizations \
+			 -Wcast-qual -Wcast-align=strict \
+			 -Wzero-as-null-pointer-constant \
+			 -Wparentheses \
+			 -Wdate-time \
+			 -Wextra-semi \ 
 	                 -Wbiznafronck"	
 	for option in $warning_options ; do
 		SAVE_CXXFLAGS="$CXXFLAGS"
