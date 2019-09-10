@@ -14,10 +14,9 @@
  * The state is global, and not held in the class
  * This class is not thread safe.
  */
-class EasyRandom
+class EasyRandom final
 {
 public:
-  class GlobalRandom;
   EasyRandom();
   /**
    * makes N random characters, suitable to use for a random filename.
@@ -27,9 +26,12 @@ public:
   std::string makeRandomFileString(std::size_t N = 16);
 
 private:
+  class GlobalRandom;
   // keep a reference to the global magic static, to avoid the cost of thread
   // safe initialization.
   GlobalRandom& m_rand;
+
+  static GlobalRandom& getGlobalObject();
 };
 
 #endif /* RDFIND_EASYRANDOM_HH_ */

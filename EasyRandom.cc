@@ -14,7 +14,7 @@
 // project
 #include "EasyRandom.hh"
 
-class EasyRandom::GlobalRandom
+class EasyRandom::GlobalRandom final
 {
 public:
   char randomFileChar() { return getChar(m_dist(m_gen)); }
@@ -52,15 +52,13 @@ private:
   std::uniform_int_distribution<int> m_dist{ 0, nchars - 1 };
 };
 
-namespace {
 EasyRandom::GlobalRandom&
-getGlobalObject()
+EasyRandom::getGlobalObject()
 {
   // thread safe (magic static)
-  static EasyRandom::GlobalRandom global{};
+  static GlobalRandom global{};
   return global;
 }
-} // namespace
 
 EasyRandom::EasyRandom()
   : m_rand(getGlobalObject())
