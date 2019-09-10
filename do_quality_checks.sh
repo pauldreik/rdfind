@@ -54,7 +54,7 @@ start_from_scratch() {
 #argument 3 (optional) is appended to CXXFLAGS
 compile_and_test_standard() {
   start_from_scratch
-  /bin/echo -n "using $(basename $1) with standard $2"
+  /bin/echo -n "$me: using $(basename $1) with standard $2"
   if [ -n "$3" ] ; then
     echo " (with additional CXXFLAGS $3)"
   else
@@ -62,11 +62,11 @@ compile_and_test_standard() {
   fi
 
   if ! ./bootstrap.sh >bootstrap.log 2>&1; then
-    echo failed bootstrap - see bootstrap.log
+    echo $me:failed bootstrap - see bootstrap.log
     exit 1
   fi
   if ! ./configure $ASSERT --enable-warnings CXX=$1 CXXFLAGS="-std=$2 $3" >configure.log 2>&1 ; then
-    echo failed configure - see configure.log
+    echo $me: failed configure - see configure.log
     exit 1
   fi
   #make sure it compiles
@@ -75,20 +75,20 @@ compile_and_test_standard() {
      exit 1
   fi
   if ! /usr/bin/time --format=%e --output=time.log make >make.log 2>&1; then
-    echo failed make
+    echo $me: failed make
     exit 1
   fi
   if [ ! -z $MEASURE_COMPILE_TIME ] ; then
-    echo "  compile with $(basename $1) $2 took $(cat time.log) seconds"
+    echo $me: "  compile with $(basename $1) $2 took $(cat time.log) seconds"
   fi
   #check for warnings
   if grep -q "warning" make.log; then
-    echo found warning - see make.log
+    echo $me: found warning - see make.log
     exit 1
   fi
   #run the tests
   if ! make check >makecheck.log 2>&1 ; then
-    echo failed make check - see makecheck.log
+    echo $me: failed make check - see makecheck.log
     exit 1
   fi
 }
@@ -100,7 +100,7 @@ compile_and_test() {
   /bin/echo -e "#include <iostream>">x.cpp
   #does the compiler understand c++11? That is mandatory.
   if ! $1 -c x.cpp -std=c++11 >/dev/null 2>&1 ; then
-    echo this compiler $1 does not understand c++11
+    echo $me: this compiler $1 does not understand c++11
     return 0
   fi
 
@@ -108,7 +108,7 @@ compile_and_test() {
   #use the code words.
   for std in 11 1y 1z 2a ; do
     if ! $1 -c x.cpp -std=c++$std >/dev/null 2>&1 ; then
-      echo compiler does not understand c++$std, skipping this combination.
+      echo $me: compiler does not understand c++$std, skipping this combination.
     else
       # debug build
       ASSERT=--enable-assert
@@ -126,11 +126,11 @@ compile_and_test() {
 }
 ###############################################################################
 run_with_sanitizer() {
-  echo "running with sanitizer (options $1)"
+  echo $me: "running with sanitizer (options $1)"
   #find the latest clang compiler
   latestclang=$(ls $(which clang++)* |grep -v libc |sort -g |tail -n1)
   if [ ! -x $latestclang ] ; then
-    echo could not find latest clang $latestclang
+    echo $me: could not find latest clang $latestclang
     return 0
   fi
 
@@ -147,9 +147,9 @@ run_with_sanitizer() {
 ###############################################################################
 #This tries to mimick how the debian package is built
 run_with_debian_buildflags() {
-  echo "running with buildflags from debian dpkg-buildflags"
+  echo $me: "running with buildflags from debian dpkg-buildflags"
   if ! which dpkg-buildflags >/dev/null  ; then
-    echo dpkg-buildflags not found - skipping
+    echo $me: dpkg-buildflags not found - skipping
     return 0
   fi
   start_from_scratch
@@ -159,7 +159,7 @@ run_with_debian_buildflags() {
   make > make.log 2>&1
   #check for warnings
   if grep -q "warning" make.log; then
-    echo "found warning(s) - see make.log"
+    echo $me: "found warning(s) - see make.log"
     exit 1
   fi
   make check >make-check.log 2>&1
@@ -173,14 +173,14 @@ run_with_debian_buildflags() {
 run_with_libcpp() {
   latestclang=$(ls $(which clang++)* |grep -v libc|sort -g |tail -n1)
   if [ ! -x $latestclang ] ; then
-    echo could not find latest clang - skipping test with libc++
+    echo $me: could not find latest clang - skipping test with libc++
     return 0
   fi
   #make a test program to make sure it works.
   echo "#include <iostream>
   int main() { std::cout<<\"libc++ works!\";}" >x.cpp
   if ! $latestclang -std=c++11 -stdlib=libc++ -lc++abi x.cpp >/dev/null 2>&1 && [ -x ./a.out ] && ./a.out ; then
-    echo "$latestclang could not compile with libc++ - perhaps uninstalled."
+    echo $me: "$latestclang could not compile with libc++ - perhaps uninstalled."
     return 0
   fi
   #echo using $latestclang with libc++
@@ -190,7 +190,7 @@ run_with_libcpp() {
 
 verify_packaging() {
   #make sure the packaging works as intended.
-  echo "trying to make a tar ball for release and building it..."
+  echo $me: "trying to make a tar ball for release and building it..."
   log="$(pwd)/packagetest.log"
   ./bootstrap.sh >$log
   ./configure  >>$log
@@ -225,11 +225,11 @@ verify_self_contained_headers() {
   fi
   for header in *.hh ; do
     if ! g++ -std=c++11 -I. $header -o /dev/null >header.log 2>&1 ; then
-      echo "found a header which is not self contained: $header"
+      echo $me: "found a header which is not self contained: $header"
       exit 1
     fi
   done
-  echo "OK!"
+  echo $me: "OK!"
 }
 
 ###############################################################################
@@ -238,15 +238,15 @@ build_32bit() {
 #apt install libc6-i386 gcc-multilib g++-multilib
 #
 if [ $(uname -m) != x86_64 ] ; then
-  echo "not on x64, won't cross compile with -m32"
+  echo $me: "not on x64, won't cross compile with -m32"
   return;
 fi
- echo "trying to compile in 32 bit mode with -m32..."
+ echo $me: "trying to compile in 32 bit mode with -m32..."
  configureflags="--build=i686-pc-linux-gnu CFLAGS=-m32 CXXFLAGS=-m32 LDFLAGS=-m32"
  here=$(pwd)
  nettleinstall=$here/nettle32bit 
  if [ -d "$nettleinstall" ] ; then
- echo "local nettle already seems to be installed"
+ echo $me: "local nettle already seems to be installed"
  else
  mkdir "$nettleinstall"
  cd "$nettleinstall"
@@ -259,7 +259,7 @@ fi
  echo $me: trying to configure nettle
  ./configure $configureflags --prefix="$nettleinstall" >$here/nettle.configure.log 2>&1
  make install >$here/nettle.install.log 2>&1
- echo "local nettle install went ok"
+ echo $me: "local nettle install went ok"
  cd $here
  fi
  ./bootstrap.sh >bootstrap.log 2>&1 
@@ -284,7 +284,7 @@ if which g++ >/dev/null ; then
   for COMPILER in $(ls $(which g++)* |grep -v libc); do
     inode=$(stat --dereference --format=%i $COMPILER)
     if grep -q "^$inode\$" inodes_for_tested_compilers.txt ; then
-      echo skipping this compiler $COMPILER - already tested
+      echo $me: skipping this compiler $COMPILER - already tested
     else
       #echo trying gcc $GCC:$($GCC --version|head -n1)
       echo $inode >>inodes_for_tested_compilers.txt
@@ -298,7 +298,7 @@ if which clang++ >/dev/null ; then
   for COMPILER in $(ls $(which clang++)* |grep -v libc); do
     inode=$(stat --dereference --format=%i $COMPILER)
     if grep -q "^$inode\$" inodes_for_tested_compilers.txt ; then
-      echo skipping this compiler $COMPILER - already tested
+      echo $me: skipping this compiler $COMPILER - already tested
     else
       #echo trying gcc $GCC:$($GCC --version|head -n1)
       echo $inode >>inodes_for_tested_compilers.txt
@@ -331,7 +331,7 @@ run_with_libcpp
 
 #test build with running through valgrind
 if which valgrind >/dev/null; then
-  echo running unit tests through valgrind
+  echo $me: running unit tests through valgrind
   ASSERT="--disable-assert"
   compile_and_test_standard g++ c++11 "-O3"
   VALGRIND=valgrind make check >make-check.log
