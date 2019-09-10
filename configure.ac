@@ -22,15 +22,15 @@ AC_HEADER_STDC
 dnl see if we should run a debug build with lots of output
 showdebugmessages=no
 AC_ARG_ENABLE(debug,
- 	AC_HELP_STRING(
- 	    [--enable-debug],
- 	    [enable debug printouts in program (default=no)]
- 	),
-   	showdebugmessages="$enableval"
+        AC_HELP_STRING(
+            [--enable-debug],
+            [enable debug printouts in program (default=no)]
+        ),
+        showdebugmessages="$enableval"
 )
 AC_MSG_RESULT($showdebugmessages)
 if test x"$showdebugmessages" = x"yes"; then
-	AC_DEFINE([RDFIND_DEBUG],[1],[Enable debug printouts in program])
+        AC_DEFINE([RDFIND_DEBUG],[1],[Enable debug printouts in program])
 fi
 
 dnl for assert() support
@@ -65,9 +65,9 @@ AC_SYS_LARGEFILE
 dnl make sure we have c++11 or better,
 dnl allow for disabling this check on older systems like Ubuntu 14.04
 AC_ARG_ENABLE(cppstandardcheck,
-	[AS_HELP_STRING([--disable-cppstandardcheck], [disable checking for C++11 and trust CXX and CXXFLAGS instead ])],
-	[ ENABLECPPSTANDARDCHECK=$enableval ],
-	[ ENABLECPPSTANDARDCHECK=yes] )
+        [AS_HELP_STRING([--disable-cppstandardcheck], [disable checking for C++11 and trust CXX and CXXFLAGS instead ])],
+        [ ENABLECPPSTANDARDCHECK=$enableval ],
+        [ ENABLECPPSTANDARDCHECK=yes] )
 if test "$ENABLECPPSTANDARDCHECK" = "yes"; then
    AC_MSG_NOTICE([checking for c++ 11, disable with --disable-cppstandardcheck])
    dnl AX_CXX_COMPILE_STDCXX_11([noext], [mandatory])
@@ -84,81 +84,81 @@ AC_SUBST(VERSION)
 dnl check for how to set warning flags
 set_more_warnings=no
 AC_ARG_ENABLE(warnings,
- 	AC_HELP_STRING(
- 	    [--enable-warnings],
- 	    [enable compiler warnings (default=no)]
- 	),
-   	set_more_warnings="$enableval"
+        AC_HELP_STRING(
+            [--enable-warnings],
+            [enable compiler warnings (default=no)]
+        ),
+        set_more_warnings="$enableval"
 )
 dnl the following warning related paragraph is from the gnumeric project, which
 dnl is gpl-v2 licensed. I modified and expanded it a bit.
 
 if test "x$set_more_warnings" != xno; then
-	dnl Clang needs this option, or else it will appear to support any
-	dnl warning option, only to spew warnings about them later.
-	uwoption="-Werror=unknown-warning-option"
-	SAVE_CXXFLAGS="$CXXFLAGS"
-	CXXFLAGS="$CXXFLAGS $uwoption"
-	AC_MSG_CHECKING([whether compiler understands $uwoption])
-	AC_COMPILE_IFELSE(
-		[AC_LANG_PROGRAM([], [])],
-		[has_unknown_warning_option=yes],
-		[has_unknown_warning_option=no; uwoption=""])
-	AC_MSG_RESULT($has_unknown_warning_option)
-	CXXFLAGS="$SAVE_CXXFLAGS"
+        dnl Clang needs this option, or else it will appear to support any
+        dnl warning option, only to spew warnings about them later.
+        uwoption="-Werror=unknown-warning-option"
+        SAVE_CXXFLAGS="$CXXFLAGS"
+        CXXFLAGS="$CXXFLAGS $uwoption"
+        AC_MSG_CHECKING([whether compiler understands $uwoption])
+        AC_COMPILE_IFELSE(
+                [AC_LANG_PROGRAM([], [])],
+                [has_unknown_warning_option=yes],
+                [has_unknown_warning_option=no; uwoption=""])
+        AC_MSG_RESULT($has_unknown_warning_option)
+        CXXFLAGS="$SAVE_CXXFLAGS"
 
-	dnl see https://github.com/lefticus/cppbestpractices/blob/master/02-Use_the_Tools_Available.md#compilers for a list of suggestions. Let's start
-	dnl small to begin with, and gradually increase.
-	warning_options="-Wall -Wextra -pedantic \
-	                 -Wshadow \
-			 -Wold-style-cast \
-			 -Wnon-virtual-dtor \
-			 -Wold-style-cast \
-			 -Wcast-align \
-			 -Wunused \
-			 -Woverloaded-virtual \
-			 -Wconversion \
-			 -Wsign-conversion \
-			 -Wmisleading-indentation \
-			 -Wduplicated-cond \
-			 -Wduplicated-branches \
-			 -Wlogical-op \
-			 -Wnull-dereference \
-			 -Wuseless-cast \
-			 -Wdouble-promotion \
-			 -Wformat=2 \
-			 -Wlifetime \
+        dnl see https://github.com/lefticus/cppbestpractices/blob/master/02-Use_the_Tools_Available.md#compilers for a list of suggestions. Let's start
+        dnl small to begin with, and gradually increase.
+        warning_options="-Wall -Wextra -pedantic \
+                         -Wshadow \
+                         -Wold-style-cast \
+                         -Wnon-virtual-dtor \
+                         -Wold-style-cast \
+                         -Wcast-align \
+                         -Wunused \
+                         -Woverloaded-virtual \
+                         -Wconversion \
+                         -Wsign-conversion \
+                         -Wmisleading-indentation \
+                         -Wduplicated-cond \
+                         -Wduplicated-branches \
+                         -Wlogical-op \
+                         -Wnull-dereference \
+                         -Wuseless-cast \
+                         -Wdouble-promotion \
+                         -Wformat=2 \
+                         -Wlifetime \
                          -Wsuggest-attribute=const \
                          -Wsuggest-attribute=pure \
                          -Wsuggest-final-types \
                          -Wsuggest-final-methods \
                          -Wsuggest-override \
                          -Wunsafe-loop-optimizations \
-			 -Wcast-qual -Wcast-align=strict \
-			 -Wzero-as-null-pointer-constant \
-			 -Wparentheses \
-			 -Wdate-time \
-			 -Wextra-semi \ 
-	                 -Wbiznafronck"	
-	for option in $warning_options ; do
-		SAVE_CXXFLAGS="$CXXFLAGS"
-		CXXFLAGS="$CXXFLAGS $uwoption $option"
-		AC_MSG_CHECKING([whether compiler understands $option])
-		dnl Include a system header so we ignore Werror=... flags
-		dnl that cause trouble.
-		AC_COMPILE_IFELSE(
-			[AC_LANG_PROGRAM([[#include <stdio.h>]], [])],
-			[has_option=yes],
-			[has_option=no])
-		CXXFLAGS="$SAVE_CXXFLAGS"
-		if test $has_option = yes; then
-			CXXFLAGS="$CXXFLAGS $option"
-		fi
-		AC_MSG_RESULT(got result $has_option)
-		unset has_option
-		unset SAVE_CXXFLAGS
-	done
-	unset option
+                         -Wcast-qual -Wcast-align=strict \
+                         -Wzero-as-null-pointer-constant \
+                         -Wparentheses \
+                         -Wdate-time \
+                         -Wextra-semi \ 
+                         -Wbiznafronck" 
+        for option in $warning_options ; do
+                SAVE_CXXFLAGS="$CXXFLAGS"
+                CXXFLAGS="$CXXFLAGS $uwoption $option"
+                AC_MSG_CHECKING([whether compiler understands $option])
+                dnl Include a system header so we ignore Werror=... flags
+                dnl that cause trouble.
+                AC_COMPILE_IFELSE(
+                        [AC_LANG_PROGRAM([[#include <stdio.h>]], [])],
+                        [has_option=yes],
+                        [has_option=no])
+                CXXFLAGS="$SAVE_CXXFLAGS"
+                if test $has_option = yes; then
+                        CXXFLAGS="$CXXFLAGS $option"
+                fi
+                AC_MSG_RESULT(got result $has_option)
+                unset has_option
+                unset SAVE_CXXFLAGS
+        done
+        unset option
 fi
 
 dnl check for fallthrough. this is tricky to use, because it may give a warning
