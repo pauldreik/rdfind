@@ -1,5 +1,5 @@
 dnl configure.in for rdfind.
-dnl copyright 2016-2018 Paul Dreik (earlier Paul Sundvall)
+dnl copyright 2016-2019 Paul Dreik (earlier Paul Sundvall)
 dnl Distributed under GPL v 2.0 or later, at your option.
 dnl See LICENSE for further details.
 
@@ -11,10 +11,10 @@ AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE
 
 
-dnl find and test the C compiler
+dnl find and test the C++ compiler
 AC_PROG_CXX
-AC_LANG_CPLUSPLUS
-        
+AC_LANG([C++])
+
 AC_PROG_MAKE_SET
                
 AC_HEADER_STDC
@@ -22,7 +22,7 @@ AC_HEADER_STDC
 dnl see if we should run a debug build with lots of output
 showdebugmessages=no
 AC_ARG_ENABLE(debug,
-        AC_HELP_STRING(
+        AS_HELP_STRING(
             [--enable-debug],
             [enable debug printouts in program (default=no)]
         ),
@@ -42,8 +42,8 @@ AC_CHECK_HEADER(nettle/sha.h,,[AC_MSG_ERROR([
  first. If you have already done so and get this error message 
  anyway, it may be installed somewhere else, maybe because you 
  don't have root access. Pass CPPFLAGS=-I/your/path/to/nettle to configure
- and try again. The path should be so that #include \"nettle/sha.h\" works.
- On Debian-ish systems, use \"apt-get install nettle-dev\" to get a system
+ and try again. The path should be so that \#include "nettle/sha.h" works.
+ On Debian-ish systems, use "apt-get install nettle-dev" to get a system
  wide nettle install.
 ])]) 
 AC_CHECK_LIB(nettle,main,,[AC_MSG_ERROR([
@@ -63,20 +63,10 @@ dnl check for 64 bit support
 AC_SYS_LARGEFILE
 
 dnl make sure we have c++11 or better,
-dnl allow for disabling this check on older systems like Ubuntu 14.04
-AC_ARG_ENABLE(cppstandardcheck,
-        [AS_HELP_STRING([--disable-cppstandardcheck], [disable checking for C++11 and trust CXX and CXXFLAGS instead ])],
-        [ ENABLECPPSTANDARDCHECK=$enableval ],
-        [ ENABLECPPSTANDARDCHECK=yes] )
-if test "$ENABLECPPSTANDARDCHECK" = "yes"; then
-   AC_MSG_NOTICE([checking for c++ 11, disable with --disable-cppstandardcheck])
-   dnl AX_CXX_COMPILE_STDCXX_11([noext], [mandatory])
-   AX_CXX_COMPILE_STDCXX([11],[noext],[mandatory])
-else
-   AC_MSG_NOTICE([not checking for c++11 support.])
-fi
-
-
+AC_MSG_CHECKING([for C++11 support or better])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([int f() { auto a=1;}])],
+                  [AC_MSG_RESULT([yes])],
+		  [AC_MSG_ERROR([no c++11 support, please set CXXFLAGS properly])])
 
 AC_SUBST(VERSION)
 
@@ -84,7 +74,7 @@ AC_SUBST(VERSION)
 dnl check for how to set warning flags
 set_more_warnings=no
 AC_ARG_ENABLE(warnings,
-        AC_HELP_STRING(
+        AS_HELP_STRING(
             [--enable-warnings],
             [enable compiler warnings (default=no)]
         ),
@@ -195,4 +185,5 @@ dnl AX_VALGRIND_CHECK
 dnl
 dnl instead, just use "VALGRIND=valgrind make check" to test with valgrind
 dnl read Makefile.in and write Makefile
-AC_OUTPUT(Makefile)
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT

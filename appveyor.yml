@@ -4,7 +4,7 @@ image: Ubuntu1804
 
 init:
 - sh: sudo apt update
-- sh: sudo apt install --quiet --assume-yes nettle-dev autoconf-archive clang g++ valgrind libc++abi-dev libc++-dev gcc-multilib libc6-i386 gcc-multilib g++-multilib
+- sh: sudo apt install --quiet --assume-yes nettle-dev clang g++ valgrind libc++abi-dev libc++-dev gcc-multilib libc6-i386 gcc-multilib g++-multilib
 
 build_script:
  - sh: >-

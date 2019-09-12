@@ -17,11 +17,10 @@ matrix:
     env: COMPILER=clang++
 
 script:
-  - grep -v AX_CXX_COMPILE_STDCXX <configure.ac >tmp && mv tmp configure.ac
   - ./bootstrap.sh
   - if [ x"$COMPILER" != "x" ] ; then export CXX=$COMPILER ; fi
   - export CXXFLAGS=-std=c++0x
-  - ./configure --enable-warnings --prefix $(pwd)/prefix --disable-cppstandardcheck
+  - ./configure --enable-warnings --prefix $(pwd)/prefix
   - make
   - make check # runs unit tests
   - make install

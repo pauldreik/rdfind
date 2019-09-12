@@ -6,9 +6,9 @@ building and installing should be as easy as
 make
 make install
 
-If you are building from git you may need to install autotools and autoconf-archive.
+If you are building from git you may need to install autotools.
 On a debian or ubuntu system, please install the following packages:
-nettle-dev autoconf-archive build-essential
+nettle-dev build-essential
 
 after that,
 ./bootstrap.sh && ./configure && make

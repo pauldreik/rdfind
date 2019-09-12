@@ -17,9 +17,9 @@ for prog in aclocal autoheader automake autoconf make; do
    fi
 done
 
-aclocal
-autoheader
-automake --add-missing
-autoconf
+aclocal --warnings=all
+autoheader --warnings=all
+automake --add-missing --warnings=all
+autoconf --warnings=all
 
 echo "it seems like everything went fine. now try ./configure && make"
