@@ -3,8 +3,8 @@ version: appveyor.{build}
 image: Ubuntu1804
 
 init:
-- sh: sudo apt update
-- sh: sudo apt install --quiet --assume-yes nettle-dev clang g++ valgrind libc++abi-dev libc++-dev gcc-multilib libc6-i386 gcc-multilib g++-multilib
+- sh: sudo apt-get update --quiet --quiet
+- sh: sudo apt-get install --quiet --quiet --assume-yes nettle-dev clang g++ valgrind libc++abi-dev libc++-dev gcc-multilib libc6-i386 gcc-multilib g++-multilib
 
 build_script:
  - sh: >-
