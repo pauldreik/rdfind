@@ -12,6 +12,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+    - name: install packages
+      run: sudo apt install build-essential nettle-dev
     - name: configure
       run: ./configure --enable-warnings
     - name: make
