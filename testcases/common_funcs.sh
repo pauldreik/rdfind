@@ -8,10 +8,12 @@ set -e
 
 me=$(basename $0)
 
-/bin/echo -n "checking for rdfind ..."
-rdfind=$(readlink -f $(dirname $0)/../rdfind)
+
+/bin/echo -n "$me: checking for rdfind ..."
+rdfind=$PWD/rdfind
 if [ ! -x "$rdfind" ]; then
    echo "could not find $rdfind"
+   exit 1
 fi
 echo " OK."
 

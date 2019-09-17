@@ -13,7 +13,7 @@ unmount_disordered() {
       return
    fi
    if [ -d $DISORDERED_MNT ]; then
-      if ! fusermount --quiet -u $DISORDERED_MNT ; then
+      if ! fusermount --quiet -z -u $DISORDERED_MNT ; then
          dbgecho failed unmounting disordered
       fi
    fi
