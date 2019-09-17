@@ -23,4 +23,4 @@ jobs:
     - name: make check
       run: make check
     - name: make distcheck
-      run: make distcheck
+      run: make distcheck CXXFLAGS=-std=c++11
