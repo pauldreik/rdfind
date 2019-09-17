@@ -1,0 +1,22 @@
+name: github quick test build
+
+on: [push]
+
+jobs:
+  build:
+    name: Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-16.04, ubuntu-18.04]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: configure
+      run: ./configure --enable-warnings
+    - name: make
+      run: make
+    - name: make check
+      run: make check
+    - name: make distcheck
+      run: make distcheck
