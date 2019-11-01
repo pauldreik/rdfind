@@ -12,12 +12,21 @@ if [ `lsb_release -i 2>/dev/null | grep -c "Ubuntu")` -eq 1 ] ;
 then
     echo "Detected Ubuntu OS."
     UBUNTU_OS=1
+    RASPBIAN_OS=0
 else
-    echo "OS is not Ubuntu. Check AX_CXX_COMPILE_STDCXX macros in configure.ac if you have problems running ./congfigure."
-    echo "You will need the equivalent packages of Ubuntu's automake, autoconf-archive, g++, and nettle-dev on your OS."
-    UBUNTU_OS=0
+    if [ `lsb_release -i 2>/dev/null | grep -c "Raspbian")` -eq 1 ] ;
+    then
+        echo "Detected Raspbian OS."
+        UBUNTU_OS=0
+        RASPBIAN_OS=1
+    else
+        echo "OS is not Ubuntu or Raspbian. Check AX_CXX_COMPILE_STDCXX macros in configure.ac if you have problems running ./congfigure."
+        echo "You will need the equivalent packages of Ubuntu's automake, autoconf-archive, g++, and nettle-dev on your OS."
+        UBUNTU_OS=0
+        RASPBIAN_OS=0
+    fi
 fi
-if [ $UBUNTU_OS -eq 1 ];
+if [ $UBUNTU_OS -eq 1 ] || [ $RASPBIAN_OS -eq 1 ];
 then
     PACKAGE_LIST="automake g++ autoconf-archive nettle-dev"
     for PKG in ${PACKAGE_LIST} ; do
@@ -31,15 +40,17 @@ then
 	fi
     done
 
-    # The following code is for older Ubuntu OS's which do not ship with the AX_CXX_COMPILE_STDCXX() macro in autoconf-archive"
+    # The following code is for older Ubuntu and Raspbian OS's which do not ship with the AX_CXX_COMPILE_STDCXX() macro in autoconf-archive"
     #
     # FRAGILE:  This code depends on the following two lines being present in configure.ac:
     #   dnl AX_CXX_COMPILE_STDCXX_11([noext], [mandatory])
     #   AX_CXX_COMPILE_STDCXX([11],[noext],[mandatory])
 
-    if [ `lsb_release -rs | cut -d. -f 1` -lt "18" ] ;
+    if ([ $UBUNTU_OS -eq 1 ] && [ `lsb_release -rs | cut -d. -f 1` -lt "18" ]) || \
+       ([ $RASPBIAN_OS -eq 1 ] && [ `lsb_release -rs | cut -d. -f 1` -lt "10" ]);
     then
-	# less than 18:  Tested with 14.04 and 16.04, unsure of 17.X releases
+	# less than Ubuntu 18:  Tested with 14.04 and 16.04, unsure of 17.X releases
+	# less than Raspbian 10:  Tested with 8.0, unsure of 9.X releases
 	echo "adjusting configure.ac file to use older C++ macro test. Preserving original in configure.ac.orig" ;
 	if [ -e configure.ac.orig ] ;
 	then
