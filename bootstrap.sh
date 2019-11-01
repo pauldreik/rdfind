@@ -58,8 +58,6 @@ then
     fi
 fi
 
-exit
-
 aclocal
 autoheader
 automake --add-missing
