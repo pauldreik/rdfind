@@ -58,7 +58,6 @@ then
     fi
 fi
 
-exit
 
 aclocal
 autoheader
