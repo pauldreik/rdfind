@@ -57,12 +57,27 @@ AC_CHECK_LIB(nettle,main,,[AC_MSG_ERROR([
 ])])
 
 dnl make sure to set feature test macros to use symlink
-AC_DEFINE([_POSIX_C_SOURCE], [200112L], [Use extra functions such as symlink])
-AC_DEFINE([_XOPEN_SOURCE], [500], [Use extra functions such as symlink])
-dnl Commented out because for some reason cygwin sys/features.h defines
-dnl _DEFAULT_SOURCE when _BSD_SOURCE is defined and redefines _POSIX_C_SOURCE,
-dnl causing a redefinition warning when it reads the config.h again
-dnl AC_DEFINE([_BSD_SOURCE], [1], [Use extra functions such as symlink])
+AH_VERBATIM([_POSIX_C_SOURCE],
+          [/* Make "extra" functions available such as symlink() */
+          #ifndef _POSIX_C_SOURCE
+          # define _POSIX_C_SOURCE 200112L
+          #endif])
+AH_VERBATIM([_XOPEN_SOURCE],
+          [/* Make "extra" functions available such as symlink() */
+          #ifndef _XOPEN_SOURCE
+          # define _XOPEN_SOURCE 500
+          #endif])
+dnl defining _BSD_SOURCE causes a deprecation warning to use _DEFAULT_SOURCE instead
+dnl AH_VERBATIM([_BSD_SOURCE],
+dnl           [/* Make "extra" functions available such as symlink() */
+dnl           #ifndef _BSD_SOURCE
+dnl           # define _BSD_SOURCE 1
+dnl           #endif])
+AH_VERBATIM([_DEFAULT_SOURCE],
+          [/* Make "extra" functions available such as symlink() */
+          #ifndef _DEFAULT_SOURCE
+          # define _DEFAULT_SOURCE 1
+          #endif])
 
 dnl test for some specific functions
 AC_CHECK_FUNC(stat,,AC_MSG_ERROR(oops! no stat ?!?))
