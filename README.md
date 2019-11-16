@@ -1,6 +1,8 @@
 # Rdfind - redundant data find
 
-Rdfind is a command line tool that finds duplicate files. It is useful for compressing backup directories or just finding duplicate files. It compares files based on their content, NOT on their file names. 
+Rdfind is a command line tool that finds duplicate files. It is useful for compressing backup directories or just finding duplicate files. It compares files based on their content, NOT on their file names.
+
+If you find rdfind useful, [drop me an email](mailto:__please_remove_this_antispam_prefix_rdfind@pauldreik.se)! I love hearing about how people actually use rdfind. In the unlikely case you want to throw money at rdfind, please use [goclimateneutral](https://www.goclimateneutral.org/gift_cards).
 
 ## Continuous integration status
 | Status (master) | Status (devel)| Description
