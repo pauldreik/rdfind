@@ -14,6 +14,7 @@
 #include <cstring>
 #include <fstream>  //for file writing
 #include <iostream> //for std::cerr
+#include <iomanip> //for number output
 #include <ostream>  //for output
 #include <string>   //for easier passing of string arguments
 #include <thread>   //sleep
@@ -547,17 +548,20 @@ Rdutil::fillwithbytes(enum Fileinfo::readtobuffermode type,
   const auto duration = std::chrono::nanoseconds{ nsecsleep };
   const auto size = m_list.size();
   std::size_t count = 0;
-  std::size_t percent = 0;
+  std::size_t per_ten_thousand = 0;
   if (out) {
     (*out) << std::endl << "0 %\r";
+    //set mode for converting numbers to two decimal places
+    (*out) << std::fixed << std::setprecision(2);
+    out->flush();
   }
   for (auto& elem : m_list) {
-    elem.fillwithbytes(type, lasttype);
-    if (out && (100*(++count))/size != percent) {
-      percent = (100*(count))/size;
-      (*out) << percent << " %\r";
+    if (out && (10000*(++count))/size != per_ten_thousand) {
+      per_ten_thousand = (10000*(count))/size;
+      (*out) << (static_cast<double> (per_ten_thousand)/100.0) << " %\r";
       out->flush();
     }
+    elem.fillwithbytes(type, lasttype);
     if (nsecsleep > 0) {
       std::this_thread::sleep_for(duration);
     }
