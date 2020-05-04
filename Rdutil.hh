@@ -16,8 +16,8 @@
 class Rdutil
 {
 public:
-  explicit Rdutil(std::vector<Fileinfo>& list)
-    : m_list(list){};
+  explicit Rdutil(std::vector<Fileinfo>& list, bool protectSameTree)
+    : m_list(list), m_protectSameTree(protectSameTree) {};
 
   /**
    * print file names to a file, with extra information.
@@ -121,6 +121,7 @@ public:
 
 private:
   std::vector<Fileinfo>& m_list;
+  bool m_protectSameTree;
 };
 
 #endif

@@ -72,6 +72,8 @@ usage()
     << " -outputname  name  sets the results file name to \"name\" "
        "(default results.txt)\n"
     << " -deleteduplicates  true |(false) delete duplicate files\n"
+    << " -protectsametree   true |(false) do not touch duplicates found in "
+       "the same tree as the original\n"
     << " -sleep              Xms          sleep for X milliseconds between "
        "file reads.\n"
     << "                                  Default is 0. Only a few values\n"
@@ -99,6 +101,7 @@ struct Options
   Fileinfo::filesizetype maximumfilesize =
     0; // if nonzero, files this size or larger are ignored
   bool deleteduplicates = false;      // delete duplicate files
+  bool protectsametree = false;       // do not touch duplicates in same tree
   bool followsymlinks = false;        // follow symlinks
   bool dryrun = false;                // only dryrun, dont destroy anything
   bool remove_identical_inode = true; // remove files with identical inodes
@@ -156,6 +159,8 @@ parseOptions(Parser& parser)
       o.maximumfilesize = maxsize;
     } else if (parser.try_parse_bool("-deleteduplicates")) {
       o.deleteduplicates = parser.get_parsed_bool();
+    } else if (parser.try_parse_bool("-protectsametree")) {
+      o.protectsametree = parser.get_parsed_bool();
     } else if (parser.try_parse_bool("-followsymlinks")) {
       o.followsymlinks = parser.get_parsed_bool();
     } else if (parser.try_parse_bool("-dryrun")) {
@@ -286,7 +291,7 @@ main(int narg, const char* argv[])
   const std::string dryruntext(o.dryrun ? "(DRYRUN MODE) " : "");
 
   // an object to do sorting and duplicate finding
-  Rdutil gswd(filelist);
+  Rdutil gswd(filelist, o.protectsametree);
 
   // an object to traverse the directory structure
   Dirlist dirlist(o.followsymlinks);

@@ -61,7 +61,7 @@ Rdutil::printtofile(const std::string& filename) const
 // returns how many times the function was invoked.
 template<typename Function>
 std::size_t
-applyactiononfile(std::vector<Fileinfo>& m_list, Function f)
+applyactiononfile(std::vector<Fileinfo>& m_list, bool m_protectSameTree, Function f)
 {
 
   const auto first = m_list.begin();
@@ -79,9 +79,12 @@ applyactiononfile(std::vector<Fileinfo>& m_list, Function f)
                "original file should have positive identity");
       } break;
 
-      case Fileinfo::duptype::DUPTYPE_OUTSIDE_TREE:
+      case Fileinfo::duptype::DUPTYPE_WITHIN_SAME_TREE:
+        if (m_protectSameTree) {
+          break;
+        }
         // intentional fallthrough
-      case Fileinfo::duptype::DUPTYPE_WITHIN_SAME_TREE: {
+      case Fileinfo::duptype::DUPTYPE_OUTSIDE_TREE: {
         assert(original != last);
         // double check that "it" shall be ~linked to "src"
         assert(it->getidentity() == -original->getidentity() &&
@@ -140,11 +143,11 @@ Rdutil::deleteduplicates(bool dryrun) const
   if (dryrun) {
     const bool outputBname = false;
     dryrun_helper<outputBname> obj("delete ");
-    auto ret = applyactiononfile(m_list, obj);
+    auto ret = applyactiononfile(m_list, m_protectSameTree, obj);
     std::cout.flush();
     return ret;
   } else {
-    return applyactiononfile(m_list, &Fileinfo::static_deletefile);
+    return applyactiononfile(m_list, m_protectSameTree, &Fileinfo::static_deletefile);
   }
 }
 
@@ -154,11 +157,11 @@ Rdutil::makesymlinks(bool dryrun) const
   if (dryrun) {
     const bool outputBname = true;
     dryrun_helper<outputBname> obj("symlink ", " to ");
-    auto ret = applyactiononfile(m_list, obj);
+    auto ret = applyactiononfile(m_list, m_protectSameTree, obj);
     std::cout.flush();
     return ret;
   } else {
-    return applyactiononfile(m_list, &Fileinfo::static_makesymlink);
+    return applyactiononfile(m_list, m_protectSameTree, &Fileinfo::static_makesymlink);
   }
 }
 
@@ -168,11 +171,11 @@ Rdutil::makehardlinks(bool dryrun) const
   if (dryrun) {
     const bool outputBname = true;
     dryrun_helper<outputBname> obj("hardlink ", " to ");
-    const auto ret = applyactiononfile(m_list, obj);
+    const auto ret = applyactiononfile(m_list, m_protectSameTree, obj);
     std::cout.flush();
     return ret;
   } else
-    return applyactiononfile(m_list, &Fileinfo::static_makehardlink);
+    return applyactiononfile(m_list, m_protectSameTree, &Fileinfo::static_makehardlink);
 }
 
 // mark files with a unique number
