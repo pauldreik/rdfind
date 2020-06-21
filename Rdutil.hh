@@ -26,6 +26,15 @@ public:
    */
   int printtofile(const std::string& filename) const;
 
+  /**
+   * print file names to a CSV file, with extra information.
+   * @param filename
+   * @param separator
+   * @return zero on success
+   */
+  int printtocsvfile(const std::string& filename,
+                     const char separator) const;
+
   /// mark files with a unique number
   void markitems();
 

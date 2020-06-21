@@ -56,6 +56,63 @@ Rdutil::printtofile(const std::string& filename) const
   return 0;
 }
 
+int
+Rdutil::printtocsvfile(const std::string& filename,
+                       const char separator) const
+{
+  // open a file to print to
+  std::ofstream f1;
+  f1.open(filename.c_str(), std::ios_base::out);
+  if (!f1.is_open()) {
+    std::cerr << "could not open file \"" << filename << "\"\n";
+    return -1;
+  }
+
+  // exchange f1 for cout to write to terminal instead of file
+  std::ostream& output(f1);
+
+  // This uses "priority" instead of "cmdlineindex". Change this the day
+  // a change in output format is allowed (for backwards compatibility).
+  output << "duptype" << separator << "id" << separator << "depth" << separator
+         << "size" << separator << "device" << separator << "inode" << separator
+         << "priority" << separator << "name\n";
+
+  std::vector<Fileinfo>::iterator it;
+  for (it = m_list.begin(); it != m_list.end(); ++it) {
+    output << Fileinfo::getduptypestring(*it)
+           << separator << it->getidentity()
+           << separator << it->depth()
+           << separator << it->size()
+           << separator << it->device()
+           << separator << it->inode()
+           << separator << it->get_cmdline_index()
+           << separator;
+
+    // Enclose filename in quotes
+    output << '"';
+
+    // If the separator is a quote, escpate any quotes in filename
+    if(separator == '"') {
+      for(auto chr = it->name().begin(); chr != it->name().end(); chr++) {
+        if(*chr == '"') {
+          output << *chr;
+        }
+        output << *chr;
+      }
+    }
+    // Otherwise, print as-is
+    else {
+      output << it->name();
+    }
+    
+    // Ending filename quote
+    output << '"' << std::endl;
+  }
+  
+  f1.close();
+  return 0;
+}
+
 // applies int f(duplicate,const original) on every duplicate.
 // if f returns nonzero, something is wrong.
 // returns how many times the function was invoked.
