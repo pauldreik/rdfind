@@ -99,7 +99,21 @@ file exists, it is overwritten.
 .TP
 .BR \-outputname " " \fIname\fR
 Make the results file name to be "name" instead of the default
-results.txt.
+results.txt or results.csv, depending on -outputformat.
+.TP
+.BR \-outputformat " " \fItext\fR|\fIcsv\fR
+Set the format of the output file between the legacy text format and
+comma separated values (CSV) format.
+.TP
+.BR \-outputseparator " " \fICHARACTER\fR
+Set the separator characher used by CSV results file format.
+Default separator used is comma (,).
+
+If the separator is a quote ("), any quotes in filenamed are
+escaped by the separator (duplicated).
+
+If the provided separator contains more than one character,
+the first character of the string is used.
 .TP
 .BR \-deleteduplicates " " \fItrue\fR|\fIfalse\fR
 Delete (unlink) files. Default is false.
@@ -124,6 +138,9 @@ Displays the version number.
 .TP
 Search for duplicate files in the home directory and a backup directory:
 .B rdfind ~ /mnt/backup
+.TP
+Search for duplicate files in home directory and save the results in a semicolon-separated CSV file:
+.B rdfind -outputformat csv -outputseparator \(aq;\(aq ~
 .TP
 Delete duplicates in a backup directory:
 .B rdfind -deleteduplicates true /mnt/backup
