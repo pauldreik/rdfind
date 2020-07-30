@@ -95,7 +95,8 @@ Replace duplicate files with hard links. Default is false.
 .TP
 .BR \-makeresultsfile " " \fItrue\fR|\fIfalse\fR
 Make a results file in the current directory. Default is true. If the
-file exists, it is overwritten.
+file exists, it is overwritten. This does not affect whether items are
+deleted. See -dryrun for how to disable deletions.
 .TP
 .BR \-outputname " " \fIname\fR
 Make the results file name to be "name" instead of the default
