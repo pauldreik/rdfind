@@ -70,7 +70,7 @@ if ! grep -iq "^expected true or false after $dryrunopt" rdfind.out ; then
  exit 1
 fi
 
-#dryrun on it's own: "rdfind -dryrun"
+#dryrun on its own: "rdfind -dryrun"
 local_reset
 if $rdfind $dryrunopt >rdfind.out 2>&1 ; then
   dbgecho "this should have failed, but did not!"

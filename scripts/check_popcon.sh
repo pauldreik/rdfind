@@ -1,5 +1,5 @@
 #!/bin/sh
-echo "will now check debians web page..."
+echo "will now check Debian's web page..."
 #checks rdfind on popularity contest page
 debian_addr=http://popcon.debian.org/by_inst.gz
 debian_row=`wget -q -O - $debian_addr |gunzip |grep rdfind`

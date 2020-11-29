@@ -2,7 +2,7 @@ TODO for rdfind
 
 20060603
 What happens when items are being removed because of duplicate inode,
-is the correct precedence preservered? 
+is the correct precedence preserved? 
 20060315: it removes depending on priority and depth, as it should.
 
 20060603

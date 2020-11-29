@@ -123,7 +123,7 @@ The following methods are used to maintain code quality:
  - tests are run on address sanitizer builds
  - tests are run on undefined sanitizer builds
  - tests are run with debug iterators enabled
- - builds are made in default mode (debug) as well as release, and also with the flags suggested by debians hardening helper dpkg-buildflags
+ - builds are made in default mode (debug) as well as release, and also with the flags suggested by Debian's hardening helper dpkg-buildflags
  - builds are made with both libstdc++ (gcc) and libc++ (llvm)
  - clang format is used, issue make format to execute it
  - cppcheck has been run manually and relevant issues are fixed
@@ -153,7 +153,7 @@ Here is a small benchmark. Times are obtained from ”elapsed time” in the tim
 
 ### Caveats / Features
 
-A group of hardlinked files to a single inode are collapsed to a single entry if `-removeidentinode true`. If you have two equal files (inodes) and two or more hardlinks for one or more of the files, the behaviour might not be what you think. Each group is collapsed to a single entry. That single entry will be hardlinked/symlinked/deleted depending on the options you pass to `rdfind`. This means that rdfind will detect and correct one file at a time. Running multiple times solves the situation. This has been discovered by a user who uses a ”hardlinks and rsync”-type of backup system. There are lots of such backup scripts around using that technique, Apple time machine also uses hardlinks. If a file is moved within the backuped tree, one gets a group of hardlinked files before the move and after the move. Running rdfind on the entire tree has to be done multiple times if -removeidentinode true. To understand the behaviour, here is an example demonstrating the behaviour:
+A group of hardlinked files to a single inode are collapsed to a single entry if `-removeidentinode true`. If you have two equal files (inodes) and two or more hardlinks for one or more of the files, the behaviour might not be what you think. Each group is collapsed to a single entry. That single entry will be hardlinked/symlinked/deleted depending on the options you pass to `rdfind`. This means that rdfind will detect and correct one file at a time. Running multiple times solves the situation. This has been discovered by a user who uses a ”hardlinks and rsync”-type of backup system. There are lots of such backup scripts around using that technique, Apple time machine also uses hardlinks. If a file is moved within the backupped tree, one gets a group of hardlinked files before the move and after the move. Running rdfind on the entire tree has to be done multiple times if -removeidentinode true. To understand the behaviour, here is an example demonstrating the behaviour:
 
     $ echo abc>a
     $ ln a a1
@@ -180,6 +180,6 @@ Everything is as expected.
     name=b1 inode=58931 nhardlinks=2
     name=b2 inode=58931 nhardlinks=2
 
-a, a1 and a2 got collapsed into a single entry. b, b1 and b2 got collapased into a single entry. So rdfind is left with a and b (depending on which of them is received first by the * expansion). It replaces b with a hardlink to a. b1 and b2 are untouched.
+a, a1 and a2 got collapsed into a single entry. b, b1 and b2 got collapsed into a single entry. So rdfind is left with a and b (depending on which of them is received first by the * expansion). It replaces b with a hardlink to a. b1 and b2 are untouched.
 
 If one runs rdfind repeatedly, the issue is resolved, one file being corrected every run.
