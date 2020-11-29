@@ -43,7 +43,7 @@ Dirlist::walk(const std::string& dir, const int recursionlevel)
     RDDEBUG("failed to open directory" << std::endl);
     // this can be due to rights, or some other error.
     handlepossiblefile(dir, recursionlevel);
-    return 1; // its a file (or something else)
+    return 1; // it's a file (or something else)
   }
 
   // we opened the directory. let us read the content.
@@ -92,7 +92,7 @@ Dirlist::walk(const std::string& dir, const int recursionlevel)
 
   // close the directory
   (void)closedir(dirp);
-  return 2; // its a directory
+  return 2; // it's a directory
 }
 
 // splits inputstring into path and filename. if no / character is found,

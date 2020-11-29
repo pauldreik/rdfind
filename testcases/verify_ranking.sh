@@ -48,7 +48,7 @@ cr8 $@
 
 #enforce the rules form RANKING in the man page.
 
-#Rule 1: If A was found while scanning an input argument earlier than than B, A is higher ranked.
+#Rule 1: If A was found while scanning an input argument earlier than B, A is higher ranked.
 
 local_reset a b 
 $rdfind -deleteduplicates true a b >rdfind.out

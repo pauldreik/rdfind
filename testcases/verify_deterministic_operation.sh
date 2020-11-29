@@ -110,7 +110,7 @@ done
 dbgecho "tests for \"-deterministic false\" passed ok on randomized filesystem order"
 
 
-#verify that with determinstic enabled, we get the same results regardless of ordering
+#verify that with deterministic enabled, we get the same results regardless of ordering
 DISORDERED_FLAGS=$DISORDERED_FLAGS_ASC
 run_outcome true
 outcome_asc=$outcome

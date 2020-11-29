@@ -11,7 +11,7 @@
 	* cleanup of source to remove compiler warnings
 	  and switch to c++11
 	* failure of making hard links will not delete the deduplicated
-	  file, if pssible. See Github bug #5. 
+	  file, if possible. See Github bug #5. 
 	* failure of making symlinks will not delete the deduplicated
 	  file, if possible. See Github bug #5.
 	* added option -minsize to optionally ignore files under a
@@ -74,7 +74,7 @@
 
 	* Bump version to 1.3.0
 	* Corrected misspelling in program (OCCURRENCE) which may break
-	peoples scripts. See Debian bug 613055. This is the justification
+	people scripts. See Debian bug 613055. This is the justification
 	for bumping the revision number to 1.3
 	* Corrected man page typos. See Debian bug 613055.
 	* Included change from Debian package patch on the man page.
@@ -102,7 +102,7 @@
 2009-01-13  Paul Sundvall  <rdfind@paulsundvall.net>
 	* updated with new option outputname
 	* added names from people who helped
-	* clarified licens here and there
+	* clarified license here and there
 	* added svn id keyword in file
 	* updated man page
 
@@ -161,7 +161,7 @@
 
 2006-01-12  Paul Sundvall  <rdfind@paulsundvall.net> 
 	*using memcmp for comparison on byte.
-	*dont read file if it already has been read and m_nbytes is longer
+	*don't read file if it already has been read and m_nbytes is longer
 	than the file itself.
 	
 
