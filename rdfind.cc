@@ -53,6 +53,10 @@ usage()
     << " -ignoreempty      (true)| false  ignore empty files (true implies "
        "-minsize 1,\n"
     << "                                  false implies -minsize 0)\n"
+    << " -ignoredirs names                ignores directory names in the space "
+       "separated list \"names\"\n"
+    << "                                  example: -ignoredirs \"foo bar baz\" "
+       "default: \"\"\n"
     << " -minsize N        (N=1)          ignores files with size less than N "
        "bytes\n"
     << " -maxsize N        (N=0)          ignores files with size N "
@@ -108,6 +112,7 @@ struct Options
   bool deterministic = true; // be independent of filesystem order
   long nsecsleep = 0; // number of nanoseconds to sleep between each file read.
   std::string resultsfile = "results.txt"; // results file name.
+  std::string ignoredirs = ""; // directory names to be ignored
 };
 
 Options
@@ -136,6 +141,8 @@ parseOptions(Parser& parser)
       o.makeresultsfile = parser.get_parsed_bool();
     } else if (parser.try_parse_string("-outputname")) {
       o.resultsfile = parser.get_parsed_string();
+    } else if (parser.try_parse_string("-ignoredirs")) {
+      o.ignoredirs = parser.get_parsed_string();
     } else if (parser.try_parse_bool("-ignoreempty")) {
       if (parser.get_parsed_bool()) {
         o.minimumfilesize = 1;
@@ -289,7 +296,7 @@ main(int narg, const char* argv[])
   Rdutil gswd(filelist);
 
   // an object to traverse the directory structure
-  Dirlist dirlist(o.followsymlinks);
+  Dirlist dirlist(o.followsymlinks, o.ignoredirs);
 
   // this is what function is called when an object is found on
   // the directory traversed by walk. Make sure the pointer to the

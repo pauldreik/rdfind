@@ -10,7 +10,10 @@
 #include <cerrno>
 #include <cstring>
 #include <iostream>
+#include <iterator>
 #include <string>
+#include <sstream>
+#include <vector>
 
 // os
 #include <dirent.h>
@@ -52,6 +55,18 @@ Dirlist::walk(const std::string& dir, const int recursionlevel)
   while (NULL != (dp = readdir(dirp))) {
     // is the directory . or ..?
     if (0 == strcmp(".", dp->d_name) || 0 == strcmp("..", dp->d_name)) {
+      continue;
+    }
+    // Does the directory match ignoredirs?
+    auto ignored = [&]() {
+      for (auto name: m_ignoredirs) {
+        if (0 == strcmp(name.c_str(), dp->d_name)) {
+          return true;
+        }
+      }
+      return false;
+    };
+    if (ignored()) {
       continue;
     }
     // investigate what kind of file it is, dont follow any
@@ -183,4 +198,14 @@ Dirlist::handlepossiblefile(const std::string& possiblefile, int recursionlevel)
        "a regular file."
     << std::endl;
   return -1;
+}
+
+// parse a space separated string of directory names to be ignored into a
+// vector of strings
+void
+Dirlist::parseignoredirs(std::string ignoredirs) {
+  std::istringstream ss{ignoredirs};
+  using iter = std::istream_iterator<std::string>;
+  std::vector<std::string> dirs{iter{ss}, iter{}};
+  m_ignoredirs = std::move(dirs);
 }
