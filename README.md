@@ -77,7 +77,7 @@ Rdfind uses the following algorithm. If N is the number of files to search throu
 2. For each argument, list the directory contents recursively and assign it to the file list. Assign a directory depth number, starting at 0 for every argument.
 3. If the input argument is a file, add it to the file list.
 4. Loop over the list, and find out the sizes of all files.
-5. If flag -removeidentinode true: Remove items from the list which already are added, based on the combination of inode and device number. A group of files that are hardlinked to the same file are collapsed to one entry. Also see the comment on hardlinks under ”caveats below”!
+5. If flag -removeidentinode true: Remove items from the list which already are added, based on the combination of inode and device number. A group of files that are hardlinked to the same file are collapsed to one entry. If flag -rememberidentinode true the removed files are rememberd and included in the final result. Also see the comment on hardlinks under ”caveats below”!
 6. Sort files on size. Remove files from the list, which have unique sizes.
 7. Sort on device and inode(speeds up file reading). Read a few bytes from the beginning of each file (first bytes).
 8. Remove files from list that have the same size but different first bytes.

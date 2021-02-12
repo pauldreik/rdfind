@@ -44,13 +44,15 @@ Rdutil::printtofile(const std::string& filename) const
   output << "# Automatically generated\n";
   output << "# duptype id depth size device inode priority name\n";
 
-  std::vector<Fileinfo>::iterator it;
-  for (it = m_list.begin(); it != m_list.end(); ++it) {
-    output << Fileinfo::getduptypestring(*it) << " " << it->getidentity() << " "
-           << it->depth() << " " << it->size() << " " << it->device() << " "
-           << it->inode() << " " << it->get_cmdline_index() << " " << it->name()
-           << '\n';
-  }
+  process_result(
+    [&output](Fileinfo& it) {
+        output << Fileinfo::getduptypestring(it) << " " << it.getidentity() << " "
+               << it.depth() << " " << it.size() << " " << it.device() << " "
+               << it.inode() << " " << it.get_cmdline_index() << " " << it.name()
+               << '\n';
+    }
+  );
+
   output << "# end of file\n";
   f1.close();
   return 0;
@@ -61,44 +63,42 @@ Rdutil::printtofile(const std::string& filename) const
 // returns how many times the function was invoked.
 template<typename Function>
 std::size_t
-applyactiononfile(std::vector<Fileinfo>& m_list, Function f)
+Rdutil::applyactiononfile(Function f) const
 {
-
-  const auto first = m_list.begin();
-  const auto last = m_list.end();
-  auto original = last;
-
+  Fileinfo* original = NULL;
   std::size_t ntimesapplied = 0;
 
-  // loop over files
-  for (auto it = first; it != last; ++it) {
-    switch (it->getduptype()) {
-      case Fileinfo::duptype::DUPTYPE_FIRST_OCCURRENCE: {
-        original = it;
-        assert(original->getidentity() >= 0 &&
-               "original file should have positive identity");
-      } break;
+  process_result(
+    [f, original, &ntimesapplied](Fileinfo& it) mutable {
+      switch (it.getduptype()) {
+        case Fileinfo::duptype::DUPTYPE_FIRST_OCCURRENCE: {
+          original = &it;
+          assert(original->getidentity() >= 0 &&
+                 "original file should have positive identity");
+        } break;
 
-      case Fileinfo::duptype::DUPTYPE_OUTSIDE_TREE:
-        // intentional fallthrough
-      case Fileinfo::duptype::DUPTYPE_WITHIN_SAME_TREE: {
-        assert(original != last);
-        // double check that "it" shall be ~linked to "src"
-        assert(it->getidentity() == -original->getidentity() &&
-               "it must be connected to src");
-        // everything is in order. we may now hardlink/symlink/remove it.
-        if (f(*it, *original)) {
-          RDDEBUG(__FILE__ ": Failed to apply function f on it.\n");
-        } else {
-          ++ntimesapplied;
-        }
-      } break;
+        case Fileinfo::duptype::DUPTYPE_OUTSIDE_TREE:
+          // intentional fallthrough
+        case Fileinfo::duptype::DUPTYPE_WITHIN_SAME_TREE: {
+          assert(original != NULL);
+          // double check that "it" shall be ~linked to "src"
+          assert(it.getidentity() == -original->getidentity() &&
+                 "it must be connected to src");
+          // everything is in order. we may now hardlink/symlink/remove it.
+          if (f(it, *original)) {
+            RDDEBUG(__FILE__ ": Failed to apply function f on it.\n");
+          } else {
+            ++ntimesapplied;
+          }
+        } break;
 
-      default:
-        assert("file with bad duptype at this stage. Programming error!" !=
-               nullptr);
+        default:
+          assert("file with bad duptype at this stage. Programming error!" !=
+                 nullptr);
+      }
     }
-  }
+  );
+
   return ntimesapplied;
 }
 
@@ -140,11 +140,11 @@ Rdutil::deleteduplicates(bool dryrun) const
   if (dryrun) {
     const bool outputBname = false;
     dryrun_helper<outputBname> obj("delete ");
-    auto ret = applyactiononfile(m_list, obj);
+    auto ret = applyactiononfile(obj);
     std::cout.flush();
     return ret;
   } else {
-    return applyactiononfile(m_list, &Fileinfo::static_deletefile);
+    return applyactiononfile(&Fileinfo::static_deletefile);
   }
 }
 
@@ -154,11 +154,11 @@ Rdutil::makesymlinks(bool dryrun) const
   if (dryrun) {
     const bool outputBname = true;
     dryrun_helper<outputBname> obj("symlink ", " to ");
-    auto ret = applyactiononfile(m_list, obj);
+    auto ret = applyactiononfile(obj);
     std::cout.flush();
     return ret;
   } else {
-    return applyactiononfile(m_list, &Fileinfo::static_makesymlink);
+    return applyactiononfile(&Fileinfo::static_makesymlink);
   }
 }
 
@@ -168,11 +168,11 @@ Rdutil::makehardlinks(bool dryrun) const
   if (dryrun) {
     const bool outputBname = true;
     dryrun_helper<outputBname> obj("hardlink ", " to ");
-    const auto ret = applyactiononfile(m_list, obj);
+    const auto ret = applyactiononfile(obj);
     std::cout.flush();
     return ret;
   } else
-    return applyactiononfile(m_list, &Fileinfo::static_makehardlink);
+    return applyactiononfile(&Fileinfo::static_makehardlink);
 }
 
 // mark files with a unique number
@@ -298,7 +298,7 @@ Rdutil::sort_on_depth_and_name(std::size_t index_of_first)
 }
 
 std::size_t
-Rdutil::removeIdenticalInodes()
+Rdutil::removeIdenticalInodes(bool rememberIdenticalInodes)
 {
   // sort list on device and inode.
   auto cmp = cmpDeviceInode;
@@ -315,6 +315,11 @@ Rdutil::removeIdenticalInodes()
       best->setdeleteflag(false);
       std::for_each(best + 1, last, [](Fileinfo& f) { f.setdeleteflag(true); });
     });
+
+  if (rememberIdenticalInodes) {
+    move_deletes_to_duplist();
+  }
+
   return cleanup();
 }
 
@@ -377,6 +382,7 @@ Rdutil::markduplicates()
 {
   const auto cmp = cmpSizeThenBuffer;
   assert(std::is_sorted(m_list.begin(), m_list.end(), cmp));
+  assert(std::is_sorted(m_identlist.begin(), m_identlist.end(), cmpDeviceInode));
 
   // loop over ranges of adjacent elements
   using Iterator = decltype(m_list.begin());
@@ -384,7 +390,7 @@ Rdutil::markduplicates()
     m_list.begin(),
     m_list.end(),
     cmp,
-    [](const Iterator first, const Iterator last) {
+    [this](const Iterator first, const Iterator last) {
       // size and buffer are equal in  [first,last) - all are duplicates!
       assert(std::distance(first, last) >= 2);
 
@@ -413,7 +419,63 @@ Rdutil::markduplicates()
       std::for_each(first + 1, last, marker);
       assert(first->getduptype() ==
              Fileinfo::duptype::DUPTYPE_FIRST_OCCURRENCE);
+
+      if (m_identlist.size() > 0) {
+        auto np = m_identlist.end();
+        m_identindex.push_back(np);
+        for (auto it = first+1; it < last; it++) {
+          auto cmp = cmpDeviceInode;
+          auto bound = std::lower_bound(m_identlist.begin(), m_identlist.end(), *it, cmp);
+          if (bound != m_identlist.end() && !cmp(*it, *bound)) {
+            assert(cmp(*it, *bound) == cmp(*bound, *it));
+            m_identindex.push_back(bound);
+          } else {
+            m_identindex.push_back(np);
+          }
+          auto range = find_identical_inodes(it);
+          std::for_each(range.first, range.second, marker);
+        }
+      }
     });
+    assert(m_identlist.size() == 0 || m_identindex.size() == m_list.size());
+}
+
+std::pair<Rdutil::FileIter, Rdutil::FileIter>
+Rdutil::find_identical_inodes(Rdutil::FileIter listpos) const
+{
+  assert(m_identindex.size() != 0);
+  auto index = listpos - m_list.begin();
+  auto first = m_identindex[index];
+  auto last = first;
+  for (; last < m_identlist.end() && !cmpDeviceInode(*first, *last); last++) {}
+  return std::pair<Rdutil::FileIter, Rdutil::FileIter>(first, last);
+}
+
+template<typename Function>
+void
+Rdutil::process_result(Function f) const
+{
+  bool with_remembered_nodes = m_identlist.size() > 0;
+  for (auto it = m_list.begin(); it < m_list.end(); ++it) {
+    f(*it);
+    if (with_remembered_nodes) {
+      auto range = find_identical_inodes(it);
+      for (auto range_it = range.first; range_it < range.second; ++range_it) {
+        f(*range_it);
+      }
+    }
+  }
+}
+
+void
+Rdutil::move_deletes_to_duplist()
+{
+    for (auto it = m_list.begin(); it < m_list.end(); it++) {
+      if(it->deleteflag()) {
+        m_identlist.push_back(*it);
+      }
+    }
+    std::sort(m_identlist.begin(), m_identlist.end(), cmpDeviceInode);
 }
 
 std::size_t

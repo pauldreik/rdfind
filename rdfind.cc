@@ -60,6 +60,9 @@ usage()
     << " -followsymlinks    true |(false) follow symlinks\n"
     << " -removeidentinode (true)| false  ignore files with nonunique "
        "device and inode\n"
+    << " -rememberidentinode true|(false) ignore files with nonunique device "
+       "and inode but remember them and include them in the result later. "
+       "Implies -removeidentinode true\n"
     << " -checksum           md5 |(sha1)| sha256\n"
     << "                                  checksum type\n"
     << " -deterministic    (true)| false  makes results independent of order\n"
@@ -102,6 +105,7 @@ struct Options
   bool followsymlinks = false;        // follow symlinks
   bool dryrun = false;                // only dryrun, dont destroy anything
   bool remove_identical_inode = true; // remove files with identical inodes
+  bool remember_identical_inode = false; // remember files with identical inodes, implies remove_identical_inode
   bool usemd5 = false;       // use md5 checksum to check for similarity
   bool usesha1 = false;      // use sha1 checksum to check for similarity
   bool usesha256 = false;    // use sha256 checksum to check for similarity
@@ -164,6 +168,8 @@ parseOptions(Parser& parser)
       o.dryrun = parser.get_parsed_bool();
     } else if (parser.try_parse_bool("-removeidentinode")) {
       o.remove_identical_inode = parser.get_parsed_bool();
+    } else if (parser.try_parse_bool("-rememberidentinode")) {
+      o.remember_identical_inode = parser.get_parsed_bool();
     } else if (parser.try_parse_bool("-deterministic")) {
       o.deterministic = parser.get_parsed_bool();
     } else if (parser.try_parse_string("-checksum")) {
@@ -334,9 +340,10 @@ main(int narg, const char* argv[])
   // list.
   gswd.markitems();
 
-  if (o.remove_identical_inode) {
+  if (o.remove_identical_inode || o.remember_identical_inode) {
     // remove files with identical devices and inodes from the list
-    std::cout << dryruntext << "Removed " << gswd.removeIdenticalInodes()
+    std::cout << dryruntext << "Removed " << (o.remember_identical_inode ? "(but remembered) " : "") 
+              << gswd.removeIdenticalInodes(o.remember_identical_inode)
               << " files due to nonunique device and inode." << std::endl;
   }
 

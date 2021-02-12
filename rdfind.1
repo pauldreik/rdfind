@@ -74,7 +74,12 @@ Follow symlinks. Default is false.
 .TP
 .BR \-removeidentinode " " \fItrue\fR|\fIfalse\fR
 Removes items found which have identical inode and device ID. Default
-is true.
+is true. Consider using -rememberidentinode true instead of -removeidentinode false.
+.TP
+.BR \-rememberidentinode " " \fItrue\fR|\fIfalse\fR
+Removes but remembers items found which have identical inode and device ID and adds
+them again in the final result. Runs faster and reports more accurate statistics
+than with  -removeidentinode false. Implies -removeidentinode true. Default is false.
 .TP
 .BR \-checksum " " \fImd5\fR|\fIsha1\fR|\fIsha256\fR
 What type of checksum to be used: md5, sha1 or sha256. The default is
