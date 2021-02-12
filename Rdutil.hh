@@ -46,7 +46,7 @@ public:
    * rank.
    * @return number of elements removed
    */
-  std::size_t removeIdenticalInodes();
+  std::size_t removeIdenticalInodes(bool rememberIdenticalInodes);
 
   /**
    * remove files with unique size from the list.
@@ -121,6 +121,20 @@ public:
 
 private:
   std::vector<Fileinfo>& m_list;
+
+  std::vector<Fileinfo> m_identlist;
+
+  typedef std::vector<Fileinfo>::iterator FileIter;
+
+  std::vector<FileIter> m_identindex;
+
+  void move_deletes_to_duplist();
+
+  std::pair<FileIter,FileIter> find_identical_inodes(const FileIter listpos) const;
+
+  template<typename Function> std::size_t applyactiononfile(Function f) const;
+
+  template<typename Function> void process_result(Function f) const;
 };
 
 #endif
