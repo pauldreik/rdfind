@@ -43,13 +43,13 @@ Look for duplicate files in directory /home/pauls/bilder:
     $ rdfind /home/pauls/bilder/
     Now scanning "/home/pauls/bilder", found 3301 files.
     Now have 3301 files in total.
-    Removed 0 files due to nonunique device and inode.
-    Now removing files with zero size...removed 3 files
+    Excluded 0 files due to nonunique device and inode.
+    Now excluding files with zero size...excluded 3 files
     Total size is 2861229059 bytes or 3 Gib
-    Now sorting on size:removed 3176 files due to unique sizes.122 files left.
-    Now eliminating candidates based on first bytes:removed 8 files.114 files left.
-    Now eliminating candidates based on last bytes:removed 12 files.102 files left.
-    Now eliminating candidates based on md5 checksum:removed 2 files.100 files left.
+    Now sorting on size:excluding 176 files due to unique sizes.122 files left.
+    Now eliminating candidates based on first bytes:excluded 8 files.114 files left.
+    Now eliminating candidates based on last bytes:excluded 12 files.102 files left.
+    Now eliminating candidates based on md5 checksum:excluded 2 files.100 files left.
     It seems like you have 100 files that are not unique
     Totally, 24 Mib can be reduced.
     Now making results file results.txt
@@ -77,15 +77,15 @@ Rdfind uses the following algorithm. If N is the number of files to search throu
 2. For each argument, list the directory contents recursively and assign it to the file list. Assign a directory depth number, starting at 0 for every argument.
 3. If the input argument is a file, add it to the file list.
 4. Loop over the list, and find out the sizes of all files.
-5. If flag -removeidentinode true: Remove items from the list which already are added, based on the combination of inode and device number. A group of files that are hardlinked to the same file are collapsed to one entry. Also see the comment on hardlinks under ”caveats below”!
-6. Sort files on size. Remove files from the list, which have unique sizes.
+5. If flag -excludeidentinode true: Exclude items already added, based on the combination of inode and device number. A group of files that are hardlinked to the same file are collapsed to one entry. Also see the comment on hardlinks under ”caveats below”!
+6. Sort files on size. Exclude files which have unique sizes.
 7. Sort on device and inode(speeds up file reading). Read a few bytes from the beginning of each file (first bytes).
-8. Remove files from list that have the same size but different first bytes.
+8. Exclude files that have the same size but different first bytes.
 9. Sort on device and inode(speeds up file reading). Read a few bytes from the end of each file (last bytes).
-10. Remove files from list that have the same size but different last bytes.
+10. Exclude files that have the same size but different last bytes.
 11. Sort on device and inode(speeds up file reading). Perform a checksum calculation for each file.
-12. Only keep files on the list with the same size and checksum. These are duplicates.
-13. Sort list on size, priority number, and depth. The first file for every set of duplicates is considered to be the original.
+12. Exclude files with different size and checksum. The rest are duplicates.
+13. Sort remaining duplicates on size, priority number, and depth. The first file for every set of duplicates is considered to be the original.
 14. If flag ”-makeresultsfile true”, then print results file (default). 
 15. If flag ”-deleteduplicates true”, then delete (unlink) duplicate files. Exit.
 16. If flag ”-makesymlinks true”, then replace duplicates with a symbolic link to the original. Exit.
@@ -153,7 +153,7 @@ Here is a small benchmark. Times are obtained from ”elapsed time” in the tim
 
 ### Caveats / Features
 
-A group of hardlinked files to a single inode are collapsed to a single entry if `-removeidentinode true`. If you have two equal files (inodes) and two or more hardlinks for one or more of the files, the behaviour might not be what you think. Each group is collapsed to a single entry. That single entry will be hardlinked/symlinked/deleted depending on the options you pass to `rdfind`. This means that rdfind will detect and correct one file at a time. Running multiple times solves the situation. This has been discovered by a user who uses a ”hardlinks and rsync”-type of backup system. There are lots of such backup scripts around using that technique, Apple time machine also uses hardlinks. If a file is moved within the backuped tree, one gets a group of hardlinked files before the move and after the move. Running rdfind on the entire tree has to be done multiple times if -removeidentinode true. To understand the behaviour, here is an example demonstrating the behaviour:
+A group of hardlinked files to a single inode are collapsed to a single entry if `-excludeidentinode true`. If you have two equal files (inodes) and two or more hardlinks for one or more of the files, the behaviour might not be what you think. Each group is collapsed to a single entry. That single entry will be hardlinked/symlinked/deleted depending on the options you pass to `rdfind`. This means that rdfind will detect and correct one file at a time. Running multiple times solves the situation. This has been discovered by a user who uses a ”hardlinks and rsync”-type of backup system. There are lots of such backup scripts around using that technique, Apple time machine also uses hardlinks. If a file is moved within the backuped tree, one gets a group of hardlinked files before the move and after the move. Running rdfind on the entire tree has to be done multiple times if -excludeidentinode true. To understand the behaviour, here is an example demonstrating the behaviour:
 
     $ echo abc>a
     $ ln a a1
@@ -171,7 +171,7 @@ A group of hardlinked files to a single inode are collapsed to a single entry if
 
 Everything is as expected.
 
-    $ rdfind -removeidentinode true -makehardlinks true ./a* ./b*
+    $ rdfind -excludeidentinode true -makehardlinks true ./a* ./b*
     $ stat --format="name=%n inode=%i nhardlinks=%h" a* b*
     name=a inode=58930 nhardlinks=4
     name=a1 inode=58930 nhardlinks=4

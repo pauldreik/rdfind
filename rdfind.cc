@@ -58,7 +58,7 @@ usage()
     << " -maxsize N        (N=0)          ignores files with size N "
        "bytes and larger (use 0 to disable this check).\n"
     << " -followsymlinks    true |(false) follow symlinks\n"
-    << " -removeidentinode (true)| false  ignore files with nonunique "
+    << " -excludeidentinode (true)| false  ignore files with nonunique "
        "device and inode\n"
     << " -checksum           md5 |(sha1)| sha256\n"
     << "                                  checksum type\n"
@@ -101,7 +101,7 @@ struct Options
   bool deleteduplicates = false;      // delete duplicate files
   bool followsymlinks = false;        // follow symlinks
   bool dryrun = false;                // only dryrun, dont destroy anything
-  bool remove_identical_inode = true; // remove files with identical inodes
+  bool exclude_identical_inode = true; // exclude files with identical inodes
   bool usemd5 = false;       // use md5 checksum to check for similarity
   bool usesha1 = false;      // use sha1 checksum to check for similarity
   bool usesha256 = false;    // use sha256 checksum to check for similarity
@@ -163,7 +163,10 @@ parseOptions(Parser& parser)
     } else if (parser.try_parse_bool("-n")) {
       o.dryrun = parser.get_parsed_bool();
     } else if (parser.try_parse_bool("-removeidentinode")) {
-      o.remove_identical_inode = parser.get_parsed_bool();
+      // backwards compatibility
+      o.exclude_identical_inode = parser.get_parsed_bool();
+    } else if (parser.try_parse_bool("-excludeidentinode")) {
+      o.exclude_identical_inode = parser.get_parsed_bool();
     } else if (parser.try_parse_bool("-deterministic")) {
       o.deterministic = parser.get_parsed_bool();
     } else if (parser.try_parse_string("-checksum")) {
@@ -334,9 +337,9 @@ main(int narg, const char* argv[])
   // list.
   gswd.markitems();
 
-  if (o.remove_identical_inode) {
-    // remove files with identical devices and inodes from the list
-    std::cout << dryruntext << "Removed " << gswd.removeIdenticalInodes()
+  if (o.exclude_identical_inode) {
+    // exclude files with identical devices and inodes from the list
+    std::cout << dryruntext << "Excluded " << gswd.excludeIdenticalInodes()
               << " files due to nonunique device and inode." << std::endl;
   }
 
@@ -344,7 +347,7 @@ main(int narg, const char* argv[])
             << " bytes or ";
   gswd.totalsize(std::cout) << std::endl;
 
-  std::cout << "Removed " << gswd.removeUniqueSizes()
+  std::cout << "Excluded " << gswd.excludeUniqueSizes()
             << " files due to unique sizes from list. ";
   std::cout << filelist.size() << " files left." << std::endl;
 
@@ -375,8 +378,8 @@ main(int narg, const char* argv[])
     // read bytes (destroys the sorting, for disk reading efficiency)
     gswd.fillwithbytes(it[0].first, it[-1].first, o.nsecsleep);
 
-    // remove non-duplicates
-    std::cout << "removed " << gswd.removeUniqSizeAndBuffer()
+    // exclude non-duplicates
+    std::cout << "excluded " << gswd.excludeUniqSizeAndBuffer()
               << " files from list. ";
     std::cout << filelist.size() << " files left." << std::endl;
   }

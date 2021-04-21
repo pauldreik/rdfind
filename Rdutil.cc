@@ -298,7 +298,7 @@ Rdutil::sort_on_depth_and_name(std::size_t index_of_first)
 }
 
 std::size_t
-Rdutil::removeIdenticalInodes()
+Rdutil::excludeIdenticalInodes()
 {
   // sort list on device and inode.
   auto cmp = cmpDeviceInode;
@@ -319,7 +319,7 @@ Rdutil::removeIdenticalInodes()
 }
 
 std::size_t
-Rdutil::removeUniqueSizes()
+Rdutil::excludeUniqueSizes()
 {
   // sort list on size
   auto cmp = cmpSize;
@@ -341,7 +341,7 @@ Rdutil::removeUniqueSizes()
 }
 
 std::size_t
-Rdutil::removeUniqSizeAndBuffer()
+Rdutil::excludeUniqSizeAndBuffer()
 {
   // sort list on size
   const auto cmp = cmpSize;
@@ -420,7 +420,7 @@ std::size_t
 Rdutil::cleanup()
 {
   const auto size_before = m_list.size();
-  auto it = std::remove_if(m_list.begin(), m_list.end(), [](const Fileinfo& A) {
+  auto it = std::exclude_if(m_list.begin(), m_list.end(), [](const Fileinfo& A) {
     return A.deleteflag();
   });
 
@@ -432,7 +432,7 @@ Rdutil::cleanup()
 }
 #if 0
 std::size_t
-Rdutil::remove_small_files(Fileinfo::filesizetype minsize)
+Rdutil::exclude_small_files(Fileinfo::filesizetype minsize)
 {
   const auto size_before = m_list.size();
   const auto begin = m_list.begin();
@@ -440,9 +440,9 @@ Rdutil::remove_small_files(Fileinfo::filesizetype minsize)
   decltype(m_list.begin()) it;
   if (minsize == 0) {
     it =
-      std::remove_if(begin, end, [](const Fileinfo& A) { return A.isempty(); });
+      std::exclude_if(begin, end, [](const Fileinfo& A) { return A.isempty(); });
   } else {
-    it = std::remove_if(begin, end, [=](const Fileinfo& A) {
+    it = std::exclude_if(begin, end, [=](const Fileinfo& A) {
       return A.is_smaller_than(minsize);
     });
   }

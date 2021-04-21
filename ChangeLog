@@ -1,3 +1,8 @@
+2021-04-21 Eoghan Murray
+        * change terminology to prefer 'exclude' over 'remove' when talking
+	  about the file list, in case there's confusion between 'remove' and
+	  'delete'
+	* as per above, rename option -removeidentinode to -excludeidentinode
 2018-11-12 Paul Dreik <rdfind@pauldreik.se>
         * release of 1.4.1
         * fixes build failure on 32 bit platforms
