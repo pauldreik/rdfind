@@ -44,21 +44,21 @@ public:
   /**
    * for each group of identical inodes, only keep the one with the highest
    * rank.
-   * @return number of elements removed
+   * @return number of elements excluded
    */
-  std::size_t removeIdenticalInodes();
+  std::size_t excludeIdenticalInodes();
 
   /**
-   * remove files with unique size from the list.
+   * exclude files with unique size from the list.
    * @return
    */
-  std::size_t removeUniqueSizes();
+  std::size_t excludeUniqueSizes();
 
   /**
-   * remove files with unique combination of size and buffer from the list.
+   * exclude files with unique combination of size and buffer from the list.
    * @return
    */
-  std::size_t removeUniqSizeAndBuffer();
+  std::size_t excludeUniqSizeAndBuffer();
 
   /**
    * Assumes the list is already sorted on size, and all elements with the same
@@ -70,14 +70,14 @@ public:
    */
   void markduplicates();
 
-  /// removes all items from the list, that have the deleteflag set to true.
+  /// excludes all items from the list that have the deleteflag set to true.
   std::size_t cleanup();
 
   /**
-   * Removes items with file size less than minsize
-   * @return the number of removed elements.
+   * Excludes items with file size less than minsize
+   * @return the number of excluded elements.
    */
-  std::size_t remove_small_files(Fileinfo::filesizetype minsize);
+  std::size_t exclude_small_files(Fileinfo::filesizetype minsize);
 
   // read some bytes. note! destroys the order of the list.
   // if lasttype is supplied, it does not reread files if they are shorter
