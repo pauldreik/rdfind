@@ -171,20 +171,24 @@ run_with_debian_buildflags() {
 }
 ###############################################################################
 run_with_libcpp() {
-   latestclang=$(ls $(which clang++)* |grep -v libc|sort -g |tail -n1)
-   if [ ! -x $latestclang ] ; then
-      echo $me: could not find latest clang - skipping test with libc++
-      return 0
-   fi
-   #make a test program to make sure it works.
+   # find a clang that works. try the latest version first.
    echo "#include <iostream>
   int main() { std::cout<<\"libc++ works!\";}" >x.cpp
-   if ! $latestclang -std=c++11 -stdlib=libc++ -lc++abi x.cpp >/dev/null 2>&1 || [ ! -x ./a.out ] || ! ./a.out ; then
-      echo $me: "$latestclang could not compile with libc++ - perhaps uninstalled."
-      return 0
-   fi
-   #echo using $latestclang with libc++
-   compile_and_test_standard $latestclang c++11 "-stdlib=libc++ -D_LIBCPP_DEBUG=1"
+   for clang in $(ls $(which clang++)* |grep -v libc|sort -g --reverse) ; do
+      if [ ! -x $clang ] ; then
+         continue
+      fi
+
+      if ! $clang -std=c++11 -stdlib=libc++ -lc++abi x.cpp >/dev/null 2>&1 || [ ! -x ./a.out ] || ! ./a.out ; then
+         echo $me: "debug: $clang could not compile with libc++ - perhaps uninstalled."
+         continue
+      fi
+      compile_and_test_standard $clang c++11 "-stdlib=libc++ -D_LIBCPP_DEBUG=1"
+      return
+   done
+   # we will get here if no working clang could be found. that is not an error,
+   # having clang and libc++ installed is optional
+   echo $me: no working clang with libc++ found, skipping.
 }
 ###############################################################################
 
