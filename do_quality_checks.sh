@@ -179,7 +179,7 @@ run_with_libcpp() {
    #make a test program to make sure it works.
    echo "#include <iostream>
   int main() { std::cout<<\"libc++ works!\";}" >x.cpp
-   if ! $latestclang -std=c++11 -stdlib=libc++ -lc++abi x.cpp >/dev/null 2>&1 && [ -x ./a.out ] && ./a.out ; then
+   if ! $latestclang -std=c++11 -stdlib=libc++ -lc++abi x.cpp >/dev/null 2>&1 || [ ! -x ./a.out ] || ! ./a.out ; then
       echo $me: "$latestclang could not compile with libc++ - perhaps uninstalled."
       return 0
    fi
