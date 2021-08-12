@@ -1,0 +1,26 @@
+name: ubuntu default build
+
+on: [push]
+
+jobs:
+  build:
+    name: Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-16.04, ubuntu-18.04, ubuntu-20.04]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: install packages
+      run: sudo apt install build-essential nettle-dev
+    - name: bootstrap
+      run: ./bootstrap.sh
+    - name: configure
+      run: ./configure --enable-warnings CXXFLAGS=-std=c++11
+    - name: make
+      run: make
+    - name: make check
+      run: make check
+    - name: make distcheck
+      run: make distcheck CXXFLAGS=-std=c++11
