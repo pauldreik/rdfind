@@ -254,10 +254,10 @@ build_32bit() {
    else
       mkdir "$nettleinstall"
       cd "$nettleinstall"
-      nettleversion=3.4
+      nettleversion=3.7.3
       echo "$me: downloading nettle from gnu.org..."
       wget --quiet https://ftp.gnu.org/gnu/nettle/nettle-$nettleversion.tar.gz
-      echo "ae7a42df026550b85daca8389b6a60ba6313b0567f374392e54918588a411e94  nettle-$nettleversion.tar.gz" >checksum
+      echo "661f5eb03f048a3b924c3a8ad2515d4068e40f67e774e8a26827658007e3bcf0  nettle-$nettleversion.tar.gz" >checksum
       sha256sum --strict --quiet -c checksum
       tar xzf nettle-$nettleversion.tar.gz
       cd nettle-$nettleversion
