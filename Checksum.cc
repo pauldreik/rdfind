@@ -10,6 +10,7 @@
 #include <array>
 #include <cassert>
 #include <cstdio>
+#include <stdexcept>
 
 // project
 #include "Checksum.hh"
