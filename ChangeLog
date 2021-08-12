@@ -11,7 +11,7 @@
 	* cleanup of source to remove compiler warnings
 	  and switch to c++11
 	* failure of making hard links will not delete the deduplicated
-	  file, if pssible. See Github bug #5.
+	  file, if possible. See Github bug #5.
 	* failure of making symlinks will not delete the deduplicated
 	  file, if possible. See Github bug #5.
 	* added option -minsize to optionally ignore files under a
@@ -172,4 +172,3 @@
 
 2006-01-05  Paul Sundvall  <rdfind@paulsundvall.net>
 	*started. first version.
-	CHANGELOG $Revision: 825 $
