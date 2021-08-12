@@ -5,10 +5,10 @@ Rdfind is a command line tool that finds duplicate files. It is useful for compr
 If you find rdfind useful, [drop me an email](mailto:__please_remove_this_antispam_prefix_rdfind@pauldreik.se)! I love hearing about how people actually use rdfind. In the unlikely case you want to throw money at rdfind, please use [goclimateneutral](https://www.goclimateneutral.org/gift_cards).
 
 ## Continuous integration status
-| Status (master) | Status (devel)| Description
+| Status (main) | Status (devel)| Description
 |-------------|-------------|------------------
 | [![Total alerts](https://img.shields.io/lgtm/alerts/g/pauldreik/rdfind.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/pauldreik/rdfind/alerts/) | N/A | Static analyzer
-| [![Build status](https://ci.appveyor.com/api/projects/status/9crp181omyugf8xk/branch/master?svg=true)](https://ci.appveyor.com/project/pauldreik/rdfind/branch/master) | [![Build status](https://ci.appveyor.com/api/projects/status/9crp181omyugf8xk/branch/devel?svg=true)](https://ci.appveyor.com/project/pauldreik/rdfind/branch/devel) | Builds and executes test on Ubuntu 18.04 with multiple versions of gcc and clang. Runs builds with address/undefined sanitizers and valgrind. Also performs the tests with a binary compiled in 32 bit mode.
+| [![Build status](https://ci.appveyor.com/api/projects/status/9crp181omyugf8xk/branch/main?svg=true)](https://ci.appveyor.com/project/pauldreik/rdfind/branch/main) | [![Build status](https://ci.appveyor.com/api/projects/status/9crp181omyugf8xk/branch/devel?svg=true)](https://ci.appveyor.com/project/pauldreik/rdfind/branch/devel) | Builds and executes test on Ubuntu 18.04 with multiple versions of gcc and clang. Runs builds with address/undefined sanitizers and valgrind. Also performs the tests with a binary compiled in 32 bit mode.
 
 ## Install
 
