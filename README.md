@@ -8,6 +8,7 @@ If you find rdfind useful, [drop me an email](mailto:__please_remove_this_antisp
 | Status (main) | Status (devel)| Description
 |-------------|-------------|------------------
 | [![Total alerts](https://img.shields.io/lgtm/alerts/g/pauldreik/rdfind.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/pauldreik/rdfind/alerts/) | N/A | Static analyzer
+| [![build status](https://github.com/pauldreik/rdfind/actions/workflows/ubuntu-default.yml/badge.svg?branch=main)](https://github.com/pauldreik/rdfind/actions/workflows/ubuntu-default.yml?query=branch%3Amain) | [![build status](https://github.com/pauldreik/rdfind/actions/workflows/ubuntu-default.yml/badge.svg?branch=develop)](https://github.com/pauldreik/rdfind/actions/workflows/ubuntu-default.yml?query=branch%3Adevel) | Builds and tests on Ubuntu 18.04 and 20.04 with the default compiler and settings |
 | [![Build status](https://ci.appveyor.com/api/projects/status/9crp181omyugf8xk/branch/main?svg=true)](https://ci.appveyor.com/project/pauldreik/rdfind/branch/main) | [![Build status](https://ci.appveyor.com/api/projects/status/9crp181omyugf8xk/branch/devel?svg=true)](https://ci.appveyor.com/project/pauldreik/rdfind/branch/devel) | Builds and executes test on Ubuntu 18.04 with multiple versions of gcc and clang. Runs builds with address/undefined sanitizers and valgrind. Also performs the tests with a binary compiled in 32 bit mode.
 
 ## Install
