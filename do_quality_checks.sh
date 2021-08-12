@@ -351,4 +351,4 @@ verify_packaging
 #try to compile to 32 bit (downloads nettle and builds it in 32 bit mode)
 build_32bit
 
-echo "$(basename $0): congratulations, all tests that were possible to run passed!"
+echo "$me: congratulations, all tests that were possible to run passed!"
