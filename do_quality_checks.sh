@@ -83,8 +83,10 @@ compile_and_test_standard() {
    fi
    #check for warnings
    if grep -q "warning" make.log; then
-      echo $me: found warning - see make.log
-      exit 1
+      # store as an artifact instead of erroring out
+      name=$(cat *.log |sha256sum |head -c 12)
+      cp make.log make_${name}.log
+      echo $me: found compile warning - see make.log, also stored as make_${name}.log
    fi
    #run the tests
    if ! make check >makecheck.log 2>&1 ; then
@@ -159,8 +161,11 @@ run_with_debian_buildflags() {
    make > make.log 2>&1
    #check for warnings
    if grep -q "warning" make.log; then
-      echo $me: "found warning(s) - see make.log"
-      exit 1
+      # store as an artifact instead of erroring out
+      name=$(cat *.log |sha256sum |head -c 12)
+      cp make.log make_${name}.log
+      echo $me: found compile warnings - see make.log, also stored as make_${name}.log
+
    fi
    make check >make-check.log 2>&1
 
