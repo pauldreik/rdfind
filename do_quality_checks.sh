@@ -118,9 +118,9 @@ compile_and_test() {
 
          # release build
          ASSERT=--disable-assert
-         compile_and_test_standard $1 c++$std "-O2"
+         #compile_and_test_standard $1 c++$std "-O2"
          compile_and_test_standard $1 c++$std "-O3"
-         compile_and_test_standard $1 c++$std "-Os"
+         #compile_and_test_standard $1 c++$std "-Os"
       fi
    done
 
