@@ -1,4 +1,6 @@
 2021-08-12 Paul Dreik <rdfind@pauldreik.se>
+        * release 1.5.0
+2021-08-12 Paul Dreik <rdfind@pauldreik.se>
         * add option -maxsize N to ignore files with size>=N bytes
 2018-11-12 Paul Dreik <rdfind@pauldreik.se>
         * release of 1.4.1
