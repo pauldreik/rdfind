@@ -1,0 +1,29 @@
+name: test deterministic operation
+
+on: [push, pull_request]
+
+
+jobs:
+  build:
+    name: Runs the deterministic operation test
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2
+    - name: install packages
+      run: sudo apt install build-essential nettle-dev time disorderfs
+    - name: bootstrap
+      run: ./bootstrap.sh
+    - name: configure
+      run: ./configure
+    - name: make
+      run: make
+    - name: run determinism test
+      run: testcases/verify_deterministic_operation.sh
+    - name: store logs as artifacts
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v2.2.4
+      with:
+         path: '**/*.log'
+
