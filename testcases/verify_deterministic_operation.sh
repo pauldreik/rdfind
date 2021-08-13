@@ -91,6 +91,7 @@ for i in $(seq 128) ; do
    run_outcome false
    if [  $last_outcome != $outcome ] ; then
       #proved that both outcomes can happen. good!
+      dbgecho "got a different outcome after $i random tries"
       break
    else
       if [ $i -eq 64 ] ; then
