@@ -147,7 +147,7 @@ run_with_sanitizer() {
    unset ASAN_OPTIONS
 }
 ###############################################################################
-#This tries to mimick how the debian package is built
+#This tries to mimic how the debian package is built
 run_with_debian_buildflags() {
    echo $me: "running with buildflags from debian dpkg-buildflags"
    if ! which dpkg-buildflags >/dev/null  ; then

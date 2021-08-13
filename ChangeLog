@@ -104,7 +104,7 @@
 2009-01-13  Paul Sundvall  <rdfind@paulsundvall.net>
 	* updated with new option outputname
 	* added names from people who helped
-	* clarified licens here and there
+	* clarified license here and there
 	* added svn id keyword in file
 	* updated man page
 
@@ -162,7 +162,7 @@
 
 2006-01-12  Paul Sundvall  <rdfind@paulsundvall.net>
 	*using memcmp for comparison on byte.
-	*dont read file if it already has been read and m_nbytes is longer
+	*don't read file if it already has been read and m_nbytes is longer
 	than the file itself.
 
 2006-01-11  Paul Sundvall  <rdfind@paulsundvall.net>
