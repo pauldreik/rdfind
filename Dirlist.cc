@@ -71,8 +71,6 @@ Dirlist::walk(const std::string& dir, const int recursionlevel)
       // symlink
       if (m_followsymlinks) {
         (*m_callback)(dir, std::string(dp->d_name), recursionlevel);
-      }
-      if (m_followsymlinks) {
         dowalk = true;
       }
     } else if (S_ISDIR(info.st_mode)) {
