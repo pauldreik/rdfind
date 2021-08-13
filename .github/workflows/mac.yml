@@ -1,6 +1,6 @@
 name: mac os x default build
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
