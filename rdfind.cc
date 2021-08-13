@@ -100,7 +100,7 @@ struct Options
     0; // if nonzero, files this size or larger are ignored
   bool deleteduplicates = false;      // delete duplicate files
   bool followsymlinks = false;        // follow symlinks
-  bool dryrun = false;                // only dryrun, dont destroy anything
+  bool dryrun = false;                // only dryrun, don't destroy anything
   bool remove_identical_inode = true; // remove files with identical inodes
   bool usemd5 = false;       // use md5 checksum to check for similarity
   bool usesha1 = false;      // use sha1 checksum to check for similarity

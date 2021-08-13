@@ -124,7 +124,7 @@ The following methods are used to maintain code quality:
  - tests are run on address sanitizer builds
  - tests are run on undefined sanitizer builds
  - tests are run with debug iterators enabled
- - builds are made in default mode (debug) as well as release, and also with the flags suggested by debians hardening helper dpkg-buildflags
+ - builds are made in default mode (debug) as well as release, and also with the flags suggested by Debian's hardening helper dpkg-buildflags
  - builds are made with both libstdc++ (gcc) and libc++ (llvm)
  - clang format is used, issue make format to execute it
  - cppcheck has been run manually and relevant issues are fixed
@@ -181,6 +181,6 @@ Everything is as expected.
     name=b1 inode=58931 nhardlinks=2
     name=b2 inode=58931 nhardlinks=2
 
-a, a1 and a2 got collapsed into a single entry. b, b1 and b2 got collapased into a single entry. So rdfind is left with a and b (depending on which of them is received first by the * expansion). It replaces b with a hardlink to a. b1 and b2 are untouched.
+a, a1 and a2 got collapsed into a single entry. b, b1 and b2 got collapsed into a single entry. So rdfind is left with a and b (depending on which of them is received first by the * expansion). It replaces b with a hardlink to a. b1 and b2 are untouched.
 
 If one runs rdfind repeatedly, the issue is resolved, one file being corrected every run.

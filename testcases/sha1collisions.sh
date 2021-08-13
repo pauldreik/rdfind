@@ -8,7 +8,7 @@ set -e
 
 reset_teststate
 
-#unpack collisions exampel from https://shattered.it/static/shattered.pdf
+#unpack collisions example from https://shattered.it/static/shattered.pdf
 base64 --decode <$testscriptsdir/sha1collisions/coll.tar.bz2.b64 |tar xvfj -
 
 #make sure nothing happens when using sha256
