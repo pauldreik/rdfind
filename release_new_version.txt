@@ -6,7 +6,7 @@ ChangeLog
 
 make a (signed) git tag:
 git config user.signingkey 4CC8C397
-git tag -s releases/1.x.y
+git tag -s releases/$(cat VERSION.txt)
 
 release a tar ball:
 git clean -xdf .
@@ -16,11 +16,11 @@ make dist-gzip
 
 make information for publishing the tar ball on https://rdfind.pauldreik.se/:
 key=$(git config user.signingkey)
-pkg=rdfind-$(cat VERSION).tar.gz
+pkg=rdfind-$(cat VERSION.txt).tar.gz
 gpg -u $key -a -b $pkg
 
 cat VERSION>table.txt
-git show-ref --hash=8 releases/$(cat VERSION) >>table.txt
+git show-ref --hash=8 releases/$(cat VERSION.txt) >>table.txt
 echo $pkg >>table.txt
 echo $pkg.asc >>table.txt
 echo 0x$key >>table.txt
