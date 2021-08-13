@@ -1,0 +1,23 @@
+name: cppcheck
+
+on: [push, pull_request]
+
+
+jobs:
+  build:
+    name: Runs cppcheck
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2
+    - name: install packages
+      run: sudo apt install cppcheck
+    - name: run cppcheck
+      run: cppcheck/run_cppcheck.sh
+    - name: store the cppcheck output as an artifact
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v2.2.4
+      with:
+         path: 'cppcheck/out/*'
+
