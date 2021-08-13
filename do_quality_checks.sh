@@ -108,7 +108,7 @@ compile_and_test() {
 
    #loop over all standard flags>=11 and try those which work.
    #use the code words.
-   for std in 11 1y 1z 2a ; do
+   for std in 11 1y 1z 2a 2b ; do
       if ! $1 -c x.cpp -std=c++$std >/dev/null 2>&1 ; then
          echo $me: compiler does not understand c++$std, skipping this combination.
       else
