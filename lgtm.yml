@@ -6,6 +6,5 @@ extraction:
           - nettle-dev
      configure:
         command:
-          - grep -v AX_CXX_COMPILE_STDCXX <configure.ac >tmp && mv tmp configure.ac
           - ./bootstrap.sh
           - ./configure
