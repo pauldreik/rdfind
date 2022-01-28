@@ -388,7 +388,7 @@ main(int narg, const char* argv[])
   gswd.markduplicates();
 
   std::cout << dryruntext << "It seems like you have " << filelist.size()
-            << " files that are not unique\n";
+            << " files that are not unique." << std::endl;
 
   std::cout << dryruntext << "Totally, ";
   gswd.saveablespace(std::cout) << " can be reduced." << std::endl;
