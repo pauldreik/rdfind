@@ -46,12 +46,12 @@ Look for duplicate files in directory /home/pauls/bilder:
     Now scanning "/home/pauls/bilder", found 3301 files.
     Now have 3301 files in total.
     Removed 0 files due to nonunique device and inode.
-    Now removing files with zero size...removed 3 files
+    Now skipping files with zero size...skipped 3 files
     Total size is 2861229059 bytes or 3 Gib
-    Now sorting on size:removed 3176 files due to unique sizes.122 files left.
-    Now eliminating candidates based on first bytes:removed 8 files.114 files left.
-    Now eliminating candidates based on last bytes:removed 12 files.102 files left.
-    Now eliminating candidates based on md5 checksum:removed 2 files.100 files left.
+    Now sorting on size:skipped 3176 files due to unique sizes.122 files left.
+    Now skipping files based on first bytes:skipped 8 files.114 files left.
+    Now skipping files based on last bytes:skipped 12 files.102 files left.
+    Now skipping files based on md5 checksum:skipped 2 files.100 files left.
     It seems like you have 100 files that are not unique
     Totally, 24 Mib can be reduced.
     Now making results file results.txt
@@ -79,12 +79,12 @@ Rdfind uses the following algorithm. If N is the number of files to search throu
 2. For each argument, list the directory contents recursively and assign it to the file list. Assign a directory depth number, starting at 0 for every argument.
 3. If the input argument is a file, add it to the file list.
 4. Loop over the list, and find out the sizes of all files.
-5. If flag -removeidentinode true: Remove items from the list which already are added, based on the combination of inode and device number. A group of files that are hardlinked to the same file are collapsed to one entry. Also see the comment on hardlinks under ”caveats below”!
-6. Sort files on size. Remove files from the list, which have unique sizes.
+5. If flag -removeidentinode true: Skip items from the list which already are added, based on the combination of inode and device number. A group of files that are hardlinked to the same file are collapsed to one entry. Also see the comment on hardlinks under ”caveats below”!
+6. Sort files on size. Skip files from the list, which have unique sizes.
 7. Sort on device and inode(speeds up file reading). Read a few bytes from the beginning of each file (first bytes).
-8. Remove files from list that have the same size but different first bytes.
+8. Skip files from list that have the same size but different first bytes.
 9. Sort on device and inode(speeds up file reading). Read a few bytes from the end of each file (last bytes).
-10. Remove files from list that have the same size but different last bytes.
+10. Skip files from list that have the same size but different last bytes.
 11. Sort on device and inode(speeds up file reading). Perform a checksum calculation for each file.
 12. Only keep files on the list with the same size and checksum. These are duplicates.
 13. Sort list on size, priority number, and depth. The first file for every set of duplicates is considered to be the original.
