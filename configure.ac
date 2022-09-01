@@ -46,7 +46,7 @@ AC_CHECK_HEADER(nettle/sha.h,,[AC_MSG_ERROR([
  On Debian-ish systems, use "apt-get install nettle-dev" to get a system
  wide nettle install.
 ])]) 
-AC_CHECK_LIB(nettle,main,,[AC_MSG_ERROR([
+AC_CHECK_LIB(nettle,nettle_pbkdf2_hmac_sha256,,[AC_MSG_ERROR([
  Could not link to libnettle. Please install nettle
  first. If you have already done so; please run ldconfig
  as root or check whether the path libnettle was installed
