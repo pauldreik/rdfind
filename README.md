@@ -136,7 +136,6 @@ The following methods are used to maintain code quality:
 
 There are some interesting alternatives.
 
-- [Duff](http://duff.sourceforge.net/) by Camilla Berglund.
 - [Fslint](http://www.pixelbeat.org/fslint/)  by Pádraig Brady
 
 A search on ”finding duplicate files” will give you lots of matches.
