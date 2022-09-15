@@ -61,7 +61,7 @@ usage()
     << " -followsymlinks    true |(false) follow symlinks\n"
     << " -removeidentinode (true)| false  ignore files with nonunique "
        "device and inode\n"
-    << " -checksum           md5 |(sha1)| sha256\n"
+    << " -checksum           md5 |(sha1)| sha256 | none\n"
     << "                                  checksum type\n"
     << " -deterministic    (true)| false  makes results independent of order\n"
     << "                                  from listing the filesystem\n"
@@ -103,6 +103,7 @@ struct Options
   bool followsymlinks = false;        // follow symlinks
   bool dryrun = false;                // only dryrun, don't destroy anything
   bool remove_identical_inode = true; // remove files with identical inodes
+  bool checksum = true;      // use some checksum
   bool usemd5 = false;       // use md5 checksum to check for similarity
   bool usesha1 = false;      // use sha1 checksum to check for similarity
   bool usesha256 = false;    // use sha256 checksum to check for similarity
@@ -174,8 +175,10 @@ parseOptions(Parser& parser)
         o.usesha1 = true;
       } else if (parser.parsed_string_is("sha256")) {
         o.usesha256 = true;
+      } else if (parser.parsed_string_is("none")) {
+        o.checksum = false;
       } else {
-        std::cerr << "expected md5/sha1/sha256, not \""
+        std::cerr << "expected md5/sha1/sha256/none, not \""
                   << parser.get_parsed_string() << "\"\n";
         std::exit(EXIT_FAILURE);
       }
@@ -237,8 +240,10 @@ parseOptions(Parser& parser)
   // done with parsing of options. remaining arguments are files and dirs.
 
   // decide what checksum to use - if no checksum is set, force sha1!
-  if (!o.usemd5 && !o.usesha1 && !o.usesha256) {
-    o.usesha1 = true;
+  if (o.checksum) {
+    if (!o.usemd5 && !o.usesha1 && !o.usesha256) {
+      o.usesha1 = true;
+    }
   }
   return o;
 }
@@ -356,17 +361,19 @@ main(int narg, const char* argv[])
     { Fileinfo::readtobuffermode::READ_FIRST_BYTES, "first bytes" },
     { Fileinfo::readtobuffermode::READ_LAST_BYTES, "last bytes" },
   };
-  if (o.usemd5) {
-    modes.emplace_back(Fileinfo::readtobuffermode::CREATE_MD5_CHECKSUM,
-                       "md5 checksum");
-  }
-  if (o.usesha1) {
-    modes.emplace_back(Fileinfo::readtobuffermode::CREATE_SHA1_CHECKSUM,
-                       "sha1 checksum");
-  }
-  if (o.usesha256) {
-    modes.emplace_back(Fileinfo::readtobuffermode::CREATE_SHA256_CHECKSUM,
-                       "sha256 checksum");
+  if (o.checksum) {
+    if (o.usemd5) {
+      modes.emplace_back(Fileinfo::readtobuffermode::CREATE_MD5_CHECKSUM,
+                         "md5 checksum");
+    }
+    if (o.usesha1) {
+      modes.emplace_back(Fileinfo::readtobuffermode::CREATE_SHA1_CHECKSUM,
+                         "sha1 checksum");
+    }
+    if (o.usesha256) {
+      modes.emplace_back(Fileinfo::readtobuffermode::CREATE_SHA256_CHECKSUM,
+                         "sha256 checksum");
+    }
   }
 
   for (auto it = modes.begin() + 1; it != modes.end(); ++it) {
