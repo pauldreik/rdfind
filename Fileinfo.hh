@@ -8,6 +8,7 @@
 #define Fileinfo_hh
 
 #include <array>
+#include <cstdint>
 #include <string>
 
 // os specific headers
