@@ -64,7 +64,7 @@ AC_SYS_LARGEFILE
 
 dnl make sure we have c++11 or better,
 AC_MSG_CHECKING([for C++11 support or better])
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([int f() { auto a=1;}])],
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([int f() { auto a=1;return a;}])],
                   [AC_MSG_RESULT([yes])],
 		  [AC_MSG_ERROR([no c++11 support, please set CXXFLAGS properly])])
 
