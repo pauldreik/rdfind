@@ -233,10 +233,13 @@ verify_self_contained_headers() {
       ./configure >configure.log 2>&1
    fi
    for header in *.hh ; do
-      if ! g++ -std=c++11 -I. $header -o /dev/null >header.log 2>&1 ; then
-         echo $me: "found a header which is not self contained: $header"
+      cp $header tmp.cc
+      if ! g++ -std=c++11 -I. -c tmp.cc -o /dev/null >header.log 2>&1 ; then
+         echo "$me: found a header which is not self contained: $header."
+         echo "$me: see header.log for details"
          exit 1
       fi
+      rm tmp.cc
    done
    echo "OK!"
 }
