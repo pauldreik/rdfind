@@ -61,7 +61,7 @@ usage()
     << " -followsymlinks    true |(false) follow symlinks\n"
     << " -removeidentinode (true)| false  ignore files with nonunique "
        "device and inode\n"
-    << " -checksum           md5 |(sha1)| sha256\n"
+    << " -checksum           md5 |(sha1)| sha256 | sha512\n"
     << "                                  checksum type\n"
     << " -deterministic    (true)| false  makes results independent of order\n"
     << "                                  from listing the filesystem\n"
@@ -106,6 +106,7 @@ struct Options
   bool usemd5 = false;       // use md5 checksum to check for similarity
   bool usesha1 = false;      // use sha1 checksum to check for similarity
   bool usesha256 = false;    // use sha256 checksum to check for similarity
+  bool usesha512 = false;    // use sha512 checksum to check for similarity
   bool deterministic = true; // be independent of filesystem order
   long nsecsleep = 0; // number of nanoseconds to sleep between each file read.
   std::string resultsfile = "results.txt"; // results file name.
@@ -174,8 +175,10 @@ parseOptions(Parser& parser)
         o.usesha1 = true;
       } else if (parser.parsed_string_is("sha256")) {
         o.usesha256 = true;
+      } else if (parser.parsed_string_is("sha512")) {
+        o.usesha512 = true;
       } else {
-        std::cerr << "expected md5/sha1/sha256, not \""
+        std::cerr << "expected md5/sha1/sha256/sha512, not \""
                   << parser.get_parsed_string() << "\"\n";
         std::exit(EXIT_FAILURE);
       }
@@ -237,7 +240,7 @@ parseOptions(Parser& parser)
   // done with parsing of options. remaining arguments are files and dirs.
 
   // decide what checksum to use - if no checksum is set, force sha1!
-  if (!o.usemd5 && !o.usesha1 && !o.usesha256) {
+  if (!o.usemd5 && !o.usesha1 && !o.usesha256 && !o.usesha512) {
     o.usesha1 = true;
   }
   return o;
@@ -367,6 +370,10 @@ main(int narg, const char* argv[])
   if (o.usesha256) {
     modes.emplace_back(Fileinfo::readtobuffermode::CREATE_SHA256_CHECKSUM,
                        "sha256 checksum");
+  }
+  if (o.usesha512) {
+    modes.emplace_back(Fileinfo::readtobuffermode::CREATE_SHA512_CHECKSUM,
+                       "sha512 checksum");
   }
 
   for (auto it = modes.begin() + 1; it != modes.end(); ++it) {

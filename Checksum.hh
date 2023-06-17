@@ -25,6 +25,7 @@ public:
     MD5,
     SHA1,
     SHA256,
+    SHA512
   };
 
   explicit Checksum(checksumtypes type);
@@ -52,6 +53,7 @@ private:
   {
     sha1_ctx sha1;
     sha256_ctx sha256;
+    sha512_ctx sha512;
     md5_ctx md5;
   } m_state;
 };

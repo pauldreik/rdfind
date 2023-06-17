@@ -9,7 +9,7 @@ set -e
 
 
 
-for checksumtype in md5 sha1 sha256; do
+for checksumtype in md5 sha1 sha256 sha512; do
    reset_teststate
    dbgecho "trying checksum $checksumtype"
    echo checksumtest >a

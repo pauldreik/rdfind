@@ -47,6 +47,7 @@ public:
     CREATE_MD5_CHECKSUM = 2,
     CREATE_SHA1_CHECKSUM,
     CREATE_SHA256_CHECKSUM,
+    CREATE_SHA512_CHECKSUM,
   };
 
   // type of duplicate

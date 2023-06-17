@@ -25,6 +25,9 @@ Checksum::Checksum(checksumtypes type)
     case checksumtypes::SHA256: {
       sha256_init(&m_state.sha256);
     } break;
+    case checksumtypes::SHA512: {
+      sha512_init(&m_state.sha512);
+    } break;
     case checksumtypes::MD5: {
       md5_init(&m_state.md5);
     } break;
@@ -43,6 +46,9 @@ Checksum::update(std::size_t length, const unsigned char* buffer)
       break;
     case checksumtypes::SHA256:
       sha256_update(&m_state.sha256, length, buffer);
+      break;
+    case checksumtypes::SHA512:
+      sha512_update(&m_state.sha512, length, buffer);
       break;
     case checksumtypes::MD5:
       md5_update(&m_state.md5, length, buffer);
@@ -107,6 +113,8 @@ Checksum::getDigestLength() const
       return SHA1_DIGEST_SIZE;
     case checksumtypes::SHA256:
       return SHA256_DIGEST_SIZE;
+    case checksumtypes::SHA512:
+      return SHA512_DIGEST_SIZE;
     case checksumtypes::MD5:
       return MD5_DIGEST_SIZE;
     default:
@@ -135,6 +143,16 @@ Checksum::printToBuffer(void* buffer, std::size_t N)
       if (N >= SHA256_DIGEST_SIZE) {
         sha256_digest(&m_state.sha256,
                       SHA256_DIGEST_SIZE,
+                      static_cast<unsigned char*>(buffer));
+      } else {
+        // bad size.
+        return -1;
+      }
+      break;
+    case checksumtypes::SHA512:
+      if (N >= SHA512_DIGEST_SIZE) {
+        sha512_digest(&m_state.sha512,
+                      SHA512_DIGEST_SIZE,
                       static_cast<unsigned char*>(buffer));
       } else {
         // bad size.
