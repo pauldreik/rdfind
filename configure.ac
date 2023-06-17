@@ -16,8 +16,6 @@ AC_PROG_CXX
 AC_LANG([C++])
 
 AC_PROG_MAKE_SET
-               
-AC_HEADER_STDC
 
 dnl see if we should run a debug build with lots of output
 showdebugmessages=no
