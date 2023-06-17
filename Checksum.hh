@@ -19,7 +19,7 @@ class Checksum
 {
 public:
   // these are the checksums that can be calculated
-  enum checksumtypes
+  enum class checksumtypes
   {
     NOTSET = 0,
     MD5,
@@ -46,7 +46,7 @@ public:
 
 private:
   // to know what type of checksum we are doing
-  const int m_checksumtype = NOTSET;
+  const checksumtypes m_checksumtype = checksumtypes::NOTSET;
   // the checksum calculation internal state
   union ChecksumStruct
   {
