@@ -1,3 +1,5 @@
+1.6.0
+supports sha512
 1.4.0alpha
 now requires a c++11 capable compiler
 1.3.5
