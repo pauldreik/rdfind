@@ -5,7 +5,7 @@ VERSION.txt
 ChangeLog
 
 make a (signed) git tag:
-git config user.signingkey 4CC8C397
+git config user.signingkey C9D9A0EA44EAE0EB
 git tag -s releases/$(cat VERSION.txt)
 
 release a tar ball:
