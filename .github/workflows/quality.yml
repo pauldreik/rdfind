@@ -6,7 +6,7 @@ on: [push, pull_request]
 jobs:
   build:
     name: Runs the quality script
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
     - name: checkout
