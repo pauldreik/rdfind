@@ -10,14 +10,14 @@ jobs:
 
     steps:
     - name: checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: install packages
       run: sudo apt install cppcheck
     - name: run cppcheck
       run: cppcheck/run_cppcheck.sh
     - name: store the cppcheck output as an artifact
       if: ${{ always() }}
-      uses: actions/upload-artifact@v2.2.4
+      uses: actions/upload-artifact@v3
       with:
          path: 'cppcheck/out/*'
 

@@ -12,7 +12,7 @@ jobs:
 
     steps:
     - name: checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: install packages
       run: brew install libnettle automake autoconf
     - name: bootstrap
@@ -28,6 +28,6 @@ jobs:
 #      run: make distcheck CXXFLAGS=-std=c++11
     - name: Upload a Build Artifact
       if: ${{ always() }}
-      uses: actions/upload-artifact@v2.2.4
+      uses: actions/upload-artifact@v3
       with:
          path: '**/*.log'
