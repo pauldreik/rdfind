@@ -72,6 +72,7 @@ usage()
     << " -makeresultsfile  (true)| false  makes a results file\n"
     << " -outputname  name  sets the results file name to \"name\" "
        "(default results.txt)\n"
+    << " -progress          true |(false) show progress\n"
     << " -deleteduplicates  true |(false) delete duplicate files\n"
     << " -sleep              Xms          sleep for X milliseconds between "
        "file reads.\n"
@@ -110,6 +111,7 @@ struct Options
   bool deterministic = true; // be independent of filesystem order
   long nsecsleep = 0; // number of nanoseconds to sleep between each file read.
   std::string resultsfile = "results.txt"; // results file name.
+  bool show_progress = false;  //show progress
 };
 
 Options
@@ -136,6 +138,8 @@ parseOptions(Parser& parser)
       o.makehardlinks = parser.get_parsed_bool();
     } else if (parser.try_parse_bool("-makeresultsfile")) {
       o.makeresultsfile = parser.get_parsed_bool();
+    } else if (parser.try_parse_bool("-progress")) {
+      o.show_progress = parser.get_parsed_bool();
     } else if (parser.try_parse_string("-outputname")) {
       o.resultsfile = parser.get_parsed_string();
     } else if (parser.try_parse_bool("-ignoreempty")) {
@@ -381,7 +385,7 @@ main(int narg, const char* argv[])
               << it->second << ": " << std::flush;
 
     // read bytes (destroys the sorting, for disk reading efficiency)
-    gswd.fillwithbytes(it[0].first, it[-1].first, o.nsecsleep);
+    gswd.fillwithbytes(it[0].first, it[-1].first, o.nsecsleep, o.show_progress ? &std::cout : nullptr);
 
     // remove non-duplicates
     std::cout << "removed " << gswd.removeUniqSizeAndBuffer()

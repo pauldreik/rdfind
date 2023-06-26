@@ -86,10 +86,13 @@ public:
   // and file is read anyway.
   // if there is trouble with too much disk reading, sleeping for nsecsleep
   // nanoseconds can be made between each file.
+  // if out is provided, the progress in % will be written to it (overwriting
+  // each line with \r )
   int fillwithbytes(enum Fileinfo::readtobuffermode type,
                     enum Fileinfo::readtobuffermode lasttype =
                       Fileinfo::readtobuffermode::NOT_DEFINED,
-                    long nsecsleep = 0);
+                    long nsecsleep = 0,
+                    std::ostream* out = nullptr);
 
   /// make symlinks of duplicates.
   std::size_t makesymlinks(bool dryrun) const;

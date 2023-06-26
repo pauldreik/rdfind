@@ -7,7 +7,7 @@
 .SH NAME
 rdfind \- finds duplicate files
 .SH SYNOPSIS
-.B rdfind [ options ] 
+.B rdfind [ options ]
 .I directory1 | file1
 .B [
 .I directory2 | file2
@@ -16,7 +16,7 @@ rdfind \- finds duplicate files
 .B rdfind
 finds duplicate files across and/or within several directories. It calculates
 checksum only if necessary.
-rdfind runs in O(Nlog(N)) time with N being the number of files. 
+rdfind runs in O(Nlog(N)) time with N being the number of files.
 
 If two (or more) equal files are found, the program decides which of
 them is the original and the rest are considered duplicates. This
@@ -24,14 +24,14 @@ is done by ranking the files to each other and deciding which has the
 highest rank. See section RANKING for details.
 
 By default, no action is taken besides creating a file with the
-detected files and showing the possible amount of saved space. 
+detected files and showing the possible amount of saved space.
 
 If you need better control over the ranking than given, you can use
 some preprocessor which sorts the file names in desired order and then
 run the program using xargs. See examples below for how to use find
 and xargs in conjunction with rdfind.
 
-To include files or directories that have names starting with -, use 
+To include files or directories that have names starting with -, use
 rdfind ./- to not confuse them with options.
 
 .SH RANKING
@@ -39,7 +39,7 @@ Given two or more equal files, the one with the highest rank is
 selected to be the original and the rest are duplicates. The rules of
 ranking are given below, where the rules are executed from start until
 an original has been found. Given two files A and B which have equal
-size and content, the ranking is as follows: 
+size and content, the ranking is as follows:
 
 If A was found while scanning an input argument earlier than B, A
 is higher ranked.
@@ -110,11 +110,14 @@ General options:
 .BR \-sleep " " \fIX\fRms
 Sleeps X milliseconds between reading each file, to reduce
 load. Default is 0 (no sleep). Note that only a few values are
-supported at present: 0,1-5,10,25,50,100 milliseconds. 
+supported at present: 0,1-5,10,25,50,100 milliseconds.
 .TP
 .BR \-n ", " \-dryrun " " \fItrue\fR|\fIfalse\fR
 Displays what should have been done, don't actually delete or link
 anything. Default is false.
+.TP
+.BR \-progress " " \fItrue\fR|\fIfalse\fR
+Show progress during elimination. Defaults to false.
 .TP
 .BR \-h ", " \-help ", " \-\-help
 Displays a brief help message.
@@ -146,7 +149,7 @@ DUPTYPE_WITHIN_SAME_TREE files in the same tree (found when processing
 the directory in the same input argument as the original)
 
 DUPTYPE_OUTSIDE_TREE the file is found during processing another input
-argument than the original. 
+argument than the original.
 .SH ENVIRONMENT
 .SH DIAGNOSTICS
 .SH EXIT VALUES
