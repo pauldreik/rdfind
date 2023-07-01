@@ -63,6 +63,8 @@ usage()
        "device and inode\n"
     << " -checksum           md5 |(sha1)| sha256 | sha512\n"
     << "                                  checksum type\n"
+    << " -skip           firstbytes | lastbytes\n"
+    << "                                  skip some check\n"
     << " -deterministic    (true)| false  makes results independent of order\n"
     << "                                  from listing the filesystem\n"
     << " -makesymlinks      true |(false) replace duplicate files with "
@@ -103,6 +105,8 @@ struct Options
   bool followsymlinks = false;        // follow symlinks
   bool dryrun = false;                // only dryrun, don't destroy anything
   bool remove_identical_inode = true; // remove files with identical inodes
+  bool usefirstbytes = true;       // use first bytes to check for differences
+  bool uselastbytes = true;       // use last bytes to check for differences
   bool usemd5 = false;       // use md5 checksum to check for similarity
   bool usesha1 = false;      // use sha1 checksum to check for similarity
   bool usesha256 = false;    // use sha256 checksum to check for similarity
@@ -179,6 +183,16 @@ parseOptions(Parser& parser)
         o.usesha512 = true;
       } else {
         std::cerr << "expected md5/sha1/sha256/sha512, not \""
+                  << parser.get_parsed_string() << "\"\n";
+        std::exit(EXIT_FAILURE);
+      }
+    } else if (parser.try_parse_string("-skip")) {
+      if (parser.parsed_string_is("firstbytes")) {
+        o.usefirstbytes = false;
+      } else if (parser.parsed_string_is("lastbytes")) {
+        o.uselastbytes = false;
+      } else {
+        std::cerr << "expected firstbytes/lastbytes, not \""
                   << parser.get_parsed_string() << "\"\n";
         std::exit(EXIT_FAILURE);
       }
@@ -356,9 +370,15 @@ main(int narg, const char* argv[])
   // candidates. start looking at the contents.
   std::vector<std::pair<Fileinfo::readtobuffermode, const char*>> modes{
     { Fileinfo::readtobuffermode::NOT_DEFINED, "" },
-    { Fileinfo::readtobuffermode::READ_FIRST_BYTES, "first bytes" },
-    { Fileinfo::readtobuffermode::READ_LAST_BYTES, "last bytes" },
   };
+  if (o.usefirstbytes) {
+    modes.emplace_back(Fileinfo::readtobuffermode::READ_FIRST_BYTES,
+                       "first bytes");
+  }
+  if (o.uselastbytes) {
+    modes.emplace_back(Fileinfo::readtobuffermode::READ_LAST_BYTES,
+                       "last bytes");
+  }
   if (o.usemd5) {
     modes.emplace_back(Fileinfo::readtobuffermode::CREATE_MD5_CHECKSUM,
                        "md5 checksum");

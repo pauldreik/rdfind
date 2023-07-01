@@ -80,6 +80,9 @@ is true.
 What type of checksum to be used: md5, sha1, sha256 or sha512. The default is
 sha1 since version 1.4.0.
 .TP
+.BR \-skip " " \fIfirstbytes\fR|\fIlastbytes\fR
+Skip some steps during the candidates pruning. This argument can be repeated.
+.TP
 .BR \-deterministic " " \fItrue\fR|\fIfalse\fR
 If set (the default), sort files of equal rank in an unspecified but
 deterministic order. This makes the behaviour independent of in which
