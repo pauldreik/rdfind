@@ -339,8 +339,8 @@ main(int narg, const char* argv[])
   gswd.markitems();
 
   if (o.remove_identical_inode) {
-    // remove files with identical devices and inodes from the list
-    std::cout << dryruntext << "Removed " << gswd.removeIdenticalInodes()
+    // skip files with identical devices and inodes from the list
+    std::cout << dryruntext << "Skipped " << gswd.removeIdenticalInodes()
               << " files due to nonunique device and inode." << std::endl;
   }
 
@@ -348,8 +348,8 @@ main(int narg, const char* argv[])
             << " bytes or ";
   gswd.totalsize(std::cout) << std::endl;
 
-  std::cout << "Removed " << gswd.removeUniqueSizes()
-            << " files due to unique sizes from list. ";
+  std::cout << "Skipped " << gswd.removeUniqueSizes()
+            << " files due to unique sizes. ";
   std::cout << filelist.size() << " files left." << std::endl;
 
   // ok. we now need to do something stronger to disambiguate the duplicate
@@ -377,15 +377,15 @@ main(int narg, const char* argv[])
   }
 
   for (auto it = modes.begin() + 1; it != modes.end(); ++it) {
-    std::cout << dryruntext << "Now eliminating candidates based on "
+    std::cout << dryruntext << "Now skipping files based on "
               << it->second << ": " << std::flush;
 
     // read bytes (destroys the sorting, for disk reading efficiency)
     gswd.fillwithbytes(it[0].first, it[-1].first, o.nsecsleep);
 
     // remove non-duplicates
-    std::cout << "removed " << gswd.removeUniqSizeAndBuffer()
-              << " files from list. ";
+    std::cout << "skipped " << gswd.removeUniqSizeAndBuffer()
+              << " files. ";
     std::cout << filelist.size() << " files left." << std::endl;
   }
 
