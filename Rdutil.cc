@@ -25,8 +25,15 @@
 // class declaration
 #include "Rdutil.hh"
 
+
 int
 Rdutil::printtofile(const std::string& filename) const
+{
+  return printtofile(filename, " ");
+}
+
+int
+Rdutil::printtofile(const std::string& filename, const std::string& delimiter) const
 {
   // open a file to print to
   std::ofstream f1;
@@ -46,9 +53,9 @@ Rdutil::printtofile(const std::string& filename) const
 
   std::vector<Fileinfo>::iterator it;
   for (it = m_list.begin(); it != m_list.end(); ++it) {
-    output << Fileinfo::getduptypestring(*it) << " " << it->getidentity() << " "
-           << it->depth() << " " << it->size() << " " << it->device() << " "
-           << it->inode() << " " << it->get_cmdline_index() << " " << it->name()
+    output << Fileinfo::getduptypestring(*it) << delimiter << it->getidentity() << delimiter
+           << it->depth() << delimiter << it->size() << delimiter << it->device() << delimiter
+           << it->inode() << delimiter << it->get_cmdline_index() << delimiter << it->name()
            << '\n';
   }
   output << "# end of file\n";

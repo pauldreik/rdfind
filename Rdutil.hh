@@ -27,6 +27,14 @@ public:
    */
   int printtofile(const std::string& filename) const;
 
+  /**
+   * print file names to a file, with extra information.
+   * @param filename
+   * @param delimiter
+   * @return zero on success
+   */
+  int printtofile(const std::string& filename, const std::string& delimiter) const;
+
   /// mark files with a unique number
   void markitems();
 
