@@ -34,8 +34,8 @@ set -e
 
 export LANG=
 
-rootdir=$(dirname $0)
-me=$(basename $0)
+rootdir=$(dirname "$0")
+me=$(basename "$0")
 
 #flags to configure, for assert.
 ASSERT=
