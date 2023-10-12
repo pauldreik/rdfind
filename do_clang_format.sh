@@ -14,8 +14,8 @@ if [ ! -x "$CLANGFORMAT" ] ; then
    echo failed finding clangformat
    exit 1
 else
-   echo found clang format: $CLANGFORMAT
+   echo "found clang format: $CLANGFORMAT"
 fi
 
 find . -maxdepth 1 -type f \( -name "*.h" -o -name "*.cpp" -o -name "*.cc" -o -name "*.hh" \) -print0 | \
-   xargs -0 -n1 $CLANGFORMAT -i
+   xargs -0 -n1 "$CLANGFORMAT" -i

@@ -16,8 +16,8 @@ fi
 
 #unmount disordered
 unmount_disordered() {
-   if [ -d $DISORDERED_MNT ]; then
-      if ! fusermount --quiet -u $DISORDERED_MNT ; then
+   if [ -d "$DISORDERED_MNT" ]; then
+      if ! fusermount --quiet -u "$DISORDERED_MNT" ; then
          dbgecho failed unmounting disordered
       fi
    fi
@@ -28,17 +28,17 @@ DISORDERED_FLAGS_ASC="--shuffle-dirents=no --sort-dirents=yes --reverse-dirents=
 DISORDERED_FLAGS_DESC="--shuffle-dirents=no --sort-dirents=yes --reverse-dirents=yes"
 DISORDERED_FLAGS=$DISORDERED_FLAGS_RANDOM
 mount_disordered() {
-   mkdir -p $DISORDERED_MNT
-   mkdir -p $DISORDERED_ROOT
-   disorderfs $DISORDERED_FLAGS $DISORDERED_ROOT $DISORDERED_MNT >/dev/null
+   mkdir -p "$DISORDERED_MNT"
+   mkdir -p "$DISORDERED_ROOT"
+   disorderfs $DISORDERED_FLAGS "$DISORDERED_ROOT" "$DISORDERED_MNT" >/dev/null
 }
 
 #create
 cr8() {
    while [ $# -gt 0 ] ; do
-      mkdir -p $(dirname $1)
+      mkdir -p "$(dirname "$1")"
       # make sure the file is longer than what fits in the byte buffer
-      head -c1000 /dev/zero >$1
+      head -c1000 /dev/zero >"$1"
       shift
    done
 }
@@ -46,17 +46,17 @@ local_reset() {
    unmount_disordered
    reset_teststate
    mount_disordered
-   cr8 $@
+   cr8 "$@"
 }
 
 #sets global variable outcome to which file was preserved, a or b.
 #$1 - value of -deterministic flag (true or false)
 run_outcome() {
-   local_reset $DISORDERED_MNT/a $DISORDERED_MNT/b
-   $rdfind -deterministic $1 -deleteduplicates true $DISORDERED_MNT >rdfind.out
-   if [ -f $DISORDERED_MNT/a -a ! -e $DISORDERED_MNT/b ] ; then
+   local_reset "$DISORDERED_MNT/a" "$DISORDERED_MNT/b"
+   $rdfind -deterministic $1 -deleteduplicates true "$DISORDERED_MNT" >rdfind.out
+   if [ -f "$DISORDERED_MNT/a" -a ! -e "$DISORDERED_MNT/b" ] ; then
       outcome=a
-   elif  [ ! -e $DISORDERED_MNT/a -a -f $DISORDERED_MNT/b ] ; then
+   elif  [ ! -e "$DISORDERED_MNT/a" -a -f "$DISORDERED_MNT/b" ] ; then
       outcome=b
    else
       dbgecho "bad result! test failed!"

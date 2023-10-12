@@ -6,7 +6,7 @@
 #bail out on the first error
 set -e
 
-me=$(basename $0)
+me=$(basename "$0")
 
 
 /bin/echo -n "$me: checking for rdfind ..."
@@ -27,7 +27,7 @@ fi
 rdfind="$VALGRIND $rdfind"
 
 #where is the test scripts dir?
-testscriptsdir=$(dirname $(readlink -f $0))
+testscriptsdir=$(dirname "$(readlink -f "$0")")
 
 
 dbgecho() {
@@ -56,21 +56,22 @@ if [ -z $KEEPTEMPDIR ] ; then
    trap cleanup INT QUIT EXIT
 fi
 
-[ -d $datadir ]
-cd $datadir
+[ -d "$datadir" ]
+cd "$datadir"
 
 reset_teststate() {
    cd /
    rm -rf "$datadir"
-   mkdir -p $datadir
+   mkdir -p "$datadir"
    cd "$datadir"
 }
 
 
 verify() {
-   if ! $@ ; then
-      echo "failed asserting $@"
+   if ! "$@" ; then
+      echo "failed asserting $*"
       exit 1
+
    fi
 }
 
@@ -81,10 +82,10 @@ DISORDERED_ROOT=$datadir/disordered_root
 # do we have a working disorder fs?
 hasdisorderfs=false
 if which disorderfs fusermount >/dev/null 2>&1; then
-   mkdir -p $DISORDERED_MNT $DISORDERED_ROOT
-   if disorderfs $DISORDERED_ROOT $DISORDERED_MNT >/dev/null 2>&1 ; then
+   mkdir -p "$DISORDERED_MNT" "$DISORDERED_ROOT"
+   if disorderfs "$DISORDERED_ROOT" "$DISORDERED_MNT" >/dev/null 2>&1 ; then
       # "Sälj inte skinnet förrän björnen är skjuten - Don't count your chickens until they're hatched"
-      fusermount -z -u $DISORDERED_MNT
+      fusermount -z -u "$DISORDERED_MNT"
       hasdisorderfs=true
    fi
 fi

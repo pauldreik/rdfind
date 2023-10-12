@@ -10,7 +10,7 @@ reset_teststate
 
 #check md5 collision files
 mkdir md5coll
-cp $testscriptsdir/md5collisions/*.ps md5coll
+cp "$testscriptsdir"/md5collisions/*.ps md5coll
 sync
 
 #make sure nothing happens when using sha

@@ -12,27 +12,27 @@ unmount_disordered() {
    if ! $hasdisorderfs ; then
       return
    fi
-   if [ -d $DISORDERED_MNT ]; then
-      if ! fusermount --quiet -z -u $DISORDERED_MNT ; then
+   if [ -d "$DISORDERED_MNT" ]; then
+      if ! fusermount --quiet -z -u "$DISORDERED_MNT" ; then
          dbgecho failed unmounting disordered
       fi
    fi
 }
 
 mount_disordered() {
-   mkdir -p $DISORDERED_MNT $DISORDERED_ROOT
+   mkdir -p "$DISORDERED_MNT" "$DISORDERED_ROOT"
    if ! $hasdisorderfs ; then
       return
    fi
-   disorderfs --sort-dirents=yes --reverse-dirents=no $DISORDERED_ROOT $DISORDERED_MNT >/dev/null
+   disorderfs --sort-dirents=yes --reverse-dirents=no "$DISORDERED_ROOT" "$DISORDERED_MNT" >/dev/null
 }
 
 #create
 cr8() {
    while [ $# -gt 0 ] ; do
-      mkdir -p $(dirname $1)
+      mkdir -p "$(dirname "$1")"
       # make sure the file is longer than what fits in the byte buffer
-      head -c1000 /dev/zero >$1
+      head -c1000 /dev/zero >"$1"
       shift
    done
 }
@@ -41,7 +41,7 @@ local_reset() {
    unmount_disordered
    reset_teststate
    mount_disordered
-   cr8 $@
+   cr8 "$@"
 }
 
 
@@ -97,16 +97,16 @@ dbgecho "tests for rule 2 passed ok"
 #apt install disorderfs, and make sure you are member of the fuse group.
 if $hasdisorderfs ; then
 
-   local_reset $DISORDERED_MNT/a $DISORDERED_MNT/b
-   $rdfind -deleteduplicates true $DISORDERED_MNT >rdfind.out
-   [ -f $DISORDERED_MNT/a ]
-   [ ! -e $DISORDERED_MNT/b ]
+   local_reset "$DISORDERED_MNT/a" "$DISORDERED_MNT/b"
+   $rdfind -deleteduplicates true "$DISORDERED_MNT" >rdfind.out
+   [ -f "$DISORDERED_MNT/a" ]
+   [ ! -e "$DISORDERED_MNT/b" ]
    dbgecho "tests for rule 3 passed ok"
 
-   local_reset $DISORDERED_MNT/b $DISORDERED_MNT/a
-   $rdfind -deleteduplicates true $DISORDERED_MNT >rdfind.out
-   [ -f $DISORDERED_MNT/a ]
-   [ ! -e $DISORDERED_MNT/b ]
+   local_reset "$DISORDERED_MNT/b" "$DISORDERED_MNT/a"
+   $rdfind -deleteduplicates true "$DISORDERED_MNT" >rdfind.out
+   [ -f "$DISORDERED_MNT/a" ]
+   [ ! -e "$DISORDERED_MNT/b" ]
    dbgecho "tests for rule 3 passed ok"
 else
    dbgecho "could not execute tests for rule 3 - please install disorderfs"

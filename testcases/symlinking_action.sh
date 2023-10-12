@@ -12,12 +12,12 @@ reset_teststate
 files="first subdir/b c some/deeply/nested/subdir/d"
 nfiles=4
 for n in $files ; do
-   mkdir -p $(dirname $datadir/$n)
-   echo "hello symlink" > $datadir/$n
+   mkdir -p "$(dirname "$datadir/$n")"
+   echo "hello symlink" > "$datadir/$n"
 done
 
 #eliminate them.
-$rdfind -makesymlinks true $datadir/first $datadir/
+$rdfind -makesymlinks true "$datadir/first" "$datadir/"
 
 #make sure the first one is untouched (it has the highest rank), and the rest are symlinks.
 export LANG=
@@ -52,15 +52,15 @@ fi
 
 reset_teststate
 system_file=$(which ls)
-cp $system_file .
-$rdfind -makesymlinks true . $system_file 2>&1 |tee rdfind.out
+cp "$system_file" .
+$rdfind -makesymlinks true . "$system_file" 2>&1 |tee rdfind.out
 if ! grep -iq "failed to make symlink" rdfind.out ; then
    dbgecho "did not get the expected error message. see for yourself above."
    exit 1
 fi
 
 #make sure that our own copy is still there
-if [ ! -e $(basename $system_file) ] ; then
+if [ ! -e "$(basename "$system_file")" ] ; then
    dbgecho file is missing, rdfind should not have removed it!
    exit 1
 fi
@@ -73,13 +73,13 @@ dbgecho passed the test with trying to write to a system directory
 # argument 1 is path to file 1. argument 2 is path to file 2.
 pathsimplification() {
    reset_teststate
-   mkdir -p $(dirname $1) && echo "simplification test" >$1
-   mkdir -p $(dirname $2) && echo "simplification test" >$2
+   mkdir -p "$(dirname "$1")" && echo "simplification test" >"$1"
+   mkdir -p "$(dirname "$2")" && echo "simplification test" >"$2"
 
    #dbgecho "state before (args  $1 $2)"
    #tree
 
-   $rdfind -makesymlinks true $1 $2 2>&1 |tee rdfind.out
+   $rdfind -makesymlinks true "$1" "$2" 2>&1 |tee rdfind.out
    # $2 should be a symlink to $1
    if [ x"$(stat -c %F "$1")" != x"regular file" ] ; then
       dbgecho "expected file $1 to be a regular file"
@@ -96,8 +96,8 @@ pathsimplification() {
       exit 1
    fi
    #switching directory should still give the correct answer
-   cd $(dirname $2)
-   inodefor2=$(stat --dereference -c %i $(basename "$2"))
+   cd "$(dirname "$2")"
+   inodefor2=$(stat --dereference -c %i "$(basename "$2")")
    if [ $inodefor1 != $inodefor2 ] ; then
       dbgecho "inode mismatch $inodefor1 vs $inodefor2"
       exit 1
@@ -116,10 +116,10 @@ pathsimplification subdir1/../a subdir2/b
 pathsimplification subdir1/../a subdir2/./././b
 pathsimplification subdir2/./././b subdir1/../a
 pathsimplification a subdir2/./././b
-pathsimplification $(pwd)/a b
-pathsimplification a $(pwd)/b
-pathsimplification $(pwd)/a $(pwd)/b
-pathsimplification $(pwd)/subdir/../a $(pwd)/b
+pathsimplification "$(pwd)/a" b
+pathsimplification a "$(pwd)/b"
+pathsimplification "$(pwd)/a" "$(pwd)/b"
+pathsimplification "$(pwd)/subdir/../a" "$(pwd)/b"
 pathsimplification ./a b
 pathsimplification ./a ./b
 pathsimplification a ./b

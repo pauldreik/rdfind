@@ -9,7 +9,7 @@ set -e
 reset_teststate
 
 #unpack collisions example from https://shattered.it/static/shattered.pdf
-base64 --decode <$testscriptsdir/sha1collisions/coll.tar.bz2.b64 |tar xvfj -
+base64 --decode <"$testscriptsdir"/sha1collisions/coll.tar.bz2.b64 |tar xvfj -
 
 #make sure nothing happens when using sha256
 $rdfind  -checksum sha256 -deleteduplicates true . 2>&1 |tee rdfind.out
