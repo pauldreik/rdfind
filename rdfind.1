@@ -31,8 +31,8 @@ some preprocessor which sorts the file names in desired order and then
 run the program using xargs. See examples below for how to use find
 and xargs in conjunction with rdfind.
 
-To include files or directories that have names starting with -, use 
-rdfind ./- to not confuse them with options.
+To include files or directories that have names starting with \-, use
+rdfind ./\- to not confuse them with options.
 
 .SH RANKING
 Given two or more equal files, the one with the highest rank is
@@ -50,7 +50,7 @@ If A was found at a directory depth lower than B, A is higher ranked
 if A and B are found during scanning of the same input argument and share
 the same directory depth, the one that ranks highest depends on if
 deterministic operation is enabled. This is on by default, see option
-\fB-deterministic\fR). If enabled, which one ranks highest is
+\fB\-deterministic\fR). If enabled, which one ranks highest is
 unspecified but deterministic. If disabled, the one that was reported
 first from the file system is highest ranked.
 
@@ -59,7 +59,7 @@ Searching options etc:
 .TP
 .BR \-ignoreempty " " \fItrue\fR|\fIfalse\fR
 Ignore empty files. Setting this to true (the default) is equivalent to
--minsize 1, false is equivalent to -minsize 0.
+\-minsize 1, false is equivalent to \-minsize 0.
 .TP
 .BR \-minsize " "\fIN\fR
 Ignores files with less than N bytes. Default is 1, meaning empty files
@@ -96,7 +96,7 @@ Replace duplicate files with hard links. Default is false.
 .BR \-makeresultsfile " " \fItrue\fR|\fIfalse\fR
 Make a results file in the current directory. Default is true. If the
 file exists, it is overwritten. This does not affect whether items are
-deleted. See -dryrun for how to disable deletions.
+deleted. See \-dryrun for how to disable deletions.
 .TP
 .BR \-outputname " " \fIname\fR
 Make the results file name to be "name" instead of the default
@@ -127,10 +127,10 @@ Search for duplicate files in the home directory and a backup directory:
 .B rdfind ~ /mnt/backup
 .TP
 Delete duplicates in a backup directory:
-.B rdfind -deleteduplicates true /mnt/backup
+.B rdfind \-deleteduplicates true /mnt/backup
 .TP
 Search for duplicate files in directories called foo:
-.B find . -type d -name foo -print0 |xargs -0 rdfind
+.B find . \-type d \-name foo \-print0 |xargs \-0 rdfind
 .SH FILES
 .I results.txt
 (the default name is results.txt and can be changed with option outputname,
