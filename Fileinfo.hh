@@ -149,6 +149,9 @@ public:
 
   std::size_t getbuffersize() const { return m_somebytes.size(); }
 
+  // copy the buffer from another source instead of (reading/calculating it)
+  void copybuffer(const Fileinfo& src);
+
   /// returns true if file is a regular file. call readfileinfo first!
   bool isRegularFile() const { return m_info.is_file; }
 

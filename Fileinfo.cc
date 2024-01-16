@@ -22,6 +22,13 @@
 #include "Fileinfo.hh"
 #include "UndoableUnlink.hh"
 
+void
+Fileinfo::copybuffer(const Fileinfo& src) 
+{
+  // copy the buffer from another source (instead of reading/calculating it)
+  std::copy(std::begin(src.m_somebytes), std::end(src.m_somebytes), std::begin(this->m_somebytes));
+}
+
 int
 Fileinfo::fillwithbytes(enum readtobuffermode filltype,
                         enum readtobuffermode lasttype)

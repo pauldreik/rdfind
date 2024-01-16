@@ -543,16 +543,24 @@ Rdutil::fillwithbytes(enum Fileinfo::readtobuffermode type,
                       enum Fileinfo::readtobuffermode lasttype,
                       const long nsecsleep)
 {
-  // first sort on inode (to read efficiently from the hard drive)
+  // first sort on inode (to read efficiently from the hard drive ànd to detect hardlinked files)
   sortOnDeviceAndInode();
 
   const auto duration = std::chrono::nanoseconds{ nsecsleep };
 
-  for (auto& elem : m_list) {
-    elem.fillwithbytes(type, lasttype);
-    if (nsecsleep > 0) {
-      std::this_thread::sleep_for(duration);
+  using Iterator = decltype(m_list.end());
+  Iterator previous_it = --m_list.end();
+  for (auto it = m_list.begin(); it != m_list.end(); it++) {
+    if (cmpDeviceInode(*it, *previous_it)) {
+      it->fillwithbytes(type, lasttype);
+      if (nsecsleep > 0) {
+        std::this_thread::sleep_for(duration);
+      }
+    } else {
+       // no need to read this elem from disk, as it is hardlinked to the previous one, so we can reuse the read data from the previous one
+      it->copybuffer(*previous_it);
     }
+    previous_it = it;
   }
   return 0;
 }
