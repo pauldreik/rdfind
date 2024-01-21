@@ -329,7 +329,7 @@ run_with_sanitizer "-fsanitize=undefined -O3"
 run_with_sanitizer "-fsanitize=address -O0"
 
 #build and test with all flags from debian, if available. this increases
-#the likelilihood rdfind will build when creating a deb package.
+#the likelihood rdfind will build when creating a deb package.
 ASSERT=""
 run_with_debian_buildflags
 
