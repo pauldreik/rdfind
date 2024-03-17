@@ -277,7 +277,7 @@ std::size_t
 Rdutil::removeUniqueSizes()
 {
   // sort list on size
-  auto cmp = Fileinfo::cmpSize;
+  auto cmp = Fileinfo::cmpSizeMeta;
   std::sort(m_list.begin(), m_list.end(), cmp);
 
   // loop over ranges of adjacent elements
@@ -299,7 +299,7 @@ std::size_t
 Rdutil::removeUniqSizeAndBuffer()
 {
   // sort list on size
-  const auto cmp = Fileinfo::cmpSize;
+  const auto cmp = Fileinfo::cmpSizeMeta;
   std::sort(m_list.begin(), m_list.end(), cmp);
 
   const auto bufcmp = Fileinfo::cmpBuffers;
@@ -330,7 +330,7 @@ Rdutil::removeUniqSizeAndBuffer()
 void
 Rdutil::markduplicates()
 {
-  const auto cmp = Fileinfo::cmpSizeBuffers;
+  const auto cmp = Fileinfo::cmpSizeMetaBuffers;
   assert(std::is_sorted(m_list.begin(), m_list.end(), cmp));
 
   // loop over ranges of adjacent elements

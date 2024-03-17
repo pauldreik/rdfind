@@ -103,7 +103,7 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
 }
 
 bool
-Fileinfo::readfileinfo()
+Fileinfo::readfileinfo(bool use_time, bool use_mode, bool use_ids)
 {
   struct stat info;
   m_info.is_file = false;
@@ -118,6 +118,11 @@ Fileinfo::readfileinfo()
     m_info.stat_size = 0;
     m_info.stat_ino = 0;
     m_info.stat_dev = 0;
+    m_info.stat_mtim.tv_sec = 0;
+    m_info.stat_mtim.tv_nsec = 0;
+    m_info.stat_mode = 0;
+    m_info.stat_uid = 0;
+    m_info.stat_gid = 0;
     std::cerr << "readfileinfo.cc:Something went wrong when reading file "
                  "info from \""
               << m_filename << "\" :" << std::strerror(errno) << std::endl;
@@ -128,6 +133,26 @@ Fileinfo::readfileinfo()
   m_info.stat_size = info.st_size;
   m_info.stat_ino = info.st_ino;
   m_info.stat_dev = info.st_dev;
+
+  if (use_time) {
+    m_info.stat_mtim.tv_sec = info.st_mtim.tv_sec;
+    m_info.stat_mtim.tv_nsec = info.st_mtim.tv_nsec;
+  } else {
+    m_info.stat_mtim.tv_sec = 0;
+    m_info.stat_mtim.tv_nsec = 0;
+  }
+  if (use_mode) {
+    m_info.stat_mode = info.st_mode;
+  } else {
+    m_info.stat_mode = 0;
+  }
+  if (use_ids) {
+    m_info.stat_uid = info.st_uid;
+    m_info.stat_gid = info.st_gid;
+  } else {
+    m_info.stat_uid = 0;
+    m_info.stat_gid = 0;
+  }
 
   m_info.is_file = S_ISREG(info.st_mode);
   m_info.is_directory = S_ISDIR(info.st_mode);
@@ -160,6 +185,11 @@ Fileinfo::Fileinfostat::Fileinfostat()
   stat_size = 99999;
   stat_ino = 99999;
   stat_dev = 99999;
+  stat_mtim.tv_sec = 99999;
+  stat_mtim.tv_nsec = 99999;
+  stat_mode = 99999;
+  stat_uid = 99999;
+  stat_gid = 99999;
   is_file = false;
   is_directory = false;
 }
@@ -328,6 +358,36 @@ Fileinfo::cmpSize(const Fileinfo& a, const Fileinfo& b)
 }
 
 bool
+Fileinfo::cmpMeta(const Fileinfo& a, const Fileinfo& b)
+{
+  return std::make_tuple(a.m_info.stat_mtim.tv_sec,
+                         a.m_info.stat_mtim.tv_nsec,
+                         a.m_info.stat_mode,
+                         a.m_info.stat_uid,
+                         a.m_info.stat_gid) <
+         std::make_tuple(b.m_info.stat_mtim.tv_sec,
+                         b.m_info.stat_mtim.tv_nsec,
+                         b.m_info.stat_mode,
+                         b.m_info.stat_uid,
+                         b.m_info.stat_gid);
+}
+
+bool
+Fileinfo::hasEqualMeta(const Fileinfo& a, const Fileinfo& b)
+{
+  return std::make_tuple(a.m_info.stat_mtim.tv_sec,
+                         a.m_info.stat_mtim.tv_nsec,
+                         a.m_info.stat_mode,
+                         a.m_info.stat_uid,
+                         a.m_info.stat_gid) ==
+         std::make_tuple(b.m_info.stat_mtim.tv_sec,
+                         b.m_info.stat_mtim.tv_nsec,
+                         b.m_info.stat_mode,
+                         b.m_info.stat_uid,
+                         b.m_info.stat_gid);
+}
+
+bool
 Fileinfo::cmpDeviceInode(const Fileinfo& a, const Fileinfo& b)
 {
   return std::make_tuple(a.device(), a.inode()) <
@@ -355,9 +415,22 @@ Fileinfo::hasEqualBuffers(const Fileinfo& a, const Fileinfo& b)
 }
 
 bool
+Fileinfo::cmpSizeMeta(const Fileinfo& a, const Fileinfo& b)
+{
+  return (a.size() < b.size()) || (a.size() == b.size() && cmpMeta(a, b));
+}
+
+bool
 Fileinfo::cmpSizeBuffers(const Fileinfo& a, const Fileinfo& b)
 {
   return (a.size() < b.size()) || (a.size() == b.size() && cmpBuffers(a, b));
+}
+
+bool
+Fileinfo::cmpSizeMetaBuffers(const Fileinfo& a, const Fileinfo& b)
+{
+  return (a.size() < b.size()) || (a.size() == b.size() && cmpMeta(a, b)) ||
+         (a.size() == b.size() && hasEqualMeta(a, b) && cmpBuffers(a,b));
 }
 
 bool
