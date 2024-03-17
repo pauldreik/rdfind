@@ -61,7 +61,7 @@ usage()
     << " -followsymlinks    true |(false) follow symlinks\n"
     << " -removeidentinode (true)| false  ignore files with nonunique "
        "device and inode\n"
-    << " -checksum           md5 |(sha1)| sha256 | sha512\n"
+    << " -checksum           none | md5 |(sha1)| sha256 | sha512 \n"
     << "                                  checksum type\n"
     << " -deterministic    (true)| false  makes results independent of order\n"
     << "                                  from listing the filesystem\n"
@@ -107,6 +107,7 @@ struct Options
   bool usesha1 = false;      // use sha1 checksum to check for similarity
   bool usesha256 = false;    // use sha256 checksum to check for similarity
   bool usesha512 = false;    // use sha512 checksum to check for similarity
+  bool usenone = false;      // skip the checksum step entirely and only rely on name and file size
   bool deterministic = true; // be independent of filesystem order
   long nsecsleep = 0; // number of nanoseconds to sleep between each file read.
   std::string resultsfile = "results.txt"; // results file name.
@@ -169,7 +170,9 @@ parseOptions(Parser& parser)
     } else if (parser.try_parse_bool("-deterministic")) {
       o.deterministic = parser.get_parsed_bool();
     } else if (parser.try_parse_string("-checksum")) {
-      if (parser.parsed_string_is("md5")) {
+      if (parser.parsed_string_is("none")) {
+        o.usenone = true;
+      } else if (parser.parsed_string_is("md5")) {
         o.usemd5 = true;
       } else if (parser.parsed_string_is("sha1")) {
         o.usesha1 = true;
@@ -178,7 +181,7 @@ parseOptions(Parser& parser)
       } else if (parser.parsed_string_is("sha512")) {
         o.usesha512 = true;
       } else {
-        std::cerr << "expected md5/sha1/sha256/sha512, not \""
+        std::cerr << "expected none/md5/sha1/sha256/sha512, not \""
                   << parser.get_parsed_string() << "\"\n";
         std::exit(EXIT_FAILURE);
       }
@@ -239,8 +242,8 @@ parseOptions(Parser& parser)
 
   // done with parsing of options. remaining arguments are files and dirs.
 
-  // decide what checksum to use - if no checksum is set, force sha1!
-  if (!o.usemd5 && !o.usesha1 && !o.usesha256 && !o.usesha512) {
+  // decide what checksum to use - if no checksum is option is specified, default to sha1!
+  if (!o.usenone && !o.usemd5 && !o.usesha1 && !o.usesha256 && !o.usesha512) {
     o.usesha1 = true;
   }
   return o;
