@@ -166,11 +166,19 @@ Fileinfo::Fileinfostat::Fileinfostat()
 int
 Fileinfo::deletefile()
 {
-  const int ret = unlink(name().c_str());
-  if (ret) {
-    std::cerr << "Failed deleting file " << name() << '\n';
+  std::vector<std::string> allfiles;
+  allfiles.push_back(m_filename);
+  allfiles.insert(allfiles.end(), m_aliases.begin(), m_aliases.end());
+
+  for (const std::string& n : allfiles) {
+    const int ret = unlink(n.c_str());
+
+    if (ret) {
+      std::cerr << "Failed deleting file " << n << '\n';
+      return ret;
+    }
   }
-  return ret;
+  return 0;
 }
 
 namespace {
@@ -267,39 +275,56 @@ transactional_operation(const std::string& filename, const Func& f)
 int
 Fileinfo::makesymlink(const Fileinfo& A)
 {
-  const int retval =
-    transactional_operation(name(), [&](const std::string& filename) {
-      // The tricky thing is that the path must be correct, as seen from
-      // the directory where *this is. Making the path absolute solves this
-      // problem. Doing string manipulations to find how to make the path
-      // relative is prone to error because directories can be symlinks.
-      std::string target = A.name();
-      makeAbsolute(target);
-      // clean up the path, so it does not contain sequences "/./" or "//"
-      simplifyPath(target);
-      return symlink(target.c_str(), filename.c_str());
-    });
+  std::vector<std::string> allfiles;
+  allfiles.push_back(m_filename);
+  allfiles.insert(allfiles.end(), m_aliases.begin(), m_aliases.end());
 
-  if (retval) {
-    std::cerr << "Failed to make symlink " << name() << " to " << A.name()
-              << '\n';
+  // The tricky thing is that the path must be correct, as seen from
+  // the directory where *this is. Making the path absolute solves this
+  // problem. Doing string manipulations to find how to make the path
+  // relative is prone to error because directories can be symlinks.
+  std::string target = A.name();
+  makeAbsolute(target);
+  // clean up the path, so it does not contain sequences "/./" or "//"
+  simplifyPath(target);
+
+  for (const std::string& n : allfiles) {
+    const int retval =
+      transactional_operation(n, [&target](const std::string& filename) {
+        return symlink(target.c_str(), filename.c_str());
+      });
+
+    if (retval) {
+      std::cerr << "Failed to make symlink " << n << " to " << A.name()
+                << '\n';
+      return retval;
+    }
   }
-  return retval;
+  return 0;
 }
 
 // makes a hard link that points to A
 int
 Fileinfo::makehardlink(const Fileinfo& A)
 {
-  return transactional_operation(name(), [&](const std::string& filename) {
-    // make a hardlink.
-    const int retval = link(A.name().c_str(), filename.c_str());
+  std::vector<std::string> allfiles;
+  allfiles.push_back(m_filename);
+  allfiles.insert(allfiles.end(), m_aliases.begin(), m_aliases.end());
+
+  for (const std::string& n : allfiles) {
+    const int retval =
+      transactional_operation(n, [&A](const std::string& filename) {
+        // make a hardlink.
+        return link(A.name().c_str(), filename.c_str());
+      });
+
     if (retval) {
-      std::cerr << "Failed to make hardlink " << filename << " to " << A.name()
+      std::cerr << "Failed to make hardlink " << n << " to " << A.name()
                 << '\n';
+      return retval;
     }
-    return retval;
-  });
+  }
+  return 0;
 }
 
 int

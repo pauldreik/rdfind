@@ -42,14 +42,19 @@ Rdutil::printtofile(const std::string& filename) const
   // This uses "priority" instead of "cmdlineindex". Change this the day
   // a change in output format is allowed (for backwards compatibility).
   output << "# Automatically generated\n";
-  output << "# duptype id depth size device inode priority name\n";
+  output << "# duptype id depth size device inode priority name(s)\n";
 
   std::vector<Fileinfo>::iterator it;
   for (it = m_list.begin(); it != m_list.end(); ++it) {
     output << Fileinfo::getduptypestring(*it) << " " << it->getidentity() << " "
            << it->depth() << " " << it->size() << " " << it->device() << " "
-           << it->inode() << " " << it->get_cmdline_index() << " " << it->name()
-           << '\n';
+           << it->inode() << " " << it->get_cmdline_index() << " " << it->name();
+    if (!it->aliases().empty()) {
+      output << " aliases:";
+      for (const std::string& n : it->aliases())
+        output << " " << n;
+    }
+    output << '\n';
   }
   output << "# end of file\n";
   f1.close();
@@ -313,9 +318,9 @@ Rdutil::removeIdenticalInodes()
       // let the highest-ranking element not be deleted. do this in order, to be
       // cache friendly.
       auto best = std::min_element(first, last, cmpRank);
-      std::for_each(first, best, [](Fileinfo& f) { f.setdeleteflag(true); });
+      std::for_each(first, last, [](Fileinfo& f) { f.setdeleteflag(true); });
       best->setdeleteflag(false);
-      std::for_each(best + 1, last, [](Fileinfo& f) { f.setdeleteflag(true); });
+      std::for_each(first, last, [&best](Fileinfo& f) { if (f.deleteflag()) best->add_alias(f.name()); });
     });
   return cleanup();
 }
