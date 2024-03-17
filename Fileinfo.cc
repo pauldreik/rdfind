@@ -12,6 +12,7 @@
 #include <cstring>  //for strerror
 #include <fstream>  //for file reading
 #include <iostream> //for cout etc
+#include <tuple>    //for comparison
 
 // os
 #include <sys/stat.h> //for file info
@@ -318,4 +319,50 @@ int
 Fileinfo::static_makehardlink(Fileinfo& A, const Fileinfo& B)
 {
   return A.makehardlink(B);
+}
+
+bool
+Fileinfo::cmpSize(const Fileinfo& a, const Fileinfo& b)
+{
+  return a.size() < b.size();
+}
+
+bool
+Fileinfo::cmpDeviceInode(const Fileinfo& a, const Fileinfo& b)
+{
+  return std::make_tuple(a.device(), a.inode()) <
+         std::make_tuple(b.device(), b.inode());
+}
+
+bool
+Fileinfo::cmpDepthName(const Fileinfo& a, const Fileinfo& b)
+{
+  // inefficient, make it a reference.
+  return std::make_tuple(a.depth(), a.name()) <
+         std::make_tuple(b.depth(), b.name());
+}
+
+bool
+Fileinfo::cmpBuffers(const Fileinfo& a, const Fileinfo& b)
+{
+  return std::memcmp(a.getbyteptr(), b.getbyteptr(), a.getbuffersize()) < 0;
+}
+
+bool
+Fileinfo::hasEqualBuffers(const Fileinfo& a, const Fileinfo& b)
+{
+  return std::memcmp(a.getbyteptr(), b.getbyteptr(), a.getbuffersize()) == 0;
+}
+
+bool
+Fileinfo::cmpSizeBuffers(const Fileinfo& a, const Fileinfo& b)
+{
+  return (a.size() < b.size()) || (a.size() == b.size() && cmpBuffers(a, b));
+}
+
+bool
+Fileinfo::cmpRank(const Fileinfo& a, const Fileinfo& b)
+{
+  return std::make_tuple(a.get_cmdline_index(), a.depth(), a.getidentity()) <
+         std::make_tuple(b.get_cmdline_index(), b.depth(), b.getidentity());
 }

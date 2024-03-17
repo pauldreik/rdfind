@@ -100,6 +100,27 @@ public:
   // deletes file A, that is a duplicate of B
   static int static_deletefile(Fileinfo& A, const Fileinfo& B);
 
+  // compares file size
+  static bool cmpSize(const Fileinfo& a, const Fileinfo& b);
+
+  // compares file device and inode
+  static bool cmpDeviceInode(const Fileinfo& a, const Fileinfo& b);
+
+  // compares depth and name
+  static bool cmpDepthName(const Fileinfo& a, const Fileinfo& b);
+
+  // compares buffers
+  static bool cmpBuffers(const Fileinfo& a, const Fileinfo& b);
+
+  // compares buffers
+  static bool hasEqualBuffers(const Fileinfo& a, const Fileinfo& b);
+
+  // compares file size then buffers
+  static bool cmpSizeBuffers(const Fileinfo& a, const Fileinfo& b);
+
+  // compares rank
+  static bool cmpRank(const Fileinfo& a, const Fileinfo& b);
+
   // sets the deleteflag
   void setdeleteflag(bool flag) { m_delete = flag; }
 
