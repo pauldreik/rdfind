@@ -258,7 +258,7 @@ report(const std::string& path, const std::string& name, int depth)
   std::string expandedname = path.empty() ? name : (path + "/" + name);
 
   Fileinfo tmp(std::move(expandedname), current_cmdline_index, depth);
-  if (tmp.readfileinfo()) {
+  if (tmp.readfileinfo(true, true, true)) {
     if (tmp.isRegularFile()) {
       const auto size = tmp.size();
       if (size >= global_options->minimumfilesize &&
@@ -349,7 +349,7 @@ main(int narg, const char* argv[])
   gswd.totalsize(std::cout) << std::endl;
 
   std::cout << "Removed " << gswd.removeUniqueSizes()
-            << " files due to unique sizes from list. ";
+            << " files due to unique size and metadata from list. ";
   std::cout << filelist.size() << " files left." << std::endl;
 
   // ok. we now need to do something stronger to disambiguate the duplicate

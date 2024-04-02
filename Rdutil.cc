@@ -188,53 +188,6 @@ Rdutil::markitems()
 }
 
 namespace {
-bool
-cmpDeviceInode(const Fileinfo& a, const Fileinfo& b)
-{
-  return std::make_tuple(a.device(), a.inode()) <
-         std::make_tuple(b.device(), b.inode());
-}
-// compares rank as described in RANKING on man page.
-bool
-cmpRank(const Fileinfo& a, const Fileinfo& b)
-{
-  return std::make_tuple(a.get_cmdline_index(), a.depth(), a.getidentity()) <
-         std::make_tuple(b.get_cmdline_index(), b.depth(), b.getidentity());
-}
-bool
-cmpDepthName(const Fileinfo& a, const Fileinfo& b)
-{
-  // inefficient, make it a reference.
-  return std::make_tuple(a.depth(), a.name()) <
-         std::make_tuple(b.depth(), b.name());
-}
-// compares buffers
-bool
-cmpBuffers(const Fileinfo& a, const Fileinfo& b)
-{
-  return std::memcmp(a.getbyteptr(), b.getbyteptr(), a.getbuffersize()) < 0;
-}
-
-#if !defined(NDEBUG)
-bool
-hasEqualBuffers(const Fileinfo& a, const Fileinfo& b)
-{
-  return std::memcmp(a.getbyteptr(), b.getbyteptr(), a.getbuffersize()) == 0;
-}
-#endif
-
-// compares file size
-bool
-cmpSize(const Fileinfo& a, const Fileinfo& b)
-{
-  return a.size() < b.size();
-}
-bool
-cmpSizeThenBuffer(const Fileinfo& a, const Fileinfo& b)
-{
-  return (a.size() < b.size()) || (a.size() == b.size() && cmpBuffers(a, b));
-}
-
 /**
  * goes through first to last, finds ranges of equal elements (determined by
  * cmp) and invokes callback on each subrange.
@@ -286,7 +239,7 @@ int
 Rdutil::sortOnDeviceAndInode()
 {
 
-  std::sort(m_list.begin(), m_list.end(), cmpDeviceInode);
+  std::sort(m_list.begin(), m_list.end(), Fileinfo::cmpDeviceInode);
   return 0;
 }
 
@@ -296,14 +249,14 @@ Rdutil::sort_on_depth_and_name(std::size_t index_of_first)
   assert(index_of_first <= m_list.size());
 
   auto it = std::begin(m_list) + static_cast<std::ptrdiff_t>(index_of_first);
-  std::sort(it, std::end(m_list), cmpDepthName);
+  std::sort(it, std::end(m_list), Fileinfo::cmpDepthName);
 }
 
 std::size_t
 Rdutil::removeIdenticalInodes()
 {
   // sort list on device and inode.
-  auto cmp = cmpDeviceInode;
+  auto cmp = Fileinfo::cmpDeviceInode;
   std::sort(m_list.begin(), m_list.end(), cmp);
 
   // loop over ranges of adjacent elements
@@ -312,7 +265,7 @@ Rdutil::removeIdenticalInodes()
     m_list.begin(), m_list.end(), cmp, [](Iterator first, Iterator last) {
       // let the highest-ranking element not be deleted. do this in order, to be
       // cache friendly.
-      auto best = std::min_element(first, last, cmpRank);
+      auto best = std::min_element(first, last, Fileinfo::cmpRank);
       std::for_each(first, best, [](Fileinfo& f) { f.setdeleteflag(true); });
       best->setdeleteflag(false);
       std::for_each(best + 1, last, [](Fileinfo& f) { f.setdeleteflag(true); });
@@ -324,7 +277,7 @@ std::size_t
 Rdutil::removeUniqueSizes()
 {
   // sort list on size
-  auto cmp = cmpSize;
+  auto cmp = Fileinfo::cmpSizeMeta;
   std::sort(m_list.begin(), m_list.end(), cmp);
 
   // loop over ranges of adjacent elements
@@ -346,10 +299,10 @@ std::size_t
 Rdutil::removeUniqSizeAndBuffer()
 {
   // sort list on size
-  const auto cmp = cmpSize;
+  const auto cmp = Fileinfo::cmpSizeMeta;
   std::sort(m_list.begin(), m_list.end(), cmp);
 
-  const auto bufcmp = cmpBuffers;
+  const auto bufcmp = Fileinfo::cmpBuffers;
 
   // loop over ranges of adjacent elements
   using Iterator = decltype(m_list.begin());
@@ -377,7 +330,7 @@ Rdutil::removeUniqSizeAndBuffer()
 void
 Rdutil::markduplicates()
 {
-  const auto cmp = cmpSizeThenBuffer;
+  const auto cmp = Fileinfo::cmpSizeMetaBuffers;
   assert(std::is_sorted(m_list.begin(), m_list.end(), cmp));
 
   // loop over ranges of adjacent elements
@@ -391,7 +344,7 @@ Rdutil::markduplicates()
       assert(std::distance(first, last) >= 2);
 
       // the one with the lowest rank is the original
-      auto orig = std::min_element(first, last, cmpRank);
+      auto orig = std::min_element(first, last, Fileinfo::cmpRank);
       assert(orig != last);
       // place it first, so later stages will find the original first.
       std::iter_swap(first, orig);
@@ -399,7 +352,7 @@ Rdutil::markduplicates()
 
       // make sure they are all duplicates
       assert(last == find_if_not(first, last, [orig](const Fileinfo& a) {
-               return orig->size() == a.size() && hasEqualBuffers(*orig, a);
+               return orig->size() == a.size() && Fileinfo::hasEqualBuffers(*orig, a);
              }));
 
       // mark the files with the appropriate tag.

@@ -73,9 +73,12 @@ public:
 
   /**
    * reads info about the file, by querying the filesystem.
+   * @param use_time use timestamp for comparison
+   * @param use_mode use mode for comparison
+   * @param use_ids use uid and gid for comparison
    * @return false if it was not possible to get the information.
    */
-  bool readfileinfo();
+  bool readfileinfo(bool use_time, bool use_mode, bool use_ids);
 
   duptype getduptype() const { return m_duptype; }
 
@@ -99,6 +102,39 @@ public:
 
   // deletes file A, that is a duplicate of B
   static int static_deletefile(Fileinfo& A, const Fileinfo& B);
+
+  // compares file size
+  static bool cmpSize(const Fileinfo& a, const Fileinfo& b);
+
+  // compares metadata
+  static bool cmpMeta(const Fileinfo& a, const Fileinfo& b);
+
+  // compares metadata
+  static bool hasEqualMeta(const Fileinfo& a, const Fileinfo& b);
+
+  // compares file device and inode
+  static bool cmpDeviceInode(const Fileinfo& a, const Fileinfo& b);
+
+  // compares depth and name
+  static bool cmpDepthName(const Fileinfo& a, const Fileinfo& b);
+
+  // compares buffers
+  static bool cmpBuffers(const Fileinfo& a, const Fileinfo& b);
+
+  // compares buffers
+  static bool hasEqualBuffers(const Fileinfo& a, const Fileinfo& b);
+
+  // compares size and metadata
+  static bool cmpSizeMeta(const Fileinfo& a, const Fileinfo& b);
+
+  // compares file size then buffers
+  static bool cmpSizeBuffers(const Fileinfo& a, const Fileinfo& b);
+
+  // compares size then Meta then buffers
+  static bool cmpSizeMetaBuffers(const Fileinfo& a, const Fileinfo& b);
+
+  // compares rank
+  static bool cmpRank(const Fileinfo& a, const Fileinfo& b);
 
   // sets the deleteflag
   void setdeleteflag(bool flag) { m_delete = flag; }
@@ -162,6 +198,10 @@ private:
     filesizetype stat_size; // size
     unsigned long stat_ino; // inode
     unsigned long stat_dev; // device
+    timespec stat_mtim; // modification time
+    unsigned long stat_mode; // access flags
+    unsigned long stat_uid; // user id
+    unsigned long stat_gid; // group id
     bool is_file;
     bool is_directory;
     Fileinfostat();
