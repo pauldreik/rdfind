@@ -28,4 +28,3 @@ echo $(sha1sum < $pkg |cut -f1 -d' ')" (SHA1)" >>table.txt
 echo $(sha256sum < $pkg |cut -f1 -d' ')" (SHA256)" >>table.txt
 
 man2html rdfind.1 |tail -n +3 > rdfind.1.html
-

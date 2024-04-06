@@ -55,7 +55,7 @@ Look for duplicate files in directory /home/pauls/bilder:
     It seems like you have 100 files that are not unique
     Totally, 24 Mib can be reduced.
     Now making results file results.txt
-              
+
 It indicates there are 100 files that are not unique. Let us examine them by looking at the newly created results.txt:
 
     $ cat results.txt
@@ -88,7 +88,7 @@ Rdfind uses the following algorithm. If N is the number of files to search throu
 11. Sort on device and inode(speeds up file reading). Perform a checksum calculation for each file.
 12. Only keep files on the list with the same size and checksum. These are duplicates.
 13. Sort list on size, priority number, and depth. The first file for every set of duplicates is considered to be the original.
-14. If flag ”-makeresultsfile true”, then print results file (default). 
+14. If flag ”-makeresultsfile true”, then print results file (default).
 15. If flag ”-deleteduplicates true”, then delete (unlink) duplicate files. Exit.
 16. If flag ”-makesymlinks true”, then replace duplicates with a symbolic link to the original. Exit.
 17. If flag ”-makehardlinks true”, then replace duplicates with a hard link to the original. Exit.
@@ -130,9 +130,9 @@ The following methods are used to maintain code quality:
  - clang format is used, issue make format to execute it
  - cppcheck has been run manually and relevant issues are fixed
  - [disorderfs](https://packages.debian.org/sid/disorderfs) is used (if available) to verify independence of file system ordering
- 
+
  There is a helper script that does the test build variants, see do_quality_checks.sh in the project root.
- 
+
 ## Alternatives
 
 There are some interesting alternatives.
