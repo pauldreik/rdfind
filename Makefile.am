@@ -49,4 +49,3 @@ man_MANS = rdfind.1
 #for formatting the source
 format:
 	./do_clang_format.sh
-
