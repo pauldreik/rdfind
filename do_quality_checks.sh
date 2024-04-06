@@ -127,12 +127,28 @@ compile_and_test() {
    rm x.cpp
 }
 ###############################################################################
+# finds the latest clang on the form clang++-<ver> and if none found, checks for
+# clang++. first found is assigned to variable latestclang
+get_latest_clang() {
+    for ver in $(seq 30 -1 10); do
+	candidate=clang++-$ver
+	if which $candidate >/dev/null 2>&1; then
+	    latestclang=$candidate
+	    return
+	fi
+    done
+    if which clang++ >/dev/null 2>&1; then
+	latestclang=clang++
+	return
+    fi
+    latestclang=
+}
+###############################################################################
 run_with_sanitizer() {
    echo $me: "running with sanitizer (options $1)"
-   #find the latest clang compiler
-   latestclang=$(ls $(which clang++)* |grep -v libc |sort -g |tail -n1)
-   if [ ! -x $latestclang ] ; then
-      echo $me: could not find latest clang $latestclang
+   get_latest_clang
+   if [ -z $latestclang ] ; then
+      echo "$me: could not find any clang compiler (on the form clang++-ver)"
       return 0
    fi
 
@@ -176,22 +192,19 @@ run_with_debian_buildflags() {
 }
 ###############################################################################
 run_with_libcpp() {
-   # find a clang that works. try the latest version first.
+   # use the latest clang and see if it works
    echo "#include <iostream>
-  int main() { std::cout<<\"libc++ works!\";}" >x.cpp
-   for clang in $(ls $(which clang++)* |grep -v libc|sort -g --reverse) ; do
-      if [ ! -x $clang ] ; then
+   int main() { std::cout<<\"libc++ works!\"<<std::endl;}" >x.cpp
+   get_latest_clang
+   if [ ! -z $latestclang ] ; then
+      if ! $latestclang -std=c++11 -stdlib=libc++ -lc++abi x.cpp >/dev/null 2>&1 || [ ! -x ./a.out ] || ! ./a.out ; then
+         echo $me: "debug: $latestclang could not compile with libc++ - perhaps uninstalled."
          continue
       fi
-
-      if ! $clang -std=c++11 -stdlib=libc++ -lc++abi x.cpp >/dev/null 2>&1 || [ ! -x ./a.out ] || ! ./a.out ; then
-         echo $me: "debug: $clang could not compile with libc++ - perhaps uninstalled."
-         continue
-      fi
-      compile_and_test_standard $clang c++11 "-stdlib=libc++ -D_LIBCPP_DEBUG=1"
+      compile_and_test_standard $latestclang c++11 "-stdlib=libc++ -D_LIBCPP_DEBUG=1"
       return
-   done
-   # we will get here if no working clang could be found. that is not an error,
+   fi
+   # we will get here if no clang could be found. that is not an error,
    # having clang and libc++ installed is optional
    echo $me: no working clang with libc++ found, skipping.
 }
@@ -308,8 +321,9 @@ if which g++ >/dev/null ; then
 fi
 
 #try all variants of clang
-if which clang++ >/dev/null ; then
-   for COMPILER in $(ls $(which clang++)* |grep -v libc); do
+get_latest_clang
+if which $latestclang >/dev/null ; then
+   for COMPILER in $(ls $(dirname $(which $latestclang))/clang++* |grep -v libc); do
       inode=$(stat --dereference --format=%i $COMPILER)
       if grep -q "^$inode\$" inodes_for_tested_compilers.txt ; then
          echo $me: skipping this compiler $COMPILER - already tested
