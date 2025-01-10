@@ -45,7 +45,7 @@ jobs:
     - name: Install dependencies
       run: |
            sudo apt-get update
-           sudo apt-get install autoconf autoconf-archive nettle-dev build-essential g++ -y
+           sudo apt-get install autoconf autoconf-archive nettle-dev libxxhash-dev build-essential g++ -y
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL

@@ -12,7 +12,7 @@ jobs:
     - name: checkout
       uses: actions/checkout@v3
     - name: install packages
-      run: sudo apt install build-essential nettle-dev time gcc-12 g++-12
+      run: sudo apt install build-essential nettle-dev libxxhash-dev time gcc-12 g++-12
     - name: bootstrap
       run: ./bootstrap.sh
     - name: configure
@@ -23,7 +23,7 @@ jobs:
       run: make check
     - name: store the logs as an artifact
       if: ${{ always() }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
          path: '**/*.log'
 

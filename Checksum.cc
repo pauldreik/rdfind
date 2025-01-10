@@ -31,6 +31,11 @@ Checksum::Checksum(checksumtypes type)
     case checksumtypes::MD5: {
       md5_init(&m_state.md5);
     } break;
+    case checksumtypes::XXH128: {
+      m_state.xxh128 = XXH3_createState();
+      assert(m_state.xxh128 != NULL && "Out of memory!");
+      (void)XXH3_128bits_reset(m_state.xxh128);
+    } break;
     default:
       // not allowed to have something that is not recognized.
       throw std::runtime_error("wrong checksum type - programming error");
@@ -52,6 +57,9 @@ Checksum::update(std::size_t length, const unsigned char* buffer)
       break;
     case checksumtypes::MD5:
       md5_update(&m_state.md5, length, buffer);
+      break;
+    case checksumtypes::XXH128:
+      (void)XXH3_128bits_update(m_state.xxh128, buffer, length);
       break;
     default:
       return -1;
@@ -117,10 +125,23 @@ Checksum::getDigestLength() const
       return SHA512_DIGEST_SIZE;
     case checksumtypes::MD5:
       return MD5_DIGEST_SIZE;
+    case checksumtypes::XXH128:
+      return XXH128_DIGEST_SIZE;
     default:
       return -1;
   }
   return -1;
+}
+
+void printXxh128(XXH128_hash_t hash)
+{
+    XXH128_canonical_t cano;
+    XXH128_canonicalFromHash(&cano, hash);
+    size_t i;
+    for(i = 0; i < sizeof(cano.digest); ++i) {
+        printf("%02x", cano.digest[i]);
+    }
+    printf("\n");
 }
 
 int
@@ -163,6 +184,16 @@ Checksum::printToBuffer(void* buffer, std::size_t N)
       if (N >= MD5_DIGEST_SIZE) {
         md5_digest(
           &m_state.md5, MD5_DIGEST_SIZE, static_cast<unsigned char*>(buffer));
+      } else {
+        // bad size.
+        return -1;
+      }
+      break;
+    case checksumtypes::XXH128:
+      if (N >= XXH128_DIGEST_SIZE) {
+        XXH128_hash_t result = XXH3_128bits_digest(m_state.xxh128);
+        XXH128_canonicalFromHash(static_cast<XXH128_canonical_t*>(buffer), result);
+        XXH3_freeState(m_state.xxh128);
       } else {
         // bad size.
         return -1;

@@ -8,7 +8,7 @@ make install
 
 If you are building from git you may need to install autotools.
 On a debian or ubuntu system, please install the following packages:
-nettle-dev build-essential
+libxxhash-dev nettle-dev build-essential
 
 after that,
 ./bootstrap.sh && ./configure && make

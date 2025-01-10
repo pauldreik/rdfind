@@ -76,6 +76,7 @@ compile_and_test_standard() {
    fi
    if ! /usr/bin/time --format=%e --output=time.log make >make.log 2>&1; then
       echo $me: failed make
+      tail -n 50 make.log
       exit 1
    fi
    if [ ! -z $MEASURE_COMPILE_TIME ] ; then
@@ -91,6 +92,7 @@ compile_and_test_standard() {
    #run the tests
    if ! make check >makecheck.log 2>&1 ; then
       echo $me: failed make check - see makecheck.log
+      tail -n 50 makecheck.log
       exit 1
    fi
 }
@@ -133,8 +135,8 @@ get_latest_clang() {
     for ver in $(seq 30 -1 10); do
 	candidate=clang++-$ver
 	if which $candidate >/dev/null 2>&1; then
-	    latestclang=$candidate
-	    return
+        latestclang=$candidate
+        return
 	fi
     done
     if which clang++ >/dev/null 2>&1; then
@@ -269,36 +271,83 @@ build_32bit() {
    echo $me: "trying to compile in 32 bit mode with -m32..."
    configureflags="--build=i686-pc-linux-gnu CFLAGS=-m32 CXXFLAGS=-m32 LDFLAGS=-m32"
    here=$(pwd)
+   nettleversion=3.7.3
    nettleinstall=$here/nettle32bit
-   if [ -d "$nettleinstall" ] ; then
+   if [ -f "$nettleinstall/include/nettle/sha.h" ] ; then
       echo $me: "local nettle already seems to be installed"
    else
-      mkdir "$nettleinstall"
+      mkdir -p "$nettleinstall"
       cd "$nettleinstall"
-      nettleversion=3.7.3
       echo "$me: downloading nettle from gnu.org..."
       wget --quiet https://ftp.gnu.org/gnu/nettle/nettle-$nettleversion.tar.gz
       echo "661f5eb03f048a3b924c3a8ad2515d4068e40f67e774e8a26827658007e3bcf0  nettle-$nettleversion.tar.gz" >checksum
+      echo "$me: verify checksum..."
       sha256sum --strict --quiet -c checksum
       tar xzf nettle-$nettleversion.tar.gz
       cd nettle-$nettleversion
       echo $me: trying to configure nettle
       ./configure $configureflags --prefix="$nettleinstall" >$here/nettle.configure.log 2>&1
       make install >$here/nettle.install.log 2>&1
-      echo $me: "local nettle install went ok"
+      echo $me: local nettle install went ok
       cd $here
    fi
-   ./bootstrap.sh >bootstrap.log 2>&1
+
+   xxhashversion=0.8.3
+   xxhashinstall=$here/xxhash32bit
+   if [ -f "$xxhashinstall/include/xxhash.h" ] ; then
+      echo $me: "local xxhash already seems to be installed"
+   else
+      mkdir -p "$xxhashinstall"
+      cd "$xxhashinstall"
+      echo "$me: downloading xxhash..."
+      wget -v https://github.com/Cyan4973/xxHash/archive/refs/tags/v$xxhashversion.tar.gz -O xxHash-$xxhashversion.tar.gz
+      echo "aae608dfe8213dfd05d909a57718ef82f30722c392344583d3f39050c7f29a80  xxHash-$xxhashversion.tar.gz" >checksum
+      echo "$me: verify checksum..."
+      sha256sum --strict --quiet -c checksum
+      tar xzf xxHash-$xxhashversion.tar.gz
+      cd xxHash-$xxhashversion
+      echo $me: trying to make xxhash
+      # ./configure $configureflags --prefix="$xxhashinstall" >$here/xxhash.configure.log 2>&1
+      if ! make install PREFIX="$xxhashinstall" CFLAGS="-m32 -shared" LDFLAGS="-m32" >$here/xxhash.install.log 2>&1; then
+        RET="$?"
+        echo "$me: make failed"
+        tail -n 50 $here/xxhash.install.log
+        exit $RET
+      fi
+      echo $me: local xxhash install went ok
+      cd $here
+   fi
+   echo $me: running bootstrap
+   if ! ./bootstrap.sh >bootstrap.log 2>&1; then
+     RET="$?"
+     echo "$me: bootstrap failed"
+     tail -n 50 bootstrap.log
+     return $RET
+   fi
    echo "$me: attempting configure with 32 bit flags... (see configure.log if it fails)"
-   ./configure --build=i686-pc-linux-gnu CFLAGS=-m32 CXXFLAGS="-m32 -I$nettleinstall/include" LDFLAGS="-m32 -L$nettleinstall/lib" >configure.log 2>&1
+   if ! ./configure --build=i686-pc-linux-gnu CFLAGS=-m32 CXXFLAGS="-m32 -I$nettleinstall/include -I$xxhashinstall/include" LDFLAGS="-m32 -L$nettleinstall/lib -L$xxhashinstall/lib" >configure.log 2>&1; then
+     RET="$?"
+     echo "$me: configure failed"
+     tail -n 50 configure.log
+     exit $RET
+   fi
    echo "$me: building with 32 bit flags... (check make.log if it fails)"
-   make >make.log 2>&1
+   if ! make >make.log 2>&1; then
+     RET="$?"
+     echo "$me: building failed"
+     tail -n 50 make.log
+     exit $RET
+   fi
    echo "$me: make check with 32 bit flags... (check make-check.log if it fails)"
-   LD_LIBRARY_PATH=$nettleinstall/lib make check >make-check.log 2>&1
+   if ! LD_LIBRARY_PATH=$nettleinstall/lib:$xxhashinstall/lib make check >make-check.log 2>&1; then
+     RET="$?"
+     echo "$me: make check failed"
+     tail -n 50 make-check.log
+     exit $RET
+   fi
    echo "$me: 32 bit tests went fine!"
 }
 ###############################################################################
-
 
 #this is pretty quick so start with it.
 verify_self_contained_headers

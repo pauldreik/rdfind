@@ -1,29 +1,29 @@
-name: gcc 11
+name: gcc 14
 
 on: [push, pull_request]
 
 
 jobs:
   build:
-    name: Compiles with gcc 11
-    runs-on: ubuntu-20.04
+    name: Compiles with gcc 14
+    runs-on: ubuntu-24.04
 
     steps:
     - name: checkout
       uses: actions/checkout@v3
     - name: install packages
-      run: sudo apt install build-essential nettle-dev time gcc-11 g++-11
+      run: sudo apt install build-essential nettle-dev libxxhash-dev time gcc-14 g++-14
     - name: bootstrap
       run: ./bootstrap.sh
     - name: configure
-      run: ./configure CXX=g++-11
+      run: ./configure CXX=g++-14
     - name: build
       run: make
     - name: check
       run: make check
     - name: store the logs as an artifact
       if: ${{ always() }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
          path: '**/*.log'
 

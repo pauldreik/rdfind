@@ -6,13 +6,13 @@ on: [push, pull_request]
 jobs:
   build:
     name: Runs the deterministic operation test
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     steps:
     - name: checkout
       uses: actions/checkout@v3
     - name: install packages
-      run: sudo apt install build-essential nettle-dev time disorderfs
+      run: sudo apt install build-essential nettle-dev libxxhash-dev time disorderfs
     - name: bootstrap
       run: ./bootstrap.sh
     - name: configure
@@ -23,7 +23,7 @@ jobs:
       run: testcases/verify_deterministic_operation.sh
     - name: store logs as artifacts
       if: ${{ always() }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
          path: '**/*.log'
 

@@ -43,6 +43,8 @@ AC_CHECK_HEADER(nettle/sha.h,,[AC_MSG_ERROR([
  and try again. The path should be so that \#include "nettle/sha.h" works.
  On Debian-ish systems, use "apt-get install nettle-dev" to get a system
  wide nettle install.
+ On RedHat-ish systems, use "dnf install nettle-devel" to get a system
+ wide nettle install.
 ])])
 AC_CHECK_LIB(nettle,nettle_pbkdf2_hmac_sha256,,[AC_MSG_ERROR([
  Could not link to libnettle. Please install nettle
@@ -51,6 +53,28 @@ AC_CHECK_LIB(nettle,nettle_pbkdf2_hmac_sha256,,[AC_MSG_ERROR([
  to is in your LD_LIBRARY_PATH. If you have nettle
  somewhere else, maybe because you don't have root
  access, pass LDFLAGS=-L/your/path/to/nettle to configure
+ and try again.
+])])
+
+dnl test for xxhash
+AC_CHECK_HEADER(xxhash.h,,[AC_MSG_ERROR([
+ xxhash header files missing. Please install xxhash
+ first. If you have already done so and get this error message
+ anyway, it may be installed somewhere else, maybe because you
+ don't have root access. Pass CPPFLAGS=-I/your/path/to/xxhash to configure
+ and try again. The path should be so that \#include "xxhash.h" works.
+ On Debian-ish systems, use "apt-get install libxxhash-dev" to get a system
+ wide xxhash install.
+ On RedHat-ish systems, use "dnf install xxhash-devel" to get a system
+ wide xxhash install.
+])])
+AC_CHECK_LIB(xxhash,XXH128,,[AC_MSG_ERROR([
+ Could not link to xxhash. Please install xxHash
+ first. If you have already done so; please run ldconfig
+ as root or check whether the path xxHash was installed
+ to is in your LD_LIBRARY_PATH. If you have xxhash
+ somewhere else, maybe because you don't have root
+ access, pass LDFLAGS=-L/your/path/to/xxhash to configure
  and try again.
 ])])
 

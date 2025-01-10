@@ -97,7 +97,10 @@ Rdfind uses the following algorithm. If N is the number of files to search throu
 
 ### Building
 
-To build this utility, you need [nettle](https://www.lysator.liu.se/~nisse/nettle/) (on Debian based distros: `apt install nettle-dev`).
+To build this utility, you need:
+
+    [nettle](https://www.lysator.liu.se/~nisse/nettle/) (on Debian based distros: `apt install nettle-dev`, on RedHat based distros `dnf install nettle-devel`)
+    [xxhash](https://github.com/Cyan4973/xxHash/) (on Debian based distros: `apt install libxxhash-dev`, on RedHat based distros `dnf install xxhash-devel`).
 
 ### Install from source
 
@@ -115,6 +118,8 @@ Here is how to get and install nettle from source. Please check for the current 
  If you install nettle as non-root, you must create a link in the rdfind directory so that rdfind later can do #include "nettle/nettle_header_files.h" correctly. Use for instance the commands
 
     ln -s nettle-1.14 nettle
+
+To build xxHash from source see https://github.com/Cyan4973/xxHash/
 
 ### Quality
 The following methods are used to maintain code quality:

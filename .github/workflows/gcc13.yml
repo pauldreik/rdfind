@@ -16,7 +16,7 @@ jobs:
         sudo add-apt-repository ppa:ubuntu-toolchain-r/test
         sudo apt-get update
     - name: install packages
-      run: sudo apt install build-essential nettle-dev time gcc-13 g++-13
+      run: sudo apt install build-essential nettle-dev libxxhash-dev time gcc-13 g++-13
     - name: bootstrap
       run: ./bootstrap.sh
     - name: configure
@@ -27,7 +27,7 @@ jobs:
       run: make check
     - name: store the logs as an artifact
       if: ${{ always() }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
          path: '**/*.log'
 
