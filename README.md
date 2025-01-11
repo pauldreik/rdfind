@@ -25,7 +25,11 @@ If you find rdfind useful, [drop me an email](mailto:__please_remove_this_antisp
 
 ### Mac
 
-If you are on Mac, you can install through [MacPorts](https://www.macports.org/) (direct link to [Portfile](https://github.com/macports/macports-ports/blob/master/sysutils/rdfind/Portfile)). If you want to compile the source yourself, that is fine. Rdfind is written in C++11 and should compile under any \*nix.
+If you are on Mac, you can install through
+ - [MacPorts](https://www.macports.org/) (direct link to [Portfile](https://github.com/macports/macports-ports/blob/master/sysutils/rdfind/Portfile)). 
+ - [brew](https://brew.sh/) direct link to [homebrew formulae](https://formulae.brew.sh/formula/rdfind)
+
+If you want to compile the source yourself, that is fine. Rdfind is written in C++11 and should compile under any \*nix.
 
 ### Windows
 

@@ -1,6 +1,6 @@
 name: mac os x default build
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   build:
@@ -12,13 +12,13 @@ jobs:
 
     steps:
     - name: checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: install packages
-      run: brew install libnettle automake autoconf
+      run: brew install nettle automake autoconf
     - name: bootstrap
       run: ./bootstrap.sh
     - name: configure
-      run: ./configure --enable-warnings CXXFLAGS=-std=c++11
+      run: ./configure --enable-warnings CXXFLAGS="-std=c++11 -I$(brew --prefix nettle)/include -L$(brew --prefix nettle)/lib"
     - name: make
       run: make
 # tests fail because readlink does not understand -f on mac      
@@ -28,6 +28,6 @@ jobs:
 #      run: make distcheck CXXFLAGS=-std=c++11
     - name: Upload a Build Artifact
       if: ${{ always() }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
          path: '**/*.log'
