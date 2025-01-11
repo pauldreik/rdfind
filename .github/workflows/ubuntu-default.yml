@@ -1,6 +1,6 @@
 name: ubuntu default build
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   build:
@@ -8,11 +8,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04]
+        os: [ubuntu-20.04, ubuntu-22.04, ubuntu-24.04]
 
     steps:
     - name: checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: install packages
       run: sudo apt install build-essential nettle-dev
     - name: bootstrap

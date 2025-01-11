@@ -1,26 +1,21 @@
-name: gcc 13
+name: gcc 14
 
 on: [pull_request]
 
-
 jobs:
   build:
-    name: Compiles with gcc 13
-    runs-on: ubuntu-22.04
+    name: Compiles with gcc 14
+    runs-on: ubuntu-24.04
 
     steps:
     - name: checkout
       uses: actions/checkout@v4
-    - name: add ppa
-      run: |
-        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-        sudo apt-get update
     - name: install packages
-      run: sudo apt install build-essential nettle-dev time gcc-13 g++-13
+      run: sudo apt install build-essential nettle-dev time gcc-14 g++-14
     - name: bootstrap
       run: ./bootstrap.sh
     - name: configure
-      run: ./configure CXX=g++-13
+      run: ./configure CXX=g++-14
     - name: build
       run: make
     - name: check
