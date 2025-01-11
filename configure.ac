@@ -35,12 +35,12 @@ dnl for assert() support
 AC_HEADER_ASSERT
 
 dnl test for nettle
-AC_CHECK_HEADER(nettle/sha.h,,[AC_MSG_ERROR([
+AC_CHECK_HEADER(nettle/sha1.h,,[AC_MSG_ERROR([
  nettle header files missing. Please install nettle
  first. If you have already done so and get this error message
  anyway, it may be installed somewhere else, maybe because you
  don't have root access. Pass CPPFLAGS=-I/your/path/to/nettle to configure
- and try again. The path should be so that \#include "nettle/sha.h" works.
+ and try again. The path should be so that \#include "nettle/sha1.h" works.
  On Debian-ish systems, use "apt-get install nettle-dev" to get a system
  wide nettle install.
 ])])
