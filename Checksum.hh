@@ -10,7 +10,8 @@
 #include <cstddef>
 
 #include <nettle/md5.h>
-#include <nettle/sha.h>
+#include <nettle/sha1.h>
+#include <nettle/sha2.h>
 
 /**
  * class for checksum calculation
