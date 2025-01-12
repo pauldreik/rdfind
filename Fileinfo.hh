@@ -194,7 +194,7 @@ private:
    */
   std::int64_t m_identity;
 
-  static const int SomeByteSize = 64;
+  static constexpr int SomeByteSize = 64;
 
   /// a buffer that will be filled with some bytes of the file or a hash
   std::array<char, SomeByteSize> m_somebytes;
