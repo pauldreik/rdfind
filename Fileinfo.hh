@@ -68,7 +68,6 @@ public:
   void setduptype(enum duptype duptype_) { m_duptype = duptype_; }
 
   std::int64_t getidentity() const { return m_identity; }
-  static std::int64_t identity(const Fileinfo& A) { return A.getidentity(); }
   void setidentity(std::int64_t id) { m_identity = id; }
 
   /**
@@ -108,9 +107,6 @@ public:
 
   /// returns the file size in bytes
   filesizetype size() const { return m_info.stat_size; }
-
-  // returns true if A has size zero
-  bool isempty() const { return size() == 0; }
 
   /// filesize comparison
   bool is_smaller_than(Fileinfo::filesizetype minsize) const

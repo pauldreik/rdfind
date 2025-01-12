@@ -81,6 +81,9 @@ UndoableUnlink::unlink()
   return 0;
 }
 
+// cppcheck thinks this can throw in undo(), but that contains a check for
+// m_state so that can not happen.
+// cppcheck-suppress throwInNoexceptFunction
 UndoableUnlink::~UndoableUnlink()
 {
   if (m_state == state::MOVED_TO_TEMPORARY) {
