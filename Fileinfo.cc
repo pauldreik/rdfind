@@ -41,7 +41,7 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
   m_somebytes.fill('\0');
 
   std::fstream f1;
-  f1.open(m_filename.c_str(), std::ios_base::in);
+  f1.open(m_filename, std::ios_base::in);
   if (!f1.is_open()) {
     std::cerr << "fillwithbytes.cc: Could not open file \"" << m_filename
               << "\"" << std::endl;
