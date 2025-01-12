@@ -155,12 +155,12 @@ Fileinfo::getduptypestring(const Fileinfo& A)
 
 // constructor
 Fileinfo::Fileinfostat::Fileinfostat()
+  : stat_size{ 99999 }
+  , stat_ino{ 99999 }
+  , stat_dev{ 99999 }
+  , is_file{ false }
+  , is_directory{ false }
 {
-  stat_size = 99999;
-  stat_ino = 99999;
-  stat_dev = 99999;
-  is_file = false;
-  is_directory = false;
 }
 
 int
