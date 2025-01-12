@@ -113,7 +113,8 @@ public:
   explicit dryrun_helper(const char* m1, const char* m2 = nullptr)
     : m_m1(m1)
     , m_m2(m2)
-  {}
+  {
+  }
 
   const char* const m_m1;
   const char* const m_m2;

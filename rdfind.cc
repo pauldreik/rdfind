@@ -38,8 +38,7 @@ static void
 usage()
 {
   std::cout
-    << "Usage: "
-    << "rdfind [options] FILE ...\n"
+    << "Usage: " << "rdfind [options] FILE ...\n"
     << '\n'
     << "Finds duplicate files recursively in the given FILEs (directories),\n"
     << "and takes appropriate action (by default, nothing).\n"

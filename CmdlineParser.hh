@@ -19,7 +19,8 @@ public:
     : m_argc(argc)
     , m_argv(argv)
     , m_index(1)
-  {}
+  {
+  }
 
   /**
    * tries to parse arg.
