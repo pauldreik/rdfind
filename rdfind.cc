@@ -183,7 +183,7 @@ parseOptions(Parser& parser)
       } else if (parser.parsed_string_is("xxh128")) {
         o.usexxh128 = true;
       } else {
-        std::cerr << "expected md5/sha1/sha256/sha512, not \""
+        std::cerr << "expected md5/sha1/sha256/sha512/xxh128, not \""
                   << parser.get_parsed_string() << "\"\n";
         std::exit(EXIT_FAILURE);
       }
@@ -384,7 +384,6 @@ main(int narg, const char* argv[])
     modes.emplace_back(Fileinfo::readtobuffermode::CREATE_XXH128_CHECKSUM,
                        "xxh128 checksum");
   }
-
 
   for (auto it = modes.begin() + 1; it != modes.end(); ++it) {
     std::cout << dryruntext << "Now eliminating candidates based on "
