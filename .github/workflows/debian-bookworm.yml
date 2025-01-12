@@ -1,0 +1,42 @@
+name: debian 12 bookworm
+
+on:
+  push:
+    branches:
+      - main
+      - devel
+  pull_request:
+
+
+jobs:
+  container-test-job:
+    runs-on: ubuntu-latest
+    container:
+      image: debian:bookworm-slim
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+    - name: install packages
+      run: apt-get update && apt-get install autoconf build-essential nettle-dev libcap2-bin --yes
+    - name: bootstrap
+      run: ./bootstrap.sh
+    - name: configure
+      run: ./configure --enable-warnings CXXFLAGS=-std=c++11
+    - name: make
+      run: make
+    - name: make check
+      run: make check
+    - name: make distcheck
+      run: make distcheck CXXFLAGS=-std=c++11
+    - name: build with hardened build flags
+      run: |
+        make clean
+        eval $(DEB_BUILD_MAINT_OPTIONS="hardening=+all qa=+all,-canary reproducible=+all" dpkg-buildflags --export=sh)
+        ./configure
+        make
+        make check
+    - name: store the logs as an artifact
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v4
+      with:
+         path: '**/*.log'
