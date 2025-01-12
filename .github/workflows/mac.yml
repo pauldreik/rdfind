@@ -23,7 +23,7 @@ jobs:
     - name: bootstrap
       run: ./bootstrap.sh
     - name: configure
-      run: ./configure --enable-warnings CXXFLAGS="-std=c++11 -I$(brew --prefix nettle)/include -L$(brew --prefix nettle)/lib"
+      run: ./configure --enable-warnings CXXFLAGS="-std=c++17 -I$(brew --prefix nettle)/include -L$(brew --prefix nettle)/lib"
     - name: make
       run: make
 # tests fail because readlink does not understand -f on mac      

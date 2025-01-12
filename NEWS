@@ -1,3 +1,5 @@
+next
+requires a C++17 capable compiler.
 1.6.0
 supports sha512
 1.4.0alpha

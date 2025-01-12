@@ -20,7 +20,7 @@ jobs:
     - name: bootstrap
       run: ./bootstrap.sh
     - name: configure
-      run: ./configure CXX=g++-14
+      run: ./configure CXX=g++-14 CXXFLAGS=-std=c++17
     - name: build
       run: make
     - name: check
