@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     name: Runs the deterministic operation test
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     steps:
     - name: checkout
@@ -21,7 +21,7 @@ jobs:
     - name: bootstrap
       run: ./bootstrap.sh
     - name: configure
-      run: ./configure
+      run: ./configure CXXFLAGS=-std=c++17
     - name: make
       run: make
     - name: run determinism test

@@ -100,15 +100,15 @@ compile_and_test() {
    #this is the test program to compile, so we know the compiler and standard lib
    #works. clang 4 with c++2a does not.
    /bin/echo -e "#include <iostream>">x.cpp
-   #does the compiler understand c++11? That is mandatory.
-   if ! $1 -c x.cpp -std=c++11 >/dev/null 2>&1 ; then
-      echo $me: this compiler $1 does not understand c++11
+   #does the compiler understand c++17? That is mandatory.
+   if ! $1 -c x.cpp -std=c++17 >/dev/null 2>&1 ; then
+      echo $me: this compiler $1 does not understand c++17
       return 0
    fi
 
-   #loop over all standard flags>=11 and try those which work.
+   #loop over all standard flags>=17 and try those which work.
    #use the code words.
-   for std in 11 1y 1z 2a 2b ; do
+   for std in 1z 2a 2b ; do
       if ! $1 -c x.cpp -std=c++$std >/dev/null 2>&1 ; then
          echo $me: compiler does not understand c++$std, skipping this combination.
       else
@@ -154,7 +154,7 @@ run_with_sanitizer() {
 
    start_from_scratch
    ./bootstrap.sh >bootstrap.log
-   ./configure $ASSERT CXX=$latestclang CXXFLAGS="-std=c++1y $1"   >configure.log
+   ./configure $ASSERT CXX=$latestclang CXXFLAGS="-std=c++17 $1"   >configure.log
    make > make.log 2>&1
    export UBSAN_OPTIONS="halt_on_error=true exitcode=1"
    export ASAN_OPTIONS="halt_on_error=true exitcode=1"
@@ -197,11 +197,11 @@ run_with_libcpp() {
    int main() { std::cout<<\"libc++ works!\"<<std::endl;}" >x.cpp
    get_latest_clang
    if [ ! -z $latestclang ] ; then
-      if ! $latestclang -std=c++11 -stdlib=libc++ -lc++abi x.cpp >/dev/null 2>&1 || [ ! -x ./a.out ] || ! ./a.out ; then
+      if ! $latestclang -std=c++17 -stdlib=libc++ -lc++abi x.cpp >/dev/null 2>&1 || [ ! -x ./a.out ] || ! ./a.out ; then
          echo $me: "debug: $latestclang could not compile with libc++ - perhaps uninstalled."
          continue
       fi
-      compile_and_test_standard $latestclang c++11 "-stdlib=libc++ -D_LIBCPP_DEBUG=1"
+      compile_and_test_standard $latestclang c++17 "-stdlib=libc++ -D_LIBCPP_DEBUG=1"
       return
    fi
    # we will get here if no clang could be found. that is not an error,
@@ -247,7 +247,7 @@ verify_self_contained_headers() {
    fi
    for header in *.hh ; do
       cp $header tmp.cc
-      if ! g++ -std=c++11 -I. -c tmp.cc -o /dev/null >header.log 2>&1 ; then
+      if ! g++ -std=c++17 -I. -c tmp.cc -o /dev/null >header.log 2>&1 ; then
          echo "$me: found a header which is not self contained: $header."
          echo "$me: see header.log for details"
          exit 1
@@ -349,7 +349,7 @@ run_with_debian_buildflags
 
 #make a test build with debug iterators
 ASSERT="--enable-assert"
-compile_and_test_standard g++ c++11 "-D_GLIBCXX_DEBUG"
+compile_and_test_standard g++ c++17 "-D_GLIBCXX_DEBUG"
 
 #test run with clang/libc++
 ASSERT="--enable-assert"
@@ -361,7 +361,7 @@ run_with_libcpp
 if which valgrind >/dev/null; then
    echo $me: running unit tests through valgrind
    ASSERT="--disable-assert"
-   compile_and_test_standard g++ c++11 "-O3"
+   compile_and_test_standard g++ c++17 "-O3"
    VALGRIND=valgrind make check >make-check.log
 fi
 

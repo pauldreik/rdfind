@@ -7,7 +7,7 @@ me=$(basename $0)
 
 mkdir -p $outdir
 
-args="--enable=all --inconclusive --std=c++11 -I . --quiet --suppress=missingIncludeSystem"
+args="--enable=all --inconclusive --std=c++17 -I . --quiet --suppress=missingIncludeSystem"
 
 # cppcheck can not produce an xml report and a reulgar text file at the same time, so run twice
 cppcheck $args *.cc *.hh --template='{severity}:{file}:{line}:{message}' 2>$outdir/cppcheck.out
