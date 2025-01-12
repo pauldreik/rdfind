@@ -1,6 +1,11 @@
 name: gcc 14
 
-on: [pull_request]
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
 
 jobs:
   build:
