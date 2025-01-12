@@ -21,13 +21,13 @@ jobs:
     - name: bootstrap
       run: ./bootstrap.sh
     - name: configure
-      run: ./configure --enable-warnings CXXFLAGS=-std=c++11
+      run: ./configure --enable-warnings CXXFLAGS=-std=c++17
     - name: make
       run: make -j $(nproc)
     - name: make check
       run: make check
     - name: make distcheck
-      run: make distcheck CXXFLAGS=-std=c++11
+      run: make distcheck CXXFLAGS=-std=c++17
     - name: store the logs as an artifact
       if: ${{ always() }}
       uses: actions/upload-artifact@v4

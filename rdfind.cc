@@ -6,6 +6,9 @@
 
 #include "config.h" //header file from autoconf
 
+static_assert(__cplusplus >= 201703L,
+              "this code requires a C++17 capable compiler!");
+
 // std
 #include <algorithm>
 #include <iostream>
