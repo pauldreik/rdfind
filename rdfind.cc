@@ -63,7 +63,7 @@ usage()
     << " -followsymlinks    true |(false) follow symlinks\n"
     << " -removeidentinode (true)| false  ignore files with nonunique "
        "device and inode\n"
-    << " -checksum           md5 |(sha1)| sha256 | sha512\n"
+    << " -checksum           md5 |(sha1)| sha256 | sha512 | xxh128\n"
     << "                                  checksum type\n"
     << " -deterministic    (true)| false  makes results independent of order\n"
     << "                                  from listing the filesystem\n"
@@ -109,6 +109,7 @@ struct Options
   bool usesha1 = false;      // use sha1 checksum to check for similarity
   bool usesha256 = false;    // use sha256 checksum to check for similarity
   bool usesha512 = false;    // use sha512 checksum to check for similarity
+  bool usexxh128 = false;    // use xxh128 checksum to check for similarity
   bool deterministic = true; // be independent of filesystem order
   long nsecsleep = 0; // number of nanoseconds to sleep between each file read.
   std::string resultsfile = "results.txt"; // results file name.
@@ -179,6 +180,8 @@ parseOptions(Parser& parser)
         o.usesha256 = true;
       } else if (parser.parsed_string_is("sha512")) {
         o.usesha512 = true;
+      } else if (parser.parsed_string_is("xxh128")) {
+        o.usexxh128 = true;
       } else {
         std::cerr << "expected md5/sha1/sha256/sha512, not \""
                   << parser.get_parsed_string() << "\"\n";
@@ -241,8 +244,8 @@ parseOptions(Parser& parser)
 
   // done with parsing of options. remaining arguments are files and dirs.
 
-  // decide what checksum to use - if no checksum is set, force sha1!
-  if (!o.usemd5 && !o.usesha1 && !o.usesha256 && !o.usesha512) {
+  // decide what checksum to use - if no checksum is set, force xxhash!
+  if (!o.usemd5 && !o.usesha1 && !o.usesha256 && !o.usesha512 && !o.usexxh128) {
     o.usesha1 = true;
   }
   return o;
@@ -377,6 +380,11 @@ main(int narg, const char* argv[])
     modes.emplace_back(Fileinfo::readtobuffermode::CREATE_SHA512_CHECKSUM,
                        "sha512 checksum");
   }
+  if (o.usexxh128) {
+    modes.emplace_back(Fileinfo::readtobuffermode::CREATE_XXH128_CHECKSUM,
+                       "xxh128 checksum");
+  }
+
 
   for (auto it = modes.begin() + 1; it != modes.end(); ++it) {
     std::cout << dryruntext << "Now eliminating candidates based on "
