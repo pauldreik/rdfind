@@ -44,27 +44,39 @@ for n in $files ; do
 done
 dbgecho passed the happy path
 
-#now try to make a symlink somewhere where it fails.
-if [ "$(id -u)" -eq 0 ]; then
-   dbgecho "running as root or through sudo, dangerous! Will not proceed with this unit tests."
-   exit 1
-fi
+# try to make a symlink somewhere where it fails.
 
 reset_teststate
-system_file=$(which ls)
-cp $system_file .
-$rdfind -makesymlinks true . $system_file 2>&1 |tee rdfind.out
-if ! grep -iq "failed to make symlink" rdfind.out ; then
-   dbgecho "did not get the expected error message. see for yourself above."
+mkdir -p $datadir/readonly.d/
+echo xxx > $datadir/readonly.d/a
+echo xxx > $datadir/readonly.d/b
+chmod 500 $datadir/readonly.d/
+
+if [ "$(id -u)" -eq 0 ]; then
+   # if running as root, directory rights are not respected. drop the capability
+   # for doing that (requires capsh from package libcap2-bin)
+   MAYBEDROP="capsh --drop=CAP_DAC_OVERRIDE -- -c"
+else
+   MAYBEDROP="/bin/sh -c"
+fi
+$MAYBEDROP "$rdfind -makesymlinks true $datadir/readonly.d/" 2>&1 |tee rdfind.out
+if ! grep -iq "failed" rdfind.out ; then
+   dbgecho "expected failure when trying to make symlink on readonly directory"
    exit 1
 fi
 
-#make sure that our own copy is still there
-if [ ! -e $(basename $system_file) ] ; then
-   dbgecho file is missing, rdfind should not have removed it!
-   exit 1
-fi
-dbgecho passed the test with trying to write to a system directory
+# make sure that our own copy is still there
+for f in a b ; do
+   if [ ! -e $datadir/readonly.d/$f ] ; then
+      dbgecho file $f is missing, rdfind should not have removed it!
+      exit 1
+   fi
+done
+
+# make sure it can be cleaned up
+chmod 700 $datadir/readonly.d/
+
+dbgecho passed the test with trying to write to a readonly directory
 
 
 
