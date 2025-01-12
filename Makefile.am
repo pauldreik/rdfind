@@ -6,6 +6,7 @@ bin_PROGRAMS = rdfind
 rdfind_SOURCES = rdfind.cc Checksum.cc  Dirlist.cc  Fileinfo.cc  Rdutil.cc \
                  EasyRandom.cc UndoableUnlink.cc CmdlineParser.cc
 
+LDADD = @LIBXXHASH@
 #these are the test scripts to execute - I do not know how to glob here,
 #feedback welcome.
 TESTS=testcases/largefilesupport.sh \

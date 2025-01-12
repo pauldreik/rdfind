@@ -54,6 +54,29 @@ AC_CHECK_LIB(nettle,nettle_pbkdf2_hmac_sha256,,[AC_MSG_ERROR([
  and try again.
 ])])
 
+dnl xxh hashing is optional:
+dnl   --with-xxhash requires it
+dnl   --without-xxhash does not use it
+dnl   not saying anything enables it if it can be found
+AC_ARG_WITH([xxhash],
+            [AS_HELP_STRING([--with-xxhash],
+              [support xxhash @<:@default=check@:>@])],
+            [],
+            [with_xxhash=check])
+
+          LIBXXHASH=
+          AS_IF([test "x$with_xxhash" != xno],
+            [AC_CHECK_LIB([xxhash], [XXH3_64bits],
+              [AC_SUBST([LIBXXHASH], ["-lxxhash"])
+               AC_DEFINE([HAVE_LIBXXHASH], [1],
+                         [Define if you have libxxhash])
+              ],
+              [if test "x$with_xxhash" != xcheck; then
+                 AC_MSG_FAILURE(
+                   [--with-xxhash was given, but test for xxhash failed])
+               fi
+              ],)])
+
 dnl test for some specific functions
 AC_CHECK_FUNC(stat,,AC_MSG_ERROR(oops! no stat ?!?))
 
