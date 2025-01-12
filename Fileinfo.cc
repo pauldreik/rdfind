@@ -73,6 +73,9 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
     case readtobuffermode::CREATE_SHA512_CHECKSUM:
       checksumtype = Checksum::checksumtypes::SHA512;
       break;
+    case readtobuffermode::CREATE_XXH128_CHECKSUM:
+      checksumtype = Checksum::checksumtypes::XXH128;
+      break;
     default:
       std::cerr << "does not know how to do that filltype:"
                 << static_cast<long>(filltype) << std::endl;

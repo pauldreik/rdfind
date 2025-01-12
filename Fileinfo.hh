@@ -49,6 +49,7 @@ public:
     CREATE_SHA1_CHECKSUM,
     CREATE_SHA256_CHECKSUM,
     CREATE_SHA512_CHECKSUM,
+    CREATE_XXH128_CHECKSUM,
   };
 
   // type of duplicate

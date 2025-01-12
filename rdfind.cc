@@ -63,8 +63,9 @@ usage()
     << " -followsymlinks    true |(false) follow symlinks\n"
     << " -removeidentinode (true)| false  ignore files with nonunique "
        "device and inode\n"
-    << " -checksum           md5 |(sha1)| sha256 | sha512\n"
-    << "                                  checksum type\n"
+    << " -checksum           md5 |(sha1)| sha256 | sha512 | xxh128\n"
+    << indent << "checksum type\n"
+    << indent << "xxh128 is very fast, but is noncryptographic.\n"
     << " -buffersize N\n"
     << indent << "chunksize in bytes when calculating the checksum.\n"
     << indent << "The default is 1 MiB, can be up to 128 MiB.\n"
@@ -112,6 +113,7 @@ struct Options
   bool usesha1 = false;      // use sha1 checksum to check for similarity
   bool usesha256 = false;    // use sha256 checksum to check for similarity
   bool usesha512 = false;    // use sha512 checksum to check for similarity
+  bool usexxh128 = false;    // use xxh128 checksum to check for similarity
   bool deterministic = true; // be independent of filesystem order
   std::size_t buffersize = 1 << 20; // chunksize to use when reading files
   long nsecsleep = 0; // number of nanoseconds to sleep between each file read.
@@ -183,8 +185,16 @@ parseOptions(Parser& parser)
         o.usesha256 = true;
       } else if (parser.parsed_string_is("sha512")) {
         o.usesha512 = true;
+      } else if (parser.parsed_string_is("xxh128")) {
+#ifdef HAVE_LIBXXHASH
+        o.usexxh128 = true;
+#else
+        std::cerr << "not compiled with xxhash, to make use of xxh128 please "
+                     "reconfigure and rebuild '--with-xxhash'\n";
+        std::exit(EXIT_FAILURE);
+#endif
       } else {
-        std::cerr << "expected md5/sha1/sha256/sha512, not \""
+        std::cerr << "expected md5/sha1/sha256/sha512/xxh128, not \""
                   << parser.get_parsed_string() << "\"\n";
         std::exit(EXIT_FAILURE);
       }
@@ -258,8 +268,8 @@ parseOptions(Parser& parser)
 
   // done with parsing of options. remaining arguments are files and dirs.
 
-  // decide what checksum to use - if no checksum is set, force sha1!
-  if (!o.usemd5 && !o.usesha1 && !o.usesha256 && !o.usesha512) {
+  // decide what checksum to use - if no checksum is set, force xxhash!
+  if (!o.usemd5 && !o.usesha1 && !o.usesha256 && !o.usesha512 && !o.usexxh128) {
     o.usesha1 = true;
   }
   return o;
@@ -393,6 +403,10 @@ main(int narg, const char* argv[])
   if (o.usesha512) {
     modes.emplace_back(Fileinfo::readtobuffermode::CREATE_SHA512_CHECKSUM,
                        "sha512 checksum");
+  }
+  if (o.usexxh128) {
+    modes.emplace_back(Fileinfo::readtobuffermode::CREATE_XXH128_CHECKSUM,
+                       "xxh128 checksum");
   }
 
   for (auto it = modes.begin() + 1; it != modes.end(); ++it) {
