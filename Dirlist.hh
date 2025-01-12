@@ -17,7 +17,8 @@ public:
   explicit Dirlist(bool followsymlinks)
     : m_followsymlinks(followsymlinks)
     , m_callback(nullptr)
-  {}
+  {
+  }
 
 private:
   // follow symlinks or not

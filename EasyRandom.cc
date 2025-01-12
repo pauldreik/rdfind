@@ -62,7 +62,8 @@ EasyRandom::getGlobalObject()
 
 EasyRandom::EasyRandom()
   : m_rand(getGlobalObject())
-{}
+{
+}
 
 std::string
 EasyRandom::makeRandomFileString(std::size_t N)

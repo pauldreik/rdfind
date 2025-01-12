@@ -18,7 +18,8 @@ class Rdutil
 public:
   explicit Rdutil(std::vector<Fileinfo>& list)
     : m_list(list)
-  {}
+  {
+  }
 
   /**
    * print file names to a file, with extra information.
