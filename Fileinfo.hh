@@ -135,10 +135,12 @@ public:
    * is shorter than the length of the bytes field.
    * @param filltype
    * @param lasttype
+   * @param buffersize
    * @return zero on success
    */
   int fillwithbytes(enum readtobuffermode filltype,
-                    enum readtobuffermode lasttype);
+                    enum readtobuffermode lasttype,
+                    const long buffersize);
 
   /// get a pointer to the bytes read from the file
   const char* getbyteptr() const { return m_somebytes.data(); }
