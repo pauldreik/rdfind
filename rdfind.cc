@@ -41,7 +41,7 @@ static void
 usage()
 {
   std::cout
-    << "Usage: " << "rdfind [options] FILE ...\n"
+    << "Usage: rdfind [options] FILE ...\n"
     << '\n'
     << "Finds duplicate files recursively in the given FILEs (directories),\n"
     << "and takes appropriate action (by default, nothing).\n"
@@ -65,6 +65,13 @@ usage()
        "device and inode\n"
     << " -checksum           md5 |(sha1)| sha256 | sha512\n"
     << "                                  checksum type\n"
+    << " -buffersize N     (N=4096,0<N<1000KB)\n"
+       "                                  Chunksize when calculating the "
+       "checksum\n"
+       "                                  for files, smaller or bigger can "
+       "improve performance\n"
+       "                                  dependent on filesystem and checksum "
+       "algorithm.\n"
     << " -deterministic    (true)| false  makes results independent of order\n"
     << "                                  from listing the filesystem\n"
     << " -makesymlinks      true |(false) replace duplicate files with "
@@ -75,7 +82,7 @@ usage()
     << " -outputname  name  sets the results file name to \"name\" "
        "(default results.txt)\n"
     << " -deleteduplicates  true |(false) delete duplicate files\n"
-    << " -sleep              Xms          sleep for X milliseconds between "
+    << " -sleep             Xms          sleep for X milliseconds between "
        "file reads.\n"
     << "                                  Default is 0. Only a few values\n"
     << "                                  are supported; 0,1-5,10,25,50,100\n"
@@ -105,11 +112,12 @@ struct Options
   bool followsymlinks = false;        // follow symlinks
   bool dryrun = false;                // only dryrun, don't destroy anything
   bool remove_identical_inode = true; // remove files with identical inodes
-  bool usemd5 = false;       // use md5 checksum to check for similarity
-  bool usesha1 = false;      // use sha1 checksum to check for similarity
-  bool usesha256 = false;    // use sha256 checksum to check for similarity
-  bool usesha512 = false;    // use sha512 checksum to check for similarity
-  bool deterministic = true; // be independent of filesystem order
+  bool usemd5 = false;           // use md5 checksum to check for similarity
+  bool usesha1 = false;          // use sha1 checksum to check for similarity
+  bool usesha256 = false;        // use sha256 checksum to check for similarity
+  bool usesha512 = false;        // use sha512 checksum to check for similarity
+  std::size_t buffersize = 4096; // chunksize to use when reading files
+  bool deterministic = true;     // be independent of filesystem order
   long nsecsleep = 0; // number of nanoseconds to sleep between each file read.
   std::string resultsfile = "results.txt"; // results file name.
 };
@@ -184,6 +192,16 @@ parseOptions(Parser& parser)
                   << parser.get_parsed_string() << "\"\n";
         std::exit(EXIT_FAILURE);
       }
+    } else if (parser.try_parse_string("-buffersize")) {
+      const long buffersize = std::stoll(parser.get_parsed_string());
+      if (buffersize <= 0) {
+        std::cerr << "negative or 0 value of buffersize not allowed\n";
+        std::exit(EXIT_FAILURE);
+      } else if (buffersize > 1000 * 1024) {
+        std::cerr << "maximum 1000KB value of buffersize not allowed";
+        std::exit(EXIT_FAILURE);
+      }
+      o.buffersize = buffersize;
     } else if (parser.try_parse_string("-sleep")) {
       const auto nextarg = std::string(parser.get_parsed_string());
       if (nextarg == "1ms") {
@@ -383,7 +401,7 @@ main(int narg, const char* argv[])
               << it->second << ": " << std::flush;
 
     // read bytes (destroys the sorting, for disk reading efficiency)
-    gswd.fillwithbytes(it[0].first, it[-1].first, o.nsecsleep);
+    gswd.fillwithbytes(it[0].first, it[-1].first, o.nsecsleep, o.buffersize);
 
     // remove non-duplicates
     std::cout << "removed " << gswd.removeUniqSizeAndBuffer()

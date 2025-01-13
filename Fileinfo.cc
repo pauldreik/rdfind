@@ -12,6 +12,7 @@
 #include <cstring>  //for strerror
 #include <fstream>  //for file reading
 #include <iostream> //for cout etc
+#include <vector>
 
 // os
 #include <sys/stat.h> //for file info
@@ -24,7 +25,8 @@
 
 int
 Fileinfo::fillwithbytes(enum readtobuffermode filltype,
-                        enum readtobuffermode lasttype)
+                        enum readtobuffermode lasttype,
+                        const long buffersize)
 {
 
   // Decide if we are going to read from file or not.
@@ -80,11 +82,12 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
   if (checksumtype != Checksum::checksumtypes::NOTSET) {
     Checksum chk(checksumtype);
 
-    char buffer[4096];
+    std::vector<char> buffer(buffersize);
+
     while (f1) {
-      f1.read(buffer, sizeof(buffer));
+      f1.read(buffer.data(), buffer.size());
       // gcount is never negative, the cast is safe.
-      chk.update(static_cast<std::size_t>(f1.gcount()), buffer);
+      chk.update(static_cast<std::size_t>(f1.gcount()), buffer.data());
     }
 
     // store the result of the checksum calculation in somebytes
