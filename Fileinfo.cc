@@ -24,7 +24,8 @@
 
 int
 Fileinfo::fillwithbytes(enum readtobuffermode filltype,
-                        enum readtobuffermode lasttype)
+                        enum readtobuffermode lasttype,
+                        const long buffersize)
 {
 
   // Decide if we are going to read from file or not.
@@ -80,7 +81,7 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
   if (checksumtype != Checksum::checksumtypes::NOTSET) {
     Checksum chk(checksumtype);
 
-    char buffer[4096];
+    char buffer[buffersize];
     while (f1) {
       f1.read(buffer, sizeof(buffer));
       // gcount is never negative, the cast is safe.
