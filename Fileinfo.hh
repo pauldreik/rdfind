@@ -10,6 +10,7 @@
 #include <array>
 #include <cstdint>
 #include <string>
+#include <vector>
 
 // os specific headers
 #include <sys/types.h> //for off_t and others.
@@ -135,10 +136,13 @@ public:
    * is shorter than the length of the bytes field.
    * @param filltype
    * @param lasttype
+   * @param buffer will be used as a scratch buffer - provided from the outside
+   * to avoid having to reallocate it for each file
    * @return zero on success
    */
   int fillwithbytes(enum readtobuffermode filltype,
-                    enum readtobuffermode lasttype);
+                    enum readtobuffermode lasttype,
+                    std::vector<char>& buffer);
 
   /// get a pointer to the bytes read from the file
   const char* getbyteptr() const { return m_somebytes.data(); }

@@ -542,15 +542,18 @@ Rdutil::saveablespace(std::ostream& out) const
 int
 Rdutil::fillwithbytes(enum Fileinfo::readtobuffermode type,
                       enum Fileinfo::readtobuffermode lasttype,
-                      const long nsecsleep)
+                      const long nsecsleep,
+                      const std::size_t buffersize)
 {
   // first sort on inode (to read efficiently from the hard drive)
   sortOnDeviceAndInode();
 
   const auto duration = std::chrono::nanoseconds{ nsecsleep };
 
+  std::vector<char> buffer(buffersize, '\0');
+
   for (auto& elem : m_list) {
-    elem.fillwithbytes(type, lasttype);
+    elem.fillwithbytes(type, lasttype, buffer);
     if (nsecsleep > 0) {
       std::this_thread::sleep_for(duration);
     }

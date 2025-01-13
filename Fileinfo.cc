@@ -24,7 +24,8 @@
 
 int
 Fileinfo::fillwithbytes(enum readtobuffermode filltype,
-                        enum readtobuffermode lasttype)
+                        enum readtobuffermode lasttype,
+                        std::vector<char>& buffer)
 {
 
   // Decide if we are going to read from file or not.
@@ -80,11 +81,10 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
   if (checksumtype != Checksum::checksumtypes::NOTSET) {
     Checksum chk(checksumtype);
 
-    char buffer[4096];
     while (f1) {
-      f1.read(buffer, sizeof(buffer));
+      f1.read(buffer.data(), static_cast<std::streamsize>(buffer.size()));
       // gcount is never negative, the cast is safe.
-      chk.update(static_cast<std::size_t>(f1.gcount()), buffer);
+      chk.update(static_cast<std::size_t>(f1.gcount()), buffer.data());
     }
 
     // store the result of the checksum calculation in somebytes
