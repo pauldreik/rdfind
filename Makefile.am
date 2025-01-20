@@ -4,7 +4,7 @@
 AUTOMAKE_OPTIONS = gnu # I would like dist-bzip2 here, but automake complains
 bin_PROGRAMS = rdfind
 rdfind_SOURCES = rdfind.cc Checksum.cc  Dirlist.cc  Fileinfo.cc  Rdutil.cc \
-                 EasyRandom.cc UndoableUnlink.cc CmdlineParser.cc
+                 EasyRandom.cc UndoableUnlink.cc CmdlineParser.cc ListProgress.cc
 
 #these are the test scripts to execute - I do not know how to glob here,
 #feedback welcome.
