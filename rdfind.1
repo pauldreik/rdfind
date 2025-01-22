@@ -76,9 +76,11 @@ Follow symlinks. Default is false.
 Removes items found which have identical inode and device ID. Default
 is true.
 .TP
-.BR \-checksum " " \fImd5\fR|\fIsha1\fR|\fIsha256\fR|\fIsha512\fR
-What type of checksum to be used: md5, sha1, sha256 or sha512. The default is
-sha1 since version 1.4.0.
+.BR \-checksum " " \fImd5\fR|\fIsha1\fR|\fIsha256\fR|\fIsha512|\fIxxh128\fR
+What type of checksum to be used: md5, sha1, sha256, sha512 or xxh128. The default is
+sha1 since version 1.4.0. xxh128 is a very fast checksum, but not of cryptographic
+quality. xxh support is optional and requires that rdfind was configured with
+--with-xxhash. In case xxh is used but there is no support, an error is returned.
 .TP
 .BR \-buffersize " " \fIN\fR
 Chunksize in bytes when calculating the checksum
