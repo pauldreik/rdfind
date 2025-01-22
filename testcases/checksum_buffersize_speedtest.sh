@@ -28,7 +28,7 @@ make_test_files
 
 cat /dev/null >"$TEST_DIR/results.tsv"
 for filesize in big small; do
-for checksumtype in md5 sha1; do
+for checksumtype in sha1 xxh128; do
     i=1
     while :; do
         if [ $i -gt 4096 ]; then

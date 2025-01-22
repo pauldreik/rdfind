@@ -8,7 +8,6 @@ set -e
 
 reset_teststate
 
-
 if [ ! -d speedtest ] ; then
    mkdir -p speedtest
 fi
@@ -21,9 +20,9 @@ if [ ! -e speedtest/largefile1 ] ; then
 fi
 
 
-for checksumtype in md5 sha1 sha256; do
+for checksumtype in $allchecksumtypes; do
    dbgecho "trying checksum $checksumtype"
-   time $rdfind  -removeidentinode false -checksum $checksumtype speedtest/largefile1 speedtest/largefile2 > rdfind.out
+   time $rdfind  -removeidentinode false -checksum "$checksumtype" speedtest/largefile1 speedtest/largefile2 > rdfind.out
 done
 
 dbgecho "all is good in this test!"

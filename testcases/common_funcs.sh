@@ -8,6 +8,11 @@ set -e
 
 me="$(basename "$0")"
 
+if [ "$WITH_XXHASH" = "1" ]; then
+    export allchecksumtypes="md5 sha1 sha256 sha512 xxh128"
+else
+    export allchecksumtypes="md5 sha1 sha256 sha512"
+fi
 
 # shellcheck disable=SC3037
 /bin/echo -n "$me: checking for rdfind ..."
