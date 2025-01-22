@@ -80,6 +80,12 @@ is true.
 What type of checksum to be used: md5, sha1, sha256 or sha512. The default is
 sha1 since version 1.4.0.
 .TP
+.BR \-buffersize " " \fIN\fR
+Chunksize in bytes when calculating the checksum
+for files, smaller or bigger can improve performance
+dependent on filesystem and checksum algorithm.
+The default is 1 MiB, the maximum allowed is 128MiB (inclusive).
+.TP
 .BR \-deterministic " " \fItrue\fR|\fIfalse\fR
 If set (the default), sort files of equal rank in an unspecified but
 deterministic order. This makes the behaviour independent of in which
