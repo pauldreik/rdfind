@@ -1,14 +1,8 @@
 #!/bin/sh
 # Test that selection of checksum works as expected.
 
-
 set -e
 . "$(dirname "$0")/common_funcs.sh"
-
-
-
-allchecksumtypes="md5 sha1 sha256 sha512"
-
 
 for checksumtype in $allchecksumtypes; do
    reset_teststate

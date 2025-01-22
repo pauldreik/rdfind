@@ -1,0 +1,39 @@
+---
+name: ubuntu default build with xxhash
+
+"on":
+  push:
+    branches:
+      - main
+      - devel
+  pull_request:
+
+jobs:
+  build:
+    name: Test on ${{ matrix.os }} with xxhash
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: install packages
+        run: sudo apt install build-essential nettle-dev libxxhash-dev
+      - name: bootstrap
+        run: ./bootstrap.sh
+      - name: configure
+        run: ./configure --with-xxhash --enable-warnings CXXFLAGS=-std=c++17
+      - name: make
+        run: make
+      - name: make check
+        run: WITH_XXHASH=1 make check
+      - name: WITH_XXHASH=1 make distcheck
+        run: make distcheck CXXFLAGS=-std=c++17
+      - name: store the logs as an artifact
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: log-artifacts-${{ matrix.os }}
+          path: '**/*.log'
