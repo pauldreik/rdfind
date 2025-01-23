@@ -1,6 +1,7 @@
+---
 name: cppcheck
 
-on:
+"on":
   push:
     branches:
       - main
@@ -14,15 +15,14 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-    - name: checkout
-      uses: actions/checkout@v4
-    - name: install packages
-      run: sudo apt install cppcheck
-    - name: run cppcheck
-      run: cppcheck/run_cppcheck.sh
-    - name: store the cppcheck output as an artifact
-      if: ${{ always() }}
-      uses: actions/upload-artifact@v4
-      with:
-         path: 'cppcheck/out/*'
-
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: install packages
+        run: sudo apt install cppcheck
+      - name: run cppcheck
+        run: cppcheck/run_cppcheck.sh
+      - name: store the cppcheck output as an artifact
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          path: 'cppcheck/out/*'

@@ -1,6 +1,7 @@
+---
 name: gcc 9
 
-on:
+"on":
   push:
     branches:
       - main
@@ -14,21 +15,20 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-    - name: checkout
-      uses: actions/checkout@v4
-    - name: install packages
-      run: sudo apt install build-essential nettle-dev time gcc-9 g++-9
-    - name: bootstrap
-      run: ./bootstrap.sh
-    - name: configure
-      run: ./configure CXX=g++-9 CXXFLAGS=-std=c++17
-    - name: build
-      run: make
-    - name: check
-      run: make check
-    - name: store the logs as an artifact
-      if: ${{ always() }}
-      uses: actions/upload-artifact@v4
-      with:
-         path: '**/*.log'
-
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: install packages
+        run: sudo apt install build-essential nettle-dev time gcc-9 g++-9
+      - name: bootstrap
+        run: ./bootstrap.sh
+      - name: configure
+        run: ./configure CXX=g++-9 CXXFLAGS=-std=c++17
+      - name: build
+        run: make
+      - name: check
+        run: make check
+      - name: store the logs as an artifact
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          path: '**/*.log'

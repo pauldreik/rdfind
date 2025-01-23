@@ -1,6 +1,7 @@
+---
 name: test deterministic operation
 
-on:
+"on":
   push:
     branches:
       - main
@@ -14,21 +15,20 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-    - name: checkout
-      uses: actions/checkout@v4
-    - name: install packages
-      run: sudo apt install build-essential nettle-dev time disorderfs
-    - name: bootstrap
-      run: ./bootstrap.sh
-    - name: configure
-      run: ./configure CXXFLAGS=-std=c++17
-    - name: make
-      run: make
-    - name: run determinism test
-      run: testcases/verify_deterministic_operation.sh
-    - name: store logs as artifacts
-      if: ${{ always() }}
-      uses: actions/upload-artifact@v4
-      with:
-         path: '**/*.log'
-
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: install packages
+        run: sudo apt install build-essential nettle-dev time disorderfs
+      - name: bootstrap
+        run: ./bootstrap.sh
+      - name: configure
+        run: ./configure CXXFLAGS=-std=c++17
+      - name: make
+        run: make
+      - name: run determinism test
+        run: testcases/verify_deterministic_operation.sh
+      - name: store logs as artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          path: '**/*.log'
