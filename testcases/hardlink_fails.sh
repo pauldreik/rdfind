@@ -13,17 +13,17 @@ reset_teststate
 files="a subdir/b c some/deeply/nested/subdir/d"
 nfiles=4
 for n in $files ; do
-   mkdir -p $(dirname $datadir/$n)
-   echo "hello hardlink" > $datadir/$n
+   mkdir -p "$(dirname "$datadir/$n")"
+   echo "hello hardlink" > "$datadir/$n"
 done
 
 #eliminate them.
-$rdfind -makehardlinks true $datadir/
+$rdfind -makehardlinks true "$datadir/"
 
 #make sure one is a hard link to the other.
 for n in $files ; do
-   nhardlinks=$(stat -c %h $datadir/$n)
-   if [ $nhardlinks -ne $nfiles ] ; then
+   nhardlinks=$(stat -c %h "$datadir/$n")
+   if [ "$nhardlinks" -ne "$nfiles" ] ; then
       dbgecho "expected $nfiles hardlinks, got $nhardlinks"
       exit 1
    fi
@@ -33,10 +33,10 @@ dbgecho passed the happy path
 # try to make a hardlink to somewhere that fails.
 
 reset_teststate
-mkdir -p $datadir/readonly.d/
-echo xxx > $datadir/readonly.d/a
-echo xxx > $datadir/readonly.d/b
-chmod 500 $datadir/readonly.d/
+mkdir -p "$datadir/readonly.d/"
+echo xxx > "$datadir/readonly.d/a"
+echo xxx > "$datadir/readonly.d/b"
+chmod 500 "$datadir/readonly.d/"
 
 if [ "$(id -u)" -eq 0 ]; then
    # if running as root, directory rights are not respected. drop the capability
@@ -53,13 +53,13 @@ fi
 
 #make sure that our own copy is still there
 for f in a b ; do
-   if [ ! -e $datadir/readonly.d/$f ] ; then
-      dbgecho file $f is missing, rdfind should not have removed it!
+   if [ ! -e "$datadir/readonly.d/$f" ] ; then
+      dbgecho "file $f is missing, rdfind should not have removed it!"
       exit 1
    fi
 done
 
 # make sure it can be cleaned up
-chmod 700 $datadir/readonly.d/
+chmod 700 "$datadir/readonly.d/"
 
 dbgecho "all is good in this test!"

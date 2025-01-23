@@ -30,12 +30,12 @@ for dryrunopt in -dryrun -n ; do
    $rdfind $dryrunopt true -makesymlinks true a b >rdfind.out
    [ -f a ]
    [ -f b ]
-   [ $(stat -c %i a) != $(stat --dereference -c %i b) ]
+   [ "$(stat -c %i a)" != "$(stat --dereference -c %i b)" ]
    dbgecho "files still there, good"
    $rdfind $dryrunopt false -makesymlinks true a b >rdfind.out
    [ -f a ]
    [ -L b ]
-   [ $(stat -c %i a) = $(stat --dereference -c %i b) ]
+   [ "$(stat -c %i a)" = "$(stat --dereference -c %i b)" ]
    dbgecho "b was replaced with a symlink, good"
 
 
@@ -44,15 +44,15 @@ for dryrunopt in -dryrun -n ; do
    $rdfind $dryrunopt true -makehardlinks true a b >rdfind.out
    [ -f a ]
    [ -f b ]
-   [ $(stat -c %i a) != $(stat -c %i b) ]
-   [ $(stat -c %h a) -eq 1 ]
+   [ "$(stat -c %i a)" != "$(stat -c %i b)" ]
+   [ "$(stat -c %h a)" -eq 1 ]
    dbgecho "files still there, good"
    $rdfind $dryrunopt false -makehardlinks true a b >rdfind.out
    [ -f a ]
    [ -f b ]
-   [ $(stat -c %i a) = $(stat -c %i b) ]
-   [ $(stat -c %h a) -eq 2 ]
-   [ $(stat -c %h b) -eq 2 ]
+   [ "$(stat -c %i a)" = "$(stat -c %i b)" ]
+   [ "$(stat -c %h a)" -eq 2 ]
+   [ "$(stat -c %h b)" -eq 2 ]
    dbgecho "b was replaced with a hard link, good"
 
 

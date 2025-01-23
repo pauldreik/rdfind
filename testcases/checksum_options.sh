@@ -15,7 +15,7 @@ for checksumtype in $allchecksumtypes; do
    dbgecho "trying checksum $checksumtype with small files"
    echo checksumtest >a
    echo checksumtest >b
-   $rdfind  -checksum $checksumtype -deleteduplicates true a b
+   $rdfind  -checksum "$checksumtype" -deleteduplicates true a b
    [ -e a ]
    [ ! -e b ]
 done
@@ -25,7 +25,7 @@ for checksumtype in $allchecksumtypes; do
    dbgecho "trying checksum $checksumtype with large files"
    head -c 1000000 /dev/zero >a
    head -c 1000000 /dev/zero >b
-   $rdfind  -checksum $checksumtype -deleteduplicates true a b
+   $rdfind  -checksum "$checksumtype" -deleteduplicates true a b
    [ -e a ]
    [ ! -e b ]
 done
@@ -35,7 +35,7 @@ for checksumtype in $allchecksumtypes; do
    dbgecho "trying checksum $checksumtype with large files that differ only in the middle"
    ( head -c 1000000 /dev/zero; echo =====a=====; head -c 1000000 /dev/zero) >a
    ( head -c 1000000 /dev/zero; echo =====b=====; head -c 1000000 /dev/zero) >b
-   $rdfind  -checksum $checksumtype -deleteduplicates true a b
+   $rdfind  -checksum "$checksumtype" -deleteduplicates true a b
    [ -e a ]
    [ -e b ]
 done

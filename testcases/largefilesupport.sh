@@ -8,7 +8,7 @@ reset_teststate
 
 #create a large file, sparse.
 filesizem1=2147483647 #size, in bytes. This is no problem.
-filesize=$(($filesizem1+1)) #size, in bytes. This is a problematic value.
+filesize=$((filesizem1+1)) #size, in bytes. This is a problematic value.
 
 #below, dd is used and the file is later appended to, to avoid problems
 #on Hurd which currently (20130619) can not take $filesize as argument to
