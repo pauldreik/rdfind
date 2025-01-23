@@ -34,15 +34,15 @@ set -e
 
 export LANG=
 
-rootdir=$(dirname $0)
-me=$(basename $0)
+rootdir="$(dirname "$0")"
+me="$(basename "$0")"
 
 #flags to configure, for assert.
 ASSERT=
 
 ###############################################################################
 start_from_scratch() {
-   cd $rootdir
+   cd "$rootdir"
    if [ -e Makefile ] ; then
       make distclean >/dev/null 2>&1
    fi
@@ -54,7 +54,8 @@ start_from_scratch() {
 #argument 3 (optional) is appended to CXXFLAGS
 compile_and_test_standard() {
    start_from_scratch
-   /bin/echo -n "$me: using $(basename $1) with standard $2"
+   # shellcheck disable=SC3037
+   /bin/echo -n "$me: using $(basename "$1") with standard $2"
    if [ -n "$3" ] ; then
       echo " (with additional CXXFLAGS $3)"
    else
@@ -62,11 +63,11 @@ compile_and_test_standard() {
    fi
 
    if ! ./bootstrap.sh >bootstrap.log 2>&1; then
-      echo $me:failed bootstrap - see bootstrap.log
+      echo "$me: failed bootstrap - see bootstrap.log"
       exit 1
    fi
-   if ! ./configure $ASSERT --enable-warnings CXX=$1 CXXFLAGS="-std=$2 $3" >configure.log 2>&1 ; then
-      echo $me: failed configure - see configure.log
+   if ! ./configure $ASSERT --enable-warnings CXX="$1" CXXFLAGS="-std=$2 $3" >configure.log 2>&1 ; then
+      echo "$me: failed configure - see configure.log"
       exit 1
    fi
    #make sure it compiles
@@ -75,22 +76,22 @@ compile_and_test_standard() {
       exit 1
    fi
    if ! /usr/bin/time --format=%e --output=time.log make >make.log 2>&1; then
-      echo $me: failed make
+      echo "$me: failed make"
       exit 1
    fi
-   if [ ! -z $MEASURE_COMPILE_TIME ] ; then
-      echo $me: "  compile with $(basename $1) $2 took $(cat time.log) seconds"
+   if [ -n "$MEASURE_COMPILE_TIME" ] ; then
+      echo "$me: compile with $(basename "$1") '$2' took $(cat time.log) seconds"
    fi
    #check for warnings
    if grep -q "warning" make.log; then
       # store as an artifact instead of erroring out
-      name=$(cat *.log |sha256sum |head -c 12)
-      cp make.log make_${name}.log
-      echo $me: found compile warning - see make.log, also stored as make_${name}.log
+      name="$(cat ./*.log |sha256sum |head -c 12)"
+      cp make.log "make_${name}.log"
+      echo "$me: found compile warning - see make.log, also stored as make_${name}.log"
    fi
    #run the tests
    if ! make check >makecheck.log 2>&1 ; then
-      echo $me: failed make check - see makecheck.log
+      echo "$me: failed make check - see makecheck.log"
       exit 1
    fi
 }
@@ -99,10 +100,10 @@ compile_and_test_standard() {
 compile_and_test() {
    #this is the test program to compile, so we know the compiler and standard lib
    #works. clang 4 with c++2a does not.
-   /bin/echo -e "#include <iostream>">x.cpp
+   echo "#include <iostream>">x.cpp
    #does the compiler understand c++17? That is mandatory.
    if ! $1 -c x.cpp -std=c++17 >/dev/null 2>&1 ; then
-      echo $me: this compiler $1 does not understand c++17
+      echo "$me: this compiler '$1' does not understand c++17"
       return 0
    fi
 
@@ -110,16 +111,16 @@ compile_and_test() {
    #use the code words.
    for std in 1z 2a 2b ; do
       if ! $1 -c x.cpp -std=c++$std >/dev/null 2>&1 ; then
-         echo $me: compiler does not understand c++$std, skipping this combination.
+         echo "$me: compiler does not understand c++$std, skipping this combination."
       else
          # debug build
          ASSERT=--enable-assert
-         compile_and_test_standard $1 c++$std "-Og"
+         compile_and_test_standard "$1" "c++$std" "-Og"
 
          # release build
          ASSERT=--disable-assert
          #compile_and_test_standard $1 c++$std "-O2"
-         compile_and_test_standard $1 c++$std "-O3"
+         compile_and_test_standard "$1" "c++$std" "-O3"
          #compile_and_test_standard $1 c++$std "-Os"
       fi
    done
@@ -130,31 +131,31 @@ compile_and_test() {
 # finds the latest clang on the form clang++-<ver> and if none found, checks for
 # clang++. first found is assigned to variable latestclang
 get_latest_clang() {
-    for ver in $(seq 30 -1 10); do
-	candidate=clang++-$ver
-	if which $candidate >/dev/null 2>&1; then
-	    latestclang=$candidate
-	    return
-	fi
-    done
-    if which clang++ >/dev/null 2>&1; then
-	latestclang=clang++
-	return
-    fi
-    latestclang=
+   for ver in $(seq 30 -1 10); do
+      candidate="clang++-$ver"
+      if which "$candidate" >/dev/null 2>&1; then
+         latestclang="$candidate"
+         return
+      fi
+   done
+   if which clang++ >/dev/null 2>&1; then
+      latestclang=clang++
+      return
+   fi
+   latestclang=
 }
 ###############################################################################
 run_with_sanitizer() {
-   echo $me: "running with sanitizer (options $1)"
+   echo "$me: running with sanitizer (options $1)"
    get_latest_clang
-   if [ -z $latestclang ] ; then
+   if [ -z "$latestclang" ] ; then
       echo "$me: could not find any clang compiler (on the form clang++-ver)"
       return 0
    fi
 
    start_from_scratch
    ./bootstrap.sh >bootstrap.log
-   ./configure $ASSERT CXX=$latestclang CXXFLAGS="-std=c++17 $1"   >configure.log
+   ./configure "$ASSERT" "CXX=$latestclang" CXXFLAGS="-std=c++17 $1"   >configure.log
    make > make.log 2>&1
    export UBSAN_OPTIONS="halt_on_error=true exitcode=1"
    export ASAN_OPTIONS="halt_on_error=true exitcode=1"
@@ -165,29 +166,29 @@ run_with_sanitizer() {
 ###############################################################################
 #This tries to mimic how the debian package is built
 run_with_debian_buildflags() {
-   echo $me: "running with buildflags from debian dpkg-buildflags"
+   echo "$me: running with buildflags from debian dpkg-buildflags"
    if ! which dpkg-buildflags >/dev/null  ; then
-      echo $me: dpkg-buildflags not found - skipping
+      echo "$me: dpkg-buildflags not found - skipping"
       return 0
    fi
    start_from_scratch
    ./bootstrap.sh >bootstrap.log
-   eval $(DEB_BUILD_MAINT_OPTIONS="hardening=+all qa=+all,-canary reproducible=+all" dpkg-buildflags --export=sh)
+   eval "$(DEB_BUILD_MAINT_OPTIONS="hardening=+all qa=+all,-canary reproducible=+all" dpkg-buildflags --export=sh)"
    ./configure  >configure.log
    make > make.log 2>&1
    #check for warnings
    if grep -q "warning" make.log; then
       # store as an artifact instead of erroring out
-      name=$(cat *.log |sha256sum |head -c 12)
-      cp make.log make_${name}.log
-      echo $me: found compile warnings - see make.log, also stored as make_${name}.log
+      name="$(cat ./*.log |sha256sum |head -c 12)"
+      cp make.log "make_${name}.log"
+      echo "$me: found compile warnings - see make.log, also stored as make_${name}.log"
 
    fi
    make check >make-check.log 2>&1
 
    #restore the build environment
    for flag in $(dpkg-buildflags  |cut -f1 -d=) ; do
-      unset $flag
+      unset "$flag"
    done
 }
 ###############################################################################
@@ -196,48 +197,51 @@ run_with_libcpp() {
    echo "#include <iostream>
    int main() { std::cout<<\"libc++ works!\"<<std::endl;}" >x.cpp
    get_latest_clang
-   if [ ! -z $latestclang ] ; then
-      if ! $latestclang -std=c++17 -stdlib=libc++ -lc++abi x.cpp >/dev/null 2>&1 || [ ! -x ./a.out ] || ! ./a.out ; then
-         echo $me: "debug: $latestclang could not compile with libc++ - perhaps uninstalled."
-         continue
+   if [ -n "$latestclang" ] ; then
+      if ! "$latestclang" -std=c++17 -stdlib=libc++ -lc++abi x.cpp >/dev/null 2>&1 || [ ! -x ./a.out ] || ! ./a.out ; then
+         echo "$me: debug: $latestclang could not compile with libc++ - perhaps uninstalled."
+         return
       fi
-      compile_and_test_standard $latestclang c++17 "-stdlib=libc++ -D_LIBCPP_DEBUG=1"
+      compile_and_test_standard "$latestclang" c++17 "-stdlib=libc++ -D_LIBCPP_DEBUG=1"
       return
    fi
    # we will get here if no clang could be found. that is not an error,
    # having clang and libc++ installed is optional
-   echo $me: no working clang with libc++ found, skipping.
+   echo "$me: no working clang with libc++ found, skipping."
 }
 ###############################################################################
 
 verify_packaging() {
    #make sure the packaging works as intended.
-   echo $me: "trying to make a tar ball for release and building it..."
+   echo "$me: trying to make a tar ball for release and building it..."
    log="$(pwd)/packagetest.log"
-   ./bootstrap.sh >$log
-   ./configure  >>$log
+   ./bootstrap.sh >"$log"
+   ./configure  >>"$log"
 
    touch dummy
-   make dist  >>$log
+   make dist  >>"$log"
    TARGZ=$(find "$(pwd)" -newer dummy -name "rdfind*gz" -type f |head -n1)
    rm dummy
-   temp=$(mktemp -d)
+   temp="$(mktemp -d)"
    cp "$TARGZ" "$temp"
    cd "$temp"
-   tar xzf $(basename "$TARGZ")  >>$log
-   cd $(basename "$TARGZ" .tar.gz)
-   ./configure --prefix=$temp  >>$log
-   make  >>$log
-   make check  >>$log
-   make install  >>$log
-   $temp/bin/rdfind --version   >>$log
+   tar xzf "$(basename "$TARGZ")"  >>"$log"
+   cd "$(basename "$TARGZ" .tar.gz)"
+   {
+        ./configure --prefix="$temp"
+        make
+        make check
+        make install
+        "$temp/bin/rdfind" --version
+    } >>"$log"
    #coming here means all went fine, go back to the source dir.
-   cd $(dirname "$TARGZ")
+   cd "$(dirname "$TARGZ")"
    rm -rf "$temp"
 }
 
 ###############################################################################
 verify_self_contained_headers() {
+   # shellcheck disable=SC3037
    /bin/echo -n "$me: verify that all header files are self contained..."
    if [ ! -e configure ]; then
       ./bootstrap.sh >bootstrap.log 2>&1
@@ -246,7 +250,7 @@ verify_self_contained_headers() {
       ./configure >configure.log 2>&1
    fi
    for header in *.hh ; do
-      cp $header tmp.cc
+      cp "$header" tmp.cc
       if ! g++ -std=c++17 -I. -c tmp.cc -o /dev/null >header.log 2>&1 ; then
          echo "$me: found a header which is not self contained: $header."
          echo "$me: see header.log for details"
@@ -262,16 +266,16 @@ build_32bit() {
    #compiling to 32 bit, on amd64.
    #apt install libc6-i386 gcc-multilib g++-multilib
    #
-   if [ $(uname -m) != x86_64 ] ; then
-      echo $me: "not on x64, won't cross compile with -m32"
+   if [ "$(uname -m)" != x86_64 ] ; then
+      echo "$me: not on x64, won't cross compile with -m32"
       return;
    fi
-   echo $me: "trying to compile in 32 bit mode with -m32..."
+   echo "$me: trying to compile in 32 bit mode with -m32..."
    configureflags="--build=i686-pc-linux-gnu CFLAGS=-m32 CXXFLAGS=-m32 LDFLAGS=-m32"
-   here=$(pwd)
+   here="$(pwd)"
    nettleinstall=$here/nettle32bit
    if [ -d "$nettleinstall" ] ; then
-      echo $me: "local nettle already seems to be installed"
+      echo "$me: local nettle already seems to be installed"
    else
       mkdir "$nettleinstall"
       cd "$nettleinstall"
@@ -282,11 +286,12 @@ build_32bit() {
       sha256sum --strict --quiet -c checksum
       tar xzf nettle-$nettleversion.tar.gz
       cd nettle-$nettleversion
-      echo $me: trying to configure nettle
-      ./configure $configureflags --prefix="$nettleinstall" >$here/nettle.configure.log 2>&1
-      make install >$here/nettle.install.log 2>&1
-      echo $me: "local nettle install went ok"
-      cd $here
+      echo "$me: trying to configure nettle"
+      # shellcheck disable=SC2086
+      ./configure $configureflags --prefix="$nettleinstall" >"$here/nettle.configure.log" 2>&1
+      make install >"$here/nettle.install.log" 2>&1
+      echo "$me: local nettle install went ok"
+      cd "$here"
    fi
    ./bootstrap.sh >bootstrap.log 2>&1
    echo "$me: attempting configure with 32 bit flags... (see configure.log if it fails)"
@@ -308,29 +313,35 @@ echo "">inodes_for_tested_compilers.txt
 
 #try all variants of g++
 if which g++ >/dev/null ; then
-   for COMPILER in $(ls $(which g++)* |grep -v libc); do
-      inode=$(stat --dereference --format=%i $COMPILER)
-      if grep -q "^$inode\$" inodes_for_tested_compilers.txt ; then
-         echo $me: skipping this compiler $COMPILER - already tested
+   for COMPILER in "$(which g++)"*; do
+      if echo "$COMPILER" | grep libc; then
+        continue
+      fi
+      inode=$(stat --dereference --format=%i "$COMPILER")
+      if  [ -f inodes_for_tested_compilers.txt ] && grep -q "^$inode\$" inodes_for_tested_compilers.txt >/dev/null; then
+         echo "$me: skipping this compiler $COMPILER - already tested"
       else
          #echo trying gcc $GCC:$($GCC --version|head -n1)
-         echo $inode >>inodes_for_tested_compilers.txt
-         compile_and_test $COMPILER
+         echo "$inode" >>inodes_for_tested_compilers.txt
+         compile_and_test "$COMPILER"
       fi
    done
 fi
 
 #try all variants of clang
 get_latest_clang
-if which $latestclang >/dev/null ; then
-   for COMPILER in $(ls $(dirname $(which $latestclang))/clang++* |grep -v libc); do
-      inode=$(stat --dereference --format=%i $COMPILER)
-      if grep -q "^$inode\$" inodes_for_tested_compilers.txt ; then
-         echo $me: skipping this compiler $COMPILER - already tested
+if which "$latestclang" >/dev/null ; then
+   for COMPILER in "$(dirname "$(which "$latestclang")")"/clang++*; do
+      if echo "$COMPILER" | grep libc; then
+        continue
+      fi
+      inode=$(stat --dereference --format=%i "$COMPILER")
+      if  [ -f inodes_for_tested_compilers.txt ] && grep -q "^$inode\$" inodes_for_tested_compilers.txt >/dev/null; then
+         echo "$me: skipping this compiler $COMPILER - already tested"
       else
          #echo trying gcc $GCC:$($GCC --version|head -n1)
-         echo $inode >>inodes_for_tested_compilers.txt
-         compile_and_test $COMPILER
+         echo "$inode" >>inodes_for_tested_compilers.txt
+         compile_and_test "$COMPILER"
       fi
    done
 fi
@@ -359,7 +370,7 @@ run_with_libcpp
 
 #test build with running through valgrind
 if which valgrind >/dev/null; then
-   echo $me: running unit tests through valgrind
+   echo "$me: running unit tests through valgrind"
    ASSERT="--disable-assert"
    compile_and_test_standard g++ c++17 "-O3"
    VALGRIND=valgrind make check >make-check.log
