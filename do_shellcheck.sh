@@ -12,7 +12,6 @@ echo "$me: run shellcheck on shellscripts"
 
 echo "$me: run shellcheck on testcases"
 (
-    # use this when all issues are fixed
-    # cd testcases && git ls-files | grep -E ".sh$" | xargs shellcheck -x
+    cd testcases && git ls-files | grep -E ".sh$" | xargs shellcheck -x
 )
 

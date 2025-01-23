@@ -11,8 +11,8 @@ set -e
 makefiles() {
    #make pairs of files, with specific sizes
    for i in $(seq 0 4) ; do
-      head -c$i /dev/zero >a$i
-      head -c$i /dev/zero >b$i
+      head -c"$i" /dev/zero >"a$i"
+      head -c"$i" /dev/zero >"b$i"
    done
 }
 
@@ -43,8 +43,8 @@ $rdfind -deleteduplicates true -minsize 2 -maxsize 3 a* b*
 verify [ -e a2 ]
 verify [ ! -e b2 ]
 for i in $(seq 0 1) $(seq 3 4); do
-   verify [ -e a$i ]
-   verify [ -e b$i ]
+   verify [ -e "a$i" ]
+   verify [ -e "b$i" ]
 done
 
 dbgecho "passed specific size test"
