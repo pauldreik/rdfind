@@ -1,0 +1,25 @@
+---
+name: run yamllint on files
+
+"on":
+  push:
+    branches:
+      - main
+      - devel
+  pull_request:
+
+
+jobs:
+  build:
+    name: Runs the yamllint on files
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: install packages
+        run: sudo apt install python3
+      - name: install yamllint
+        run: python3 -m venv .venv && .venv/bin/python3 -m pip install yamllint
+      - name: run yamllint
+        run: ./do_yamllint.sh
