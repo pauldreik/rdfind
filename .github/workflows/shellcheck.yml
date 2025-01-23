@@ -1,0 +1,23 @@
+---
+name: run shellcheck on scripts
+
+"on":
+  push:
+    branches:
+      - main
+      - devel
+  pull_request:
+
+
+jobs:
+  build:
+    name: Runs the shellcheck on scripts
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: install packages
+        run: sudo apt install shellcheck
+      - name: run shellcheck
+        run: ./do_shellcheck.sh
