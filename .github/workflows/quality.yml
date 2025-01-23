@@ -1,6 +1,7 @@
+---
 name: build variants
 
-on:
+"on":
   push:
     branches:
       - main
@@ -14,15 +15,14 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-    - name: checkout
-      uses: actions/checkout@v4
-    - name: install packages
-      run: sudo apt install build-essential nettle-dev time libc6-i386 gcc-multilib g++-multilib valgrind libc++-dev libc++abi-dev clang
-    - name: run do_quality_checks.sh
-      run: ./do_quality_checks.sh
-    - name: store logs as artifacts
-      if: ${{ always() }}
-      uses: actions/upload-artifact@v4
-      with:
-         path: '**/*.log'
-
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: install packages
+        run: sudo apt install build-essential nettle-dev time libc6-i386 gcc-multilib g++-multilib valgrind libc++-dev libc++abi-dev clang
+      - name: run do_quality_checks.sh
+        run: ./do_quality_checks.sh
+      - name: store logs as artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          path: '**/*.log'

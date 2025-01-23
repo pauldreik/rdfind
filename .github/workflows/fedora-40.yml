@@ -1,6 +1,7 @@
+---
 name: fedora 40
 
-on:
+"on":
   push:
     branches:
       - main
@@ -14,22 +15,22 @@ jobs:
     container:
       image: fedora:40
     steps:
-    - name: checkout
-      uses: actions/checkout@v4
-    - name: install packages
-      run: yes | dnf install automake gcc which g++ nettle-devel
-    - name: bootstrap
-      run: ./bootstrap.sh
-    - name: configure
-      run: ./configure --enable-warnings CXXFLAGS=-std=c++17
-    - name: make
-      run: make -j $(nproc)
-    - name: make check
-      run: make check
-    - name: make distcheck
-      run: make distcheck CXXFLAGS=-std=c++17
-    - name: store the logs as an artifact
-      if: ${{ always() }}
-      uses: actions/upload-artifact@v4
-      with:
-         path: '**/*.log'
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: install packages
+        run: yes | dnf install automake gcc which g++ nettle-devel
+      - name: bootstrap
+        run: ./bootstrap.sh
+      - name: configure
+        run: ./configure --enable-warnings CXXFLAGS=-std=c++17
+      - name: make
+        run: make -j $(nproc)
+      - name: make check
+        run: make check
+      - name: make distcheck
+        run: make distcheck CXXFLAGS=-std=c++17
+      - name: store the logs as an artifact
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          path: '**/*.log'

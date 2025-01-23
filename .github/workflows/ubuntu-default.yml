@@ -1,6 +1,7 @@
+---
 name: ubuntu default build
 
-on:
+"on":
   push:
     branches:
       - main
@@ -16,17 +17,17 @@ jobs:
         os: [ubuntu-20.04, ubuntu-22.04, ubuntu-24.04]
 
     steps:
-    - name: checkout
-      uses: actions/checkout@v4
-    - name: install packages
-      run: sudo apt install build-essential nettle-dev
-    - name: bootstrap
-      run: ./bootstrap.sh
-    - name: configure
-      run: ./configure --enable-warnings CXXFLAGS=-std=c++17
-    - name: make
-      run: make
-    - name: make check
-      run: make check
-    - name: make distcheck
-      run: make distcheck CXXFLAGS=-std=c++17
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: install packages
+        run: sudo apt install build-essential nettle-dev
+      - name: bootstrap
+        run: ./bootstrap.sh
+      - name: configure
+        run: ./configure --enable-warnings CXXFLAGS=-std=c++17
+      - name: make
+        run: make
+      - name: make check
+        run: make check
+      - name: make distcheck
+        run: make distcheck CXXFLAGS=-std=c++17

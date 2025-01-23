@@ -16,6 +16,4 @@ else
 fi
 
 # run this when all issues are fixed
-# git ls-files | grep -E "*.yml$" | xargs "$YMLLINT"
-
-"$YMLLINT" .github/workflows/shellcheck.yml .github/workflows/yamllint.yml
+git ls-files | grep -E ".yml$" | xargs "$YMLLINT"
