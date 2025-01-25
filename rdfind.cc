@@ -15,6 +15,7 @@ static_assert(__cplusplus >= 201703L,
 #include <limits>
 #include <string>
 #include <vector>
+#include <limits>
 
 // project
 #include "CmdlineParser.hh"
@@ -112,6 +113,7 @@ struct Options
   bool deterministic = true; // be independent of filesystem order
   long nsecsleep = 0; // number of nanoseconds to sleep between each file read.
   std::string resultsfile = "results.txt"; // results file name.
+  std::string results_delimiter = " "; // fields delimiter in results file
 };
 
 Options
@@ -140,6 +142,8 @@ parseOptions(Parser& parser)
       o.makeresultsfile = parser.get_parsed_bool();
     } else if (parser.try_parse_string("-outputname")) {
       o.resultsfile = parser.get_parsed_string();
+    } else if (parser.try_parse_string("-outputdelimiter")){
+      o.results_delimiter = parser.get_parsed_string();
     } else if (parser.try_parse_bool("-ignoreempty")) {
       if (parser.get_parsed_bool()) {
         o.minimumfilesize = 1;
@@ -407,7 +411,7 @@ main(int narg, const char* argv[])
   if (o.makeresultsfile) {
     std::cout << dryruntext << "Now making results file " << o.resultsfile
               << std::endl;
-    gswd.printtofile(o.resultsfile);
+    gswd.printtofile(o.resultsfile, o.results_delimiter);
   }
 
   // traverse the list and replace with symlinks
