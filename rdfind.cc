@@ -10,7 +10,6 @@ static_assert(__cplusplus >= 201703L,
               "this code requires a C++17 capable compiler!");
 
 // std
-#include <algorithm>
 #include <iostream>
 #include <limits>
 #include <string>
