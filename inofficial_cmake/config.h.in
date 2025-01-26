@@ -1,0 +1,4 @@
+#cmakedefine RDFIND_VERSION "@RDFIND_VERSION@"
+#cmakedefine FOO_ENABLE
+#cmakedefine FOO_STRING "@FOO_STRING@"
+#define VERSION "@RDFIND_VERSION@"
