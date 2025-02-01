@@ -9,6 +9,15 @@ project(rdfind VERSION "${PROJECT_VERSION}")
 find_package(PkgConfig)
 pkg_check_modules(nettle REQUIRED nettle)
 
+pkg_check_modules(xxhash IMPORTED_TARGET libxxhash)
+
+if(xxhash_FOUND)
+    set(HAVE_LIBXXHASH 1)
+else()
+    set(HAVE_LIBXXHASH 0)
+endif()
+
+
 configure_file(config.h.in config.h @ONLY)
 
 add_executable(rdfind
@@ -33,5 +42,8 @@ target_include_directories(rdfind PRIVATE ..)
 
 target_compile_features(rdfind PRIVATE cxx_std_17)
 target_link_libraries(rdfind nettle)
+if(xxhash_FOUND)
+target_link_libraries(rdfind PkgConfig::xxhash)
+endif()
 target_compile_options(rdfind PRIVATE -Wall -Wextra -Wpedantic)
 
