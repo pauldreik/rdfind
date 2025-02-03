@@ -18,13 +18,10 @@ cppcheck $args --xml ./*.cc ./*.hh 2>"$outdir/cppcheck.xml"
 
 cppcheck-htmlreport --source-dir=. --title=rdfind --file="$outdir/cppcheck.xml" --report-dir="$outdir"
 
-
 #is anything serious found?
 if grep --quiet -v -E '^(style|information|performance):' "$outdir/cppcheck.out"; then
- echo "$me: cppcheck found serious issues. see $outdir/cppcheck.out"
- exit 1
+  echo "$me: cppcheck found serious issues. see $outdir/cppcheck.out"
+  exit 1
 fi
 
 echo "$me: cppcheck passed without serious issues."
-
-
