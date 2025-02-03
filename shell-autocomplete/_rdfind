@@ -1,0 +1,24 @@
+#compdef rdfind
+# shell autocompletion for zsh
+# put this file in a dir from $fpath
+# for example in /usr/share/zsh/vendor-completions/
+# or /usr/share/zsh/site-functions/
+
+_arguments \
+	"-ignoreempty[Ignore empty files]:flag:(true false)" \
+	"-minsize[Ignores files with less than N bytes]:N" \
+	"-maxsize[Ignores files with N bytes or more]:N" \
+	"-followsymlinks[Follow symlinks]:flag:(true false)" \
+	"-removeidentinode[Removes items found which have identical inode and device ID]:flag:(true false)" \
+	"-checksum[What type of checksum to be used]:algo:(md5 sha1 sha256 sha512)" \
+	"-deterministic[If set (the default), sort files of equal rank in an unspecified but deterministic order]:flag:(true false)" \
+	"-makesymlinks[Replace duplicate files with symbolic links]:flag:(true false)" \
+	"-makehardlinks[Replace duplicate files with hard links]:flag:(true false)" \
+	"-deleteduplicates[Delete (unlink) files]:flag:(true false)" \
+	"-makeresultsfile[Make a results file in the current directory]:flag:(true false)" \
+	"-outputname[Make the results file name to be \"name\" instead of the default results.txt]:name" \
+	{-n,-dryrun}"[Displays what should have been done, don’t actually delete or link anything]:flag:(true false)" \
+	"-sleep[Sleeps X milliseconds between reading each file, to reduce load]:X" \
+	{-h,-help,--help}"[Displays a brief help message]" \
+	{-v,-version,--version}"[Displays the version number]" \
+	"*:file or directory:_files"
