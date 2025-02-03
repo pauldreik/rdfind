@@ -268,7 +268,7 @@ parseOptions(Parser& parser)
 
   // done with parsing of options. remaining arguments are files and dirs.
 
-  // decide what checksum to use - if no checksum is set, force xxhash!
+  // decide what checksum to use - if no checksum is set, force sha1!
   if (!o.usemd5 && !o.usesha1 && !o.usesha256 && !o.usesha512 && !o.usexxh128) {
     o.usesha1 = true;
   }
@@ -296,7 +296,7 @@ report(const std::string& path, const std::string& name, int depth)
       }
     }
   } else {
-    std::cerr << "failed to read file info on file \"" << tmp.name() << '\n';
+    std::cerr << "failed to read file info on file \"" << tmp.name() << "\"\n";
     return -1;
   }
   return 0;
