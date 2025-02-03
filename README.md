@@ -123,7 +123,7 @@ Here is how to get and install nettle from source. Please check for the current 
 ### Quality
 The following methods are used to maintain code quality:
  - builds without warnings on gcc and clang, even with all the suggested warnings from [cppbestpractices](https://github.com/lefticus/cppbestpractices/blob/master/02-Use_the_Tools_Available.md) enabled. Pass --enable-warnings to configure to turn them on.
- - builds with standards c++11, 14, 17 and 2a
+ - builds with standards c++17 and 20
  - tests are written for newly found bugs, first to prove the bug and then to prove that it is fixed. Older bugs do not all have tests.
  - tests are also run through valgrind
  - tests are run on address sanitizer builds

@@ -1,3 +1,7 @@
+2025-02-03 Paul Dreik <rdfind@pauldreik.se>
+        * release 1.7.0
+	* add xxh checksum for speed
+	* add controllable buffer size -buffersize N
 2023-06-17 Paul Dreik <rdfind@pauldreik.se>
         * release 1.6.0
 2023-06-17 Paul Dreik <rdfind@pauldreik.se>
