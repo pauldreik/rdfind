@@ -1,0 +1,35 @@
+---
+name: run shell formatting on scripts
+
+"on":
+  push:
+    branches:
+      - main
+      - devel
+  pull_request:
+
+
+jobs:
+  build:
+    name: Runs shell formatting on scripts
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: install packages
+        run: sudo apt install shfmt
+      - name: run fmtsh
+        run: ./do_shellfmt.sh
+      - name: check diff
+        run: |
+          git diff |tee shellfmt.patch
+          if ! git diff-index --quiet HEAD ; then
+            echo "please run ./do_shellfmt.sh";
+            exit 1;
+          fi
+      - name: store diff as an artifact
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          path: 'shellfmt.patch'
