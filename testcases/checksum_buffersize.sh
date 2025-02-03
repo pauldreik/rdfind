@@ -25,7 +25,7 @@ dbgecho "check so all buffersizes behave the same"
 for checksumtype in sha256; do
   i=1
   while :; do
-    if [ $i -gt 128 ]; then
+    if [ $i -gt 65536 ]; then
       break
     fi
     i="$((i * 2))"
