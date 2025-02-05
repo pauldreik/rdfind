@@ -158,8 +158,23 @@ Dirlist::handlepossiblefile(const std::string& possiblefile, int recursionlevel)
 
   if (S_ISDIR(info.st_mode)) {
     std::cerr << "Dirlist.cc::handlepossiblefile: This should never happen. "
-                 "FIXME! details on the next row:\n";
+                 "FIXME! details on the next rows:\n";
     std::cerr << "possiblefile=\"" << possiblefile << "\"\n";
+    DIR* dirp = opendir(possiblefile.c_str());
+    if (dirp == nullptr) {
+      std::cerr << "File seems to be a directory, but opendir() returned error: " << strerror(errno) << std::endl;
+      #ifdef __APPLE__
+      if (errno == EPERM) {
+        std::cerr << "This could be due to Full Disk Access not being "
+                   "granted to the terminal running rdfind" << std::endl;
+        std::cerr << "You can grant Full Disk Access to your terminal in "
+                     "System Preferences -> Security & Privacy -> Privacy -> "
+                     "Full Disk Access" << std::endl;
+      }
+      #endif
+    } else {
+      std::cerr << "opendir() succeeded on the second try. Was this changed while we were reading it?!" << std::endl;
+    }
     // this should never happen, because this function is only to be called
     // for items that can not be opened with opendir.
     // maybe it happens if someone else is changing the file while we
