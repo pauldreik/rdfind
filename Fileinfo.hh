@@ -125,6 +125,12 @@ public:
   // gets the filename
   const std::string& name() const { return m_filename; }
 
+  // gets the filename
+  const std::vector<std::string>& aliases() const { return m_aliases; }
+
+  // adds a filename alias
+  void add_alias(std::string n) { m_aliases.push_back(n); }
+
   // gets the command line index this item was found at
   int get_cmdline_index() const { return m_cmdline_index; }
 
@@ -174,6 +180,9 @@ private:
 
   // to be deleted or not
   bool m_delete;
+
+  // list of hardlinks
+  std::vector<std::string> m_aliases;
 
   duptype m_duptype;
 
