@@ -544,8 +544,7 @@ Rdutil::fillwithbytes(enum Fileinfo::readtobuffermode type,
                       enum Fileinfo::readtobuffermode lasttype,
                       const long nsecsleep,
                       const std::size_t buffersize,
-                      void (*debugProgress)(int, int))
-                      )
+                      void (*debugProgress)(int, int)))
 {
   // first sort on inode (to read efficiently from the hard drive)
   sortOnDeviceAndInode();
