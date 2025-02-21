@@ -86,7 +86,7 @@ public:
   // than the file length. (unnecessary!). if -1, feature is turned off.
   // and file is read anyway.
   // if there is trouble with too much disk reading, sleeping for nsecsleep
-  // nanoseconds can be made between each file.  
+  // nanoseconds can be made between each file.
   int fillwithbytes(enum Fileinfo::readtobuffermode type,
                     enum Fileinfo::readtobuffermode lasttype =
                       Fileinfo::readtobuffermode::NOT_DEFINED,
