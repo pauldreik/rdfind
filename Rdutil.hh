@@ -90,7 +90,8 @@ public:
   int fillwithbytes(enum Fileinfo::readtobuffermode type,
                     enum Fileinfo::readtobuffermode lasttype,
                     long nsecsleep,
-                    std::size_t buffersize);
+                    std::size_t buffersize,
+                    void (*debugProgress)(int, int) = NULL);
 
   /// make symlinks of duplicates.
   std::size_t makesymlinks(bool dryrun) const;

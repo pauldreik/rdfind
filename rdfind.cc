@@ -21,6 +21,7 @@ static_assert(__cplusplus >= 201703L,
 #include "Fileinfo.hh"    //file container
 #include "RdfindDebug.hh" //debug macro
 #include "Rdutil.hh"      //to do some work
+#include "ListProgress.hh"
 
 // global variables
 
@@ -78,6 +79,7 @@ usage()
     << " -makeresultsfile  (true)| false  makes a results file\n"
     << " -outputname  name  sets the results file name to \"name\" "
        "(default results.txt)\n"
+    << " -progress          true |(false) output progress information"
     << " -deleteduplicates  true |(false) delete duplicate files\n"
     << " -sleep             Xms          sleep for X milliseconds between "
        "file reads.\n"
@@ -118,6 +120,7 @@ struct Options
   std::size_t buffersize = 1 << 20; // chunksize to use when reading files
   long nsecsleep = 0; // number of nanoseconds to sleep between each file read.
   std::string resultsfile = "results.txt"; // results file name.
+  void (*debugProgressFuncPtr)(int, int) = NULL; // call this function for each iteration of fillwithbytes
 };
 
 Options
@@ -237,6 +240,8 @@ parseOptions(Parser& parser)
                   << nextarg << "\" is not among them.\n";
         std::exit(EXIT_FAILURE);
       }
+    } else if (parser.try_parse_bool("-progress") && parser.get_parsed_bool()) {
+      o.debugProgressFuncPtr = outputMlistProgress;
     } else if (parser.current_arg_is("-help") || parser.current_arg_is("-h") ||
                parser.current_arg_is("--help")) {
       usage();
@@ -414,7 +419,7 @@ main(int narg, const char* argv[])
               << it->second << ": " << std::flush;
 
     // read bytes (destroys the sorting, for disk reading efficiency)
-    gswd.fillwithbytes(it[0].first, it[-1].first, o.nsecsleep, o.buffersize);
+    gswd.fillwithbytes(it[0].first, it[-1].first, o.nsecsleep, o.buffersize, o.debugProgressFuncPtr);
 
     // remove non-duplicates
     std::cout << "removed " << gswd.removeUniqSizeAndBuffer()
