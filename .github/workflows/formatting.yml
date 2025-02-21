@@ -1,0 +1,43 @@
+---
+name: code formatting
+
+"on":
+  push:
+    branches:
+      - main
+      - devel
+  pull_request:
+
+
+jobs:
+  build:
+    name: Auto format with clang 18
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: install packages
+        run: sudo apt install clang-18
+      - name: run clang format
+        run: |
+          ./do_clang_format.sh
+      - name: check for differences
+        run: |
+          git diff >clang-format.patch
+          if [ $(wc -c <clang-format.patch) -ne 0 ] ; then
+             echo "there was a formatting issue."
+             cat /etc/os-release
+             echo "you may download the artifact and apply it with git apply"
+             cat clang-format.patch
+             exit 1
+          else
+             rm clang-format.patch
+          fi
+      - name: store patch as artifact if there is one
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clang-format.patch
+          path: clang-format.patch
+          if-no-files-found: ignore

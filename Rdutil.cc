@@ -113,7 +113,8 @@ public:
   explicit dryrun_helper(const char* m1, const char* m2 = nullptr)
     : m_m1(m1)
     , m_m2(m2)
-  {}
+  {
+  }
 
   const char* const m_m1;
   const char* const m_m2;
@@ -542,20 +543,24 @@ int
 Rdutil::fillwithbytes(enum Fileinfo::readtobuffermode type,
                       enum Fileinfo::readtobuffermode lasttype,
                       const long nsecsleep,
+                      const std::size_t buffersize,
                       void (*debugProgress)(int, int))
+                      )
 {
   // first sort on inode (to read efficiently from the hard drive)
   sortOnDeviceAndInode();
 
   const auto duration = std::chrono::nanoseconds{ nsecsleep };
 
+  std::vector<char> buffer(buffersize, '\0');
   int progress = 0;
+
   for (auto& elem : m_list) {
     if (debugProgress) {
       progress += 1;
       debugProgress(progress, m_list.size());
     }
-    elem.fillwithbytes(type, lasttype);
+    elem.fillwithbytes(type, lasttype, buffer);
     if (nsecsleep > 0) {
       std::this_thread::sleep_for(duration);
     }

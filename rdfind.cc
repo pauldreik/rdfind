@@ -6,8 +6,10 @@
 
 #include "config.h" //header file from autoconf
 
+static_assert(__cplusplus >= 201703L,
+              "this code requires a C++17 capable compiler!");
+
 // std
-#include <algorithm>
 #include <iostream>
 #include <limits>
 #include <string>
@@ -38,9 +40,9 @@ int current_cmdline_index = 0;
 static void
 usage()
 {
+  const auto indent = "                                  ";
   std::cout
-    << "Usage: "
-    << "rdfind [options] FILE ...\n"
+    << "Usage: rdfind [options] FILE ...\n"
     << '\n'
     << "Finds duplicate files recursively in the given FILEs (directories),\n"
     << "and takes appropriate action (by default, nothing).\n"
@@ -62,8 +64,12 @@ usage()
     << " -followsymlinks    true |(false) follow symlinks\n"
     << " -removeidentinode (true)| false  ignore files with nonunique "
        "device and inode\n"
-    << " -checksum           md5 |(sha1)| sha256 | sha512\n"
-    << "                                  checksum type\n"
+    << " -checksum           md5 |(sha1)| sha256 | sha512 | xxh128\n"
+    << indent << "checksum type\n"
+    << indent << "xxh128 is very fast, but is noncryptographic.\n"
+    << " -buffersize N\n"
+    << indent << "chunksize in bytes when calculating the checksum.\n"
+    << indent << "The default is 1 MiB, can be up to 128 MiB.\n"
     << " -deterministic    (true)| false  makes results independent of order\n"
     << "                                  from listing the filesystem\n"
     << " -makesymlinks      true |(false) replace duplicate files with "
@@ -75,7 +81,7 @@ usage()
        "(default results.txt)\n"
     << " -progress          true |(false) output progress information"
     << " -deleteduplicates  true |(false) delete duplicate files\n"
-    << " -sleep              Xms          sleep for X milliseconds between "
+    << " -sleep             Xms          sleep for X milliseconds between "
        "file reads.\n"
     << "                                  Default is 0. Only a few values\n"
     << "                                  are supported; 0,1-5,10,25,50,100\n"
@@ -109,7 +115,9 @@ struct Options
   bool usesha1 = false;      // use sha1 checksum to check for similarity
   bool usesha256 = false;    // use sha256 checksum to check for similarity
   bool usesha512 = false;    // use sha512 checksum to check for similarity
+  bool usexxh128 = false;    // use xxh128 checksum to check for similarity
   bool deterministic = true; // be independent of filesystem order
+  std::size_t buffersize = 1 << 20; // chunksize to use when reading files
   long nsecsleep = 0; // number of nanoseconds to sleep between each file read.
   std::string resultsfile = "results.txt"; // results file name.
   void (*debugProgressFuncPtr)(int, int) = NULL; // call this function for each iteration of fillwithbytes
@@ -180,11 +188,32 @@ parseOptions(Parser& parser)
         o.usesha256 = true;
       } else if (parser.parsed_string_is("sha512")) {
         o.usesha512 = true;
+      } else if (parser.parsed_string_is("xxh128")) {
+#ifdef HAVE_LIBXXHASH
+        o.usexxh128 = true;
+#else
+        std::cerr << "not compiled with xxhash, to make use of xxh128 please "
+                     "reconfigure and rebuild '--with-xxhash'\n";
+        std::exit(EXIT_FAILURE);
+#endif
       } else {
-        std::cerr << "expected md5/sha1/sha256/sha512, not \""
+        std::cerr << "expected md5/sha1/sha256/sha512/xxh128, not \""
                   << parser.get_parsed_string() << "\"\n";
         std::exit(EXIT_FAILURE);
       }
+    } else if (parser.try_parse_string("-buffersize")) {
+      const long buffersize = std::stoll(parser.get_parsed_string());
+      constexpr long max_buffersize = 128 << 20;
+      if (buffersize <= 0) {
+        std::cerr << "a negative or zero buffersize is not allowed\n";
+        std::exit(EXIT_FAILURE);
+      } else if (buffersize > max_buffersize) {
+        std::cerr << "a maximum of " << (max_buffersize >> 20)
+                  << " MiB buffersize is allowed, got " << (buffersize >> 20)
+                  << " MiB\n";
+        std::exit(EXIT_FAILURE);
+      }
+      o.buffersize = static_cast<std::size_t>(buffersize);
     } else if (parser.try_parse_string("-sleep")) {
       const auto nextarg = std::string(parser.get_parsed_string());
       if (nextarg == "1ms") {
@@ -245,7 +274,7 @@ parseOptions(Parser& parser)
   // done with parsing of options. remaining arguments are files and dirs.
 
   // decide what checksum to use - if no checksum is set, force sha1!
-  if (!o.usemd5 && !o.usesha1 && !o.usesha256 && !o.usesha512) {
+  if (!o.usemd5 && !o.usesha1 && !o.usesha256 && !o.usesha512 && !o.usexxh128) {
     o.usesha1 = true;
   }
   return o;
@@ -272,7 +301,7 @@ report(const std::string& path, const std::string& name, int depth)
       }
     }
   } else {
-    std::cerr << "failed to read file info on file \"" << tmp.name() << '\n';
+    std::cerr << "failed to read file info on file \"" << tmp.name() << "\"\n";
     return -1;
   }
   return 0;
@@ -380,13 +409,17 @@ main(int narg, const char* argv[])
     modes.emplace_back(Fileinfo::readtobuffermode::CREATE_SHA512_CHECKSUM,
                        "sha512 checksum");
   }
+  if (o.usexxh128) {
+    modes.emplace_back(Fileinfo::readtobuffermode::CREATE_XXH128_CHECKSUM,
+                       "xxh128 checksum");
+  }
 
   for (auto it = modes.begin() + 1; it != modes.end(); ++it) {
     std::cout << dryruntext << "Now eliminating candidates based on "
               << it->second << ": " << std::flush;
 
     // read bytes (destroys the sorting, for disk reading efficiency)
-    gswd.fillwithbytes(it[0].first, it[-1].first, o.nsecsleep, o.debugProgressFuncPtr);
+    gswd.fillwithbytes(it[0].first, it[-1].first, o.nsecsleep, o.buffersize, o.debugProgressFuncPtr);
 
     // remove non-duplicates
     std::cout << "removed " << gswd.removeUniqSizeAndBuffer()

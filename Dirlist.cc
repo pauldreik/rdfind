@@ -54,7 +54,7 @@ Dirlist::walk(const std::string& dir, const int recursionlevel)
     if (0 == strcmp(".", dp->d_name) || 0 == strcmp("..", dp->d_name)) {
       continue;
     }
-    // investigate what kind of file it is, dont follow any
+    // investigate what kind of file it is, don't follow any
     // symlinks when doing this (lstat instead of stat).
     struct stat info;
     const int statval =
@@ -130,7 +130,7 @@ Dirlist::handlepossiblefile(const std::string& possiblefile, int recursionlevel)
   RDDEBUG("split filename is path=" << path.c_str() << " filename="
                                     << filename.c_str() << std::endl);
 
-  // investigate what kind of file it is, dont follow symlink
+  // investigate what kind of file it is, don't follow symlink
   int statval = 0;
   struct stat info;
   do {

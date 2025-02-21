@@ -5,13 +5,13 @@ Rdfind is a command line tool that finds duplicate files. It is useful for compr
 If you find rdfind useful, [drop me an email](mailto:__please_remove_this_antispam_prefix_rdfind@pauldreik.se)! I love hearing about how people actually use rdfind. In the unlikely case you want to throw money at rdfind, please use [goclimate](https://www.goclimate.com/gift-cards).
 
 ## Continuous integration status
-| Status (main) | Status (devel)| Description
-|-------------|-------------|------------------
+| Status (main) | Status (devel)| Description |
+|-------------|-------------|------------------|
 | [issues list](https://github.com/pauldreik/rdfind/security/code-scanning?query=is%3Aopen+branch%3Amain) | [issues list](https://github.com/pauldreik/rdfind/security/code-scanning?query=is%3Aopen+branch%3Adevel) | Static analyzer (codeql) |
-| [![build status](https://github.com/pauldreik/rdfind/actions/workflows/cppcheck.yml/badge.svg?branch=main)](https://github.com/pauldreik/rdfind/actions/workflows/cppcheck.yml?query=branch%3Amain) | [![build status](https://github.com/pauldreik/rdfind/actions/workflows/cppcheck.yml/badge.svg?branch=devel)](https://github.com/pauldreik/rdfind/actions/workflows/cppcheck.yml?query=branch%3Adevel) | Static analyzer (cppcheck)|
-| [![build status](https://github.com/pauldreik/rdfind/actions/workflows/ubuntu-default.yml/badge.svg?branch=main)](https://github.com/pauldreik/rdfind/actions/workflows/ubuntu-default.yml?query=branch%3Amain) | [![build status](https://github.com/pauldreik/rdfind/actions/workflows/ubuntu-default.yml/badge.svg?branch=devel)](https://github.com/pauldreik/rdfind/actions/workflows/ubuntu-default.yml?query=branch%3Adevel) | Builds and tests on Ubuntu 20.04 and 22.04 with the default compiler and settings |
-|  [![build status](https://github.com/pauldreik/rdfind/actions/workflows/mac.yml/badge.svg?branch=main)](https://github.com/pauldreik/rdfind/actions/workflows/mac.yml?query=branch%3Amain) | [![build status](https://github.com/pauldreik/rdfind/actions/workflows/mac.yml/badge.svg?branch=devel)](https://github.com/pauldreik/rdfind/actions/workflows/mac.yml?query=branch%3Adevel) | Compiles on Mac OS X|
-|  [![build status](https://github.com/pauldreik/rdfind/actions/workflows/quality.yml/badge.svg?branch=main)](https://github.com/pauldreik/rdfind/actions/workflows/quality.yml?query=branch%3Amain) | [![build status](https://github.com/pauldreik/rdfind/actions/workflows/quality.yml/badge.svg?branch=devel)](https://github.com/pauldreik/rdfind/actions/workflows/quality.yml?query=branch%3Adevel) | Builds and executes test on Ubuntu 20.04 with multiple versions of gcc and clang. Runs builds with address/undefined sanitizers and valgrind. Also performs the tests with a binary compiled in 32 bit mode.
+| [![build status](https://github.com/pauldreik/rdfind/actions/workflows/cppcheck.yml/badge.svg?branch=main)](https://github.com/pauldreik/rdfind/actions/workflows/cppcheck.yml?query=branch%3Amain) | [![build status](https://github.com/pauldreik/rdfind/actions/workflows/cppcheck.yml/badge.svg?branch=devel)](https://github.com/pauldreik/rdfind/actions/workflows/cppcheck.yml?query=branch%3Adevel) | Static analyzer (cppcheck) |
+| [![build status](https://github.com/pauldreik/rdfind/actions/workflows/ubuntu-default.yml/badge.svg?branch=main)](https://github.com/pauldreik/rdfind/actions/workflows/ubuntu-default.yml?query=branch%3Amain) | [![build status](https://github.com/pauldreik/rdfind/actions/workflows/ubuntu-default.yml/badge.svg?branch=devel)](https://github.com/pauldreik/rdfind/actions/workflows/ubuntu-default.yml?query=branch%3Adevel) | Builds and tests on Ubuntu 20.04, 22.04 and 24.04 with the default compiler and settings |
+| [![build status](https://github.com/pauldreik/rdfind/actions/workflows/mac.yml/badge.svg?branch=main)](https://github.com/pauldreik/rdfind/actions/workflows/mac.yml?query=branch%3Amain) | [![build status](https://github.com/pauldreik/rdfind/actions/workflows/mac.yml/badge.svg?branch=devel)](https://github.com/pauldreik/rdfind/actions/workflows/mac.yml?query=branch%3Adevel) | Compiles on latest Mac OS X |
+| [![build status](https://github.com/pauldreik/rdfind/actions/workflows/quality.yml/badge.svg?branch=main)](https://github.com/pauldreik/rdfind/actions/workflows/quality.yml?query=branch%3Amain) | [![build status](https://github.com/pauldreik/rdfind/actions/workflows/quality.yml/badge.svg?branch=devel)](https://github.com/pauldreik/rdfind/actions/workflows/quality.yml?query=branch%3Adevel) | Builds and executes tests on Ubuntu 24.04 with multiple versions of gcc and clang. Runs builds with address/undefined sanitizers and valgrind. Also performs the tests with a binary compiled in 32 bit mode. |
 
 ## Install
 
@@ -25,7 +25,11 @@ If you find rdfind useful, [drop me an email](mailto:__please_remove_this_antisp
 
 ### Mac
 
-If you are on Mac, you can install through [MacPorts](https://www.macports.org/) (direct link to [Portfile](https://github.com/macports/macports-ports/blob/master/sysutils/rdfind/Portfile)). If you want to compile the source yourself, that is fine. Rdfind is written in C++11 and should compile under any \*nix.
+If you are on Mac, you can install through
+ - [MacPorts](https://www.macports.org/) (direct link to [Portfile](https://github.com/macports/macports-ports/blob/master/sysutils/rdfind/Portfile)). 
+ - [brew](https://brew.sh/) direct link to [homebrew formulae](https://formulae.brew.sh/formula/rdfind)
+
+If you want to compile the source yourself, that is fine. Rdfind is written in C++17 and should compile under any \*nix.
 
 ### Windows
 
@@ -55,7 +59,7 @@ Look for duplicate files in directory /home/pauls/bilder:
     It seems like you have 100 files that are not unique
     Totally, 24 Mib can be reduced.
     Now making results file results.txt
-              
+
 It indicates there are 100 files that are not unique. Let us examine them by looking at the newly created results.txt:
 
     $ cat results.txt
@@ -88,7 +92,7 @@ Rdfind uses the following algorithm. If N is the number of files to search throu
 11. Sort on device and inode(speeds up file reading). Perform a checksum calculation for each file.
 12. Only keep files on the list with the same size and checksum. These are duplicates.
 13. Sort list on size, priority number, and depth. The first file for every set of duplicates is considered to be the original.
-14. If flag ”-makeresultsfile true”, then print results file (default). 
+14. If flag ”-makeresultsfile true”, then print results file (default).
 15. If flag ”-deleteduplicates true”, then delete (unlink) duplicate files. Exit.
 16. If flag ”-makesymlinks true”, then replace duplicates with a symbolic link to the original. Exit.
 17. If flag ”-makehardlinks true”, then replace duplicates with a hard link to the original. Exit.
@@ -119,7 +123,7 @@ Here is how to get and install nettle from source. Please check for the current 
 ### Quality
 The following methods are used to maintain code quality:
  - builds without warnings on gcc and clang, even with all the suggested warnings from [cppbestpractices](https://github.com/lefticus/cppbestpractices/blob/master/02-Use_the_Tools_Available.md) enabled. Pass --enable-warnings to configure to turn them on.
- - builds with standards c++11, 14, 17 and 2a
+ - builds with standards c++17 and 20
  - tests are written for newly found bugs, first to prove the bug and then to prove that it is fixed. Older bugs do not all have tests.
  - tests are also run through valgrind
  - tests are run on address sanitizer builds
@@ -130,9 +134,9 @@ The following methods are used to maintain code quality:
  - clang format is used, issue make format to execute it
  - cppcheck has been run manually and relevant issues are fixed
  - [disorderfs](https://packages.debian.org/sid/disorderfs) is used (if available) to verify independence of file system ordering
- 
+
  There is a helper script that does the test build variants, see do_quality_checks.sh in the project root.
- 
+
 ## Alternatives
 
 There are some interesting alternatives.

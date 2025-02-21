@@ -38,15 +38,14 @@ public:
 
 private:
   std::mt19937 m_gen{};
-  static const int nchars = 64;
+  static constexpr int nchars = 64;
   static char getChar(int i)
   {
-    const char acceptable_filename_chars[] = "abcdefghijklmnopqrstuvwxyz"
-                                             "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                             "0123456789"
-                                             "_-";
-    static_assert(nchars + 1 == sizeof(acceptable_filename_chars),
-                  "mismatch in size");
+    const char acceptable_filename_chars[nchars + 1] =
+      "abcdefghijklmnopqrstuvwxyz"
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+      "0123456789"
+      "_-";
     return acceptable_filename_chars[i];
   }
   std::uniform_int_distribution<int> m_dist{ 0, nchars - 1 };
@@ -62,14 +61,14 @@ EasyRandom::getGlobalObject()
 
 EasyRandom::EasyRandom()
   : m_rand(getGlobalObject())
-{}
+{
+}
 
 std::string
 EasyRandom::makeRandomFileString(std::size_t N)
 {
   std::string ret(N, '\0');
-  for (auto& c : ret) {
-    c = m_rand.randomFileChar();
-  }
+  std::generate(
+    begin(ret), end(ret), [this]() { return m_rand.randomFileChar(); });
   return ret;
 }

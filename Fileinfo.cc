@@ -24,7 +24,8 @@
 
 int
 Fileinfo::fillwithbytes(enum readtobuffermode filltype,
-                        enum readtobuffermode lasttype)
+                        enum readtobuffermode lasttype,
+                        std::vector<char>& buffer)
 {
 
   // Decide if we are going to read from file or not.
@@ -41,7 +42,7 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
   m_somebytes.fill('\0');
 
   std::fstream f1;
-  f1.open(m_filename.c_str(), std::ios_base::in);
+  f1.open(m_filename, std::ios_base::in);
   if (!f1.is_open()) {
     std::cerr << "fillwithbytes.cc: Could not open file \"" << m_filename
               << "\"" << std::endl;
@@ -72,6 +73,9 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
     case readtobuffermode::CREATE_SHA512_CHECKSUM:
       checksumtype = Checksum::checksumtypes::SHA512;
       break;
+    case readtobuffermode::CREATE_XXH128_CHECKSUM:
+      checksumtype = Checksum::checksumtypes::XXH128;
+      break;
     default:
       std::cerr << "does not know how to do that filltype:"
                 << static_cast<long>(filltype) << std::endl;
@@ -80,19 +84,16 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
   if (checksumtype != Checksum::checksumtypes::NOTSET) {
     Checksum chk(checksumtype);
 
-    char buffer[4096];
     while (f1) {
-      f1.read(buffer, sizeof(buffer));
+      f1.read(buffer.data(), static_cast<std::streamsize>(buffer.size()));
       // gcount is never negative, the cast is safe.
-      chk.update(static_cast<std::size_t>(f1.gcount()), buffer);
+      chk.update(static_cast<std::size_t>(f1.gcount()), buffer.data());
     }
 
     // store the result of the checksum calculation in somebytes
-    int digestlength = chk.getDigestLength();
-    if (digestlength <= 0 ||
-        digestlength >= static_cast<int>(m_somebytes.size())) {
-      std::cerr << "wrong answer from getDigestLength! FIXME" << std::endl;
-    }
+    assert(chk.getDigestLength() > 0);
+    assert(static_cast<std::size_t>(chk.getDigestLength()) <=
+           m_somebytes.size());
     if (chk.printToBuffer(m_somebytes.data(), m_somebytes.size())) {
       std::cerr << "failed writing digest to buffer!!" << std::endl;
     }
@@ -155,12 +156,12 @@ Fileinfo::getduptypestring(const Fileinfo& A)
 
 // constructor
 Fileinfo::Fileinfostat::Fileinfostat()
+  : stat_size{ 99999 }
+  , stat_ino{ 99999 }
+  , stat_dev{ 99999 }
+  , is_file{ false }
+  , is_directory{ false }
 {
-  stat_size = 99999;
-  stat_ino = 99999;
-  stat_dev = 99999;
-  is_file = false;
-  is_directory = false;
 }
 
 int

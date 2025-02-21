@@ -1,29 +1,34 @@
+---
 name: gcc 11
 
-on: [push, pull_request]
+"on":
+  push:
+    branches:
+      - main
+      - devel
+  pull_request:
 
 
 jobs:
   build:
     name: Compiles with gcc 11
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
-    - name: checkout
-      uses: actions/checkout@v3
-    - name: install packages
-      run: sudo apt install build-essential nettle-dev time gcc-11 g++-11
-    - name: bootstrap
-      run: ./bootstrap.sh
-    - name: configure
-      run: ./configure CXX=g++-11
-    - name: build
-      run: make
-    - name: check
-      run: make check
-    - name: store the logs as an artifact
-      if: ${{ always() }}
-      uses: actions/upload-artifact@v3
-      with:
-         path: '**/*.log'
-
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: install packages
+        run: sudo apt install build-essential nettle-dev time gcc-11 g++-11
+      - name: bootstrap
+        run: ./bootstrap.sh
+      - name: configure
+        run: ./configure CXX=g++-11 CXXFLAGS=-std=c++17
+      - name: build
+        run: make
+      - name: check
+        run: make check
+      - name: store the logs as an artifact
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          path: '**/*.log'

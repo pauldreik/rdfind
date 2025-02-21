@@ -10,6 +10,7 @@
 #include <array>
 #include <cstdint>
 #include <string>
+#include <vector>
 
 // os specific headers
 #include <sys/types.h> //for off_t and others.
@@ -48,6 +49,7 @@ public:
     CREATE_SHA1_CHECKSUM,
     CREATE_SHA256_CHECKSUM,
     CREATE_SHA512_CHECKSUM,
+    CREATE_XXH128_CHECKSUM,
   };
 
   // type of duplicate
@@ -68,7 +70,6 @@ public:
   void setduptype(enum duptype duptype_) { m_duptype = duptype_; }
 
   std::int64_t getidentity() const { return m_identity; }
-  static std::int64_t identity(const Fileinfo& A) { return A.getidentity(); }
   void setidentity(std::int64_t id) { m_identity = id; }
 
   /**
@@ -109,9 +110,6 @@ public:
   /// returns the file size in bytes
   filesizetype size() const { return m_info.stat_size; }
 
-  // returns true if A has size zero
-  bool isempty() const { return size() == 0; }
-
   /// filesize comparison
   bool is_smaller_than(Fileinfo::filesizetype minsize) const
   {
@@ -139,10 +137,13 @@ public:
    * is shorter than the length of the bytes field.
    * @param filltype
    * @param lasttype
+   * @param buffer will be used as a scratch buffer - provided from the outside
+   * to avoid having to reallocate it for each file
    * @return zero on success
    */
   int fillwithbytes(enum readtobuffermode filltype,
-                    enum readtobuffermode lasttype);
+                    enum readtobuffermode lasttype,
+                    std::vector<char>& buffer);
 
   /// get a pointer to the bytes read from the file
   const char* getbyteptr() const { return m_somebytes.data(); }
@@ -198,7 +199,7 @@ private:
    */
   std::int64_t m_identity;
 
-  static const int SomeByteSize = 64;
+  static constexpr int SomeByteSize = 64;
 
   /// a buffer that will be filled with some bytes of the file or a hash
   std::array<char, SomeByteSize> m_somebytes;

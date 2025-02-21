@@ -10,7 +10,14 @@
 #include <cstddef>
 
 #include <nettle/md5.h>
-#include <nettle/sha.h>
+#include <nettle/sha1.h>
+#include <nettle/sha2.h>
+
+#include "config.h"
+
+#ifdef HAVE_LIBXXHASH
+#include <xxhash.h>
+#endif
 
 /**
  * class for checksum calculation
@@ -25,7 +32,8 @@ public:
     MD5,
     SHA1,
     SHA256,
-    SHA512
+    SHA512,
+    XXH128
   };
 
   explicit Checksum(checksumtypes type);
@@ -55,6 +63,9 @@ private:
     sha256_ctx sha256;
     sha512_ctx sha512;
     md5_ctx md5;
+#ifdef HAVE_LIBXXHASH
+    XXH3_state_t* xxh128;
+#endif
   } m_state;
 };
 

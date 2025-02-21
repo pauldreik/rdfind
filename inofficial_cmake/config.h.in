@@ -1,0 +1,5 @@
+#cmakedefine RDFIND_VERSION "@RDFIND_VERSION@"
+#cmakedefine FOO_ENABLE
+#cmakedefine FOO_STRING "@FOO_STRING@"
+#cmakedefine HAVE_LIBXXHASH @HAVE_LIBXXHASH@
+#define VERSION "@RDFIND_VERSION@"

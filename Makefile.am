@@ -6,6 +6,7 @@ bin_PROGRAMS = rdfind
 rdfind_SOURCES = rdfind.cc Checksum.cc  Dirlist.cc  Fileinfo.cc  Rdutil.cc \
                  EasyRandom.cc UndoableUnlink.cc CmdlineParser.cc ListProgress.cc
 
+LDADD = @LIBXXHASH@
 #these are the test scripts to execute - I do not know how to glob here,
 #feedback welcome.
 TESTS=testcases/largefilesupport.sh \
@@ -18,7 +19,8 @@ TESTS=testcases/largefilesupport.sh \
       testcases/verify_deterministic_operation.sh \
       testcases/checksum_options.sh \
       testcases/md5collisions.sh \
-      testcases/sha1collisions.sh
+      testcases/sha1collisions.sh \
+      testcases/checksum_buffersize.sh
 
 AUXFILES=testcases/common_funcs.sh \
          testcases/md5collisions/letter_of_rec.ps \
@@ -49,4 +51,3 @@ man_MANS = rdfind.1
 #for formatting the source
 format:
 	./do_clang_format.sh
-

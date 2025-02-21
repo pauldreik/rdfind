@@ -1,3 +1,7 @@
+1.7.0
+requires a C++17 capable compiler.
+new fast non-cryptographic hash xxh
+controllable buffer size for calculating checksum
 1.6.0
 supports sha512
 1.4.0alpha

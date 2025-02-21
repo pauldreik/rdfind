@@ -31,6 +31,14 @@ Checksum::Checksum(checksumtypes type)
     case checksumtypes::MD5: {
       md5_init(&m_state.md5);
     } break;
+#ifdef HAVE_LIBXXHASH
+    case checksumtypes::XXH128: {
+      m_state.xxh128 = XXH3_createState();
+      assert(m_state.xxh128 != NULL && "Out of memory!");
+      [[maybe_unused]] const auto ret = XXH3_128bits_reset(m_state.xxh128);
+      assert(ret == XXH_OK);
+    } break;
+#endif
     default:
       // not allowed to have something that is not recognized.
       throw std::runtime_error("wrong checksum type - programming error");
@@ -53,6 +61,12 @@ Checksum::update(std::size_t length, const unsigned char* buffer)
     case checksumtypes::MD5:
       md5_update(&m_state.md5, length, buffer);
       break;
+#ifdef HAVE_LIBXXHASH
+    case checksumtypes::XXH128: {
+      const auto res = XXH3_128bits_update(m_state.xxh128, buffer, length);
+      return res == XXH_OK ? 0 : -1;
+    }
+#endif
     default:
       return -1;
   }
@@ -117,6 +131,10 @@ Checksum::getDigestLength() const
       return SHA512_DIGEST_SIZE;
     case checksumtypes::MD5:
       return MD5_DIGEST_SIZE;
+#ifdef HAVE_LIBXXHASH
+    case checksumtypes::XXH128:
+      return sizeof(XXH128_hash_t);
+#endif
     default:
       return -1;
   }
@@ -168,6 +186,19 @@ Checksum::printToBuffer(void* buffer, std::size_t N)
         return -1;
       }
       break;
+#ifdef HAVE_LIBXXHASH
+    case checksumtypes::XXH128:
+      if (N >= sizeof(XXH128_hash_t)) {
+        XXH128_hash_t result = XXH3_128bits_digest(m_state.xxh128);
+        XXH128_canonicalFromHash(static_cast<XXH128_canonical_t*>(buffer),
+                                 result);
+        XXH3_freeState(m_state.xxh128);
+      } else {
+        // bad size.
+        return -1;
+      }
+      break;
+#endif
     default:
       return -1;
   }
