@@ -7,6 +7,8 @@
 #ifndef RDFIND_CMDLINEPARSER_HH_
 #define RDFIND_CMDLINEPARSER_HH_
 
+#include "Fileinfo.hh"    //for filesizetype
+
 /**
  * Command line parser, designed to be easy to use for rdfind.
  * It will signal user errors by a helpful printout followed by
@@ -49,6 +51,8 @@ public:
 
   bool current_arg_is(const char* what) const;
 
+  static Fileinfo::filesizetype read_file_size(char const *text);
+    
 private:
   const int m_argc{};
   const char** m_argv{};

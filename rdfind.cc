@@ -58,6 +58,9 @@ usage()
     << "                                  false implies -minsize 0)\n"
     << " -minsize N        (N=1)          ignores files with size less than N "
        "bytes\n"
+    << "                                  For -minsize, -maxsize and -buffersize,\n"
+       "                                  Suffixes 'K', 'M', 'G' etc. up to 'E'\n"
+       "                                  are accepted. Factors are 1024, not 1000.\n"
     << " -maxsize N        (N=0)          ignores files with size N "
        "bytes and larger (use 0 to disable this check).\n"
     << " -followsymlinks    true |(false) follow symlinks\n"
@@ -153,13 +156,13 @@ parseOptions(Parser& parser)
         o.minimumfilesize = 0;
       }
     } else if (parser.try_parse_string("-minsize")) {
-      const long long minsize = std::stoll(parser.get_parsed_string());
+        const long long minsize = Parser::read_file_size(parser.get_parsed_string());
       if (minsize < 0) {
         throw std::runtime_error("negative value of minsize not allowed");
       }
       o.minimumfilesize = minsize;
     } else if (parser.try_parse_string("-maxsize")) {
-      const long long maxsize = std::stoll(parser.get_parsed_string());
+        const long long maxsize = Parser::read_file_size(parser.get_parsed_string());
       if (maxsize < 0) {
         throw std::runtime_error("negative value of maxsize not allowed");
       }
@@ -199,7 +202,7 @@ parseOptions(Parser& parser)
         std::exit(EXIT_FAILURE);
       }
     } else if (parser.try_parse_string("-buffersize")) {
-      const long buffersize = std::stoll(parser.get_parsed_string());
+      const long buffersize = Parser::read_file_size(parser.get_parsed_string());
       constexpr long max_buffersize = 128 << 20;
       if (buffersize <= 0) {
         std::cerr << "a negative or zero buffersize is not allowed\n";

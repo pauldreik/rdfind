@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <stdexcept>
 
 // project
 #include "CmdlineParser.hh"
@@ -96,4 +97,72 @@ bool
 Parser::current_arg_is(const char* what) const
 {
   return 0 == std::strcmp(get_current_arg(), what);
+}
+
+namespace {
+
+    enum FILESIZE : long long
+    {
+        k = 1024,
+        K = k,
+        M = k * k,
+        G = k * M,
+        T = k * G,
+        P = k * T,
+        E = k * P,
+        // too big for signed long long // Z = k * E,
+        // too big for signed long long // Y = k * Z,
+        // too big for signed long long // R = k * Y,
+        // too big for signed long long // Q = k * R,
+    };
+
+    
+    Fileinfo::filesizetype value_of_file_size_suffix(char suffix)
+    {
+        switch (toupper(suffix))
+        {
+        // No 'B': too ambiguous.
+        case 'K': return FILESIZE::k;
+        case 'M': return FILESIZE::M;
+        case 'G': return FILESIZE::G;
+        case 'T': return FILESIZE::T;
+        case 'P': return FILESIZE::P;
+        case 'E': return FILESIZE::E;
+        // case 'Z': return FILESIZE::Z;
+        // case 'Y': return FILESIZE::Y;
+        // case 'R': return FILESIZE::R;
+        // case 'Q': return FILESIZE::Q;
+        default: throw std::runtime_error(
+            "The program only understands file size suffixes "
+            "K, M, G, T, P or E. Lower case works too.");
+        };
+    }
+
+}
+
+Fileinfo::filesizetype long Parser::read_file_size(char const *text)
+{
+
+    using filesizetype = Fileinfo::filesizetype;
+    
+    size_t pos = 0;
+    filesizetype const without_suffix = std::stoll(text, &pos);
+
+    size_t const len = strlen(text);
+    filesizetype const multiplier = 
+        (len - pos > 1) ?
+        throw std::runtime_error(
+            "The program only understands single-letter file size suffixes.")
+        :
+        (len > pos) ?
+        value_of_file_size_suffix(text[pos])
+        :
+        1;
+
+    filesizetype const retval = multiplier * without_suffix;
+
+    if (retval / multiplier != without_suffix)
+        throw std::runtime_error("File size overflows long long.");
+
+    return retval;
 }
