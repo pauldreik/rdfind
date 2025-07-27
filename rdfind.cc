@@ -382,7 +382,7 @@ main(int narg, const char* argv[])
             << " bytes or ";
   gswd.totalsize(std::cout) << std::endl;
 
-  std::cout << "Removed " << gswd.removeUniqueSizes()
+  std::cout << dryruntext << "Removed " << gswd.removeUniqueSizes()
             << " files due to unique sizes from list. ";
   std::cout << filelist.size() << " files left." << std::endl;
 
