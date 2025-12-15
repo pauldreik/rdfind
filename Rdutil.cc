@@ -544,8 +544,12 @@ Rdutil::fillwithbytes(enum Fileinfo::readtobuffermode type,
                       enum Fileinfo::readtobuffermode lasttype,
                       const long nsecsleep,
                       const std::size_t buffersize,
-                      std::function<void(std::size_t)> progress_cb)
+                      std::function<std::function<void(std::size_t)>(void)> progress_cb_f)
 {
+  std::function<void(std::size_t)> progress_cb;
+  if (progress_cb_f) {
+    progress_cb = progress_cb_f();
+  }
   // first sort on inode (to read efficiently from the hard drive)
   sortOnDeviceAndInode();
 

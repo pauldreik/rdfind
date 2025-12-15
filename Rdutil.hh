@@ -92,7 +92,7 @@ public:
                     enum Fileinfo::readtobuffermode lasttype,
                     long nsecsleep,
                     std::size_t buffersize,
-                    std::function<void(std::size_t)> progress_cb);
+                    std::function<std::function<void(std::size_t)>(void)> progress_cb_f);
 
   /// make symlinks of duplicates.
   std::size_t makesymlinks(bool dryrun) const;

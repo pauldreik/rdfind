@@ -414,7 +414,7 @@ main(int narg, const char* argv[])
                        "xxh128 checksum");
   }
 
-  std::function<void(std::size_t)> progress_callback;
+  std::function<std::function<void(std::size_t)>(void)> progress_callback;
   if (o.showprogress) {
     progress_callback = []() {
       // format the total count only once, not each iteration.
@@ -426,7 +426,7 @@ main(int narg, const char* argv[])
           << "\033[s\033[K" // Save the cursor position & clear following text
           << "(" << completed << suffix << std::flush;
       };
-    }();
+    };
   }
 
   for (auto it = modes.begin() + 1; it != modes.end(); ++it) {
