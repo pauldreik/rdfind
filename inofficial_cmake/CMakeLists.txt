@@ -47,6 +47,8 @@ if(xxhash_FOUND)
 endif()
 target_compile_options(rdfind PRIVATE -Wall -Wextra -Wpedantic)
 
+file(GENERATE OUTPUT .gitignore CONTENT "*")
+
 enable_testing()
 
 find_program(SHELL_PROGRAM sh REQUIRED)
