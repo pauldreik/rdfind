@@ -1,0 +1,25 @@
+---
+name: cmake clang 18
+
+"on":
+  push:
+    branches:
+      - main
+      - devel
+  pull_request:
+
+
+jobs:
+  build:
+    name: Compiles with clang 18, using cmake
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: install packages
+        run: sudo apt install build-essential cmake nettle-dev time clang-18
+      - name: configure
+        run: cmake -B build -S inofficial_cmake/ -DCMAKE_CXX_COMPILER=clang++-18
+      - name: build
+        run: cmake --build build
