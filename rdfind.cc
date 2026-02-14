@@ -415,23 +415,24 @@ main(int narg, const char* argv[])
   }
 
   std::function<void(std::size_t)> progress_callback;
-  if (o.showprogress) {
-    progress_callback = []() {
-      // format the total count only once, not each iteration.
-      std::ostringstream oss;
-      oss << "/" << filelist.size() << ")"
-          << "\033[u"; // Restore the cursor to the saved position;
-      return [suffix = oss.str()](std::size_t completed) {
-        std::cout
-          << "\033[s\033[K" // Save the cursor position & clear following text
-          << "(" << completed << suffix << std::flush;
-      };
-    }();
-  }
 
   for (auto it = modes.begin() + 1; it != modes.end(); ++it) {
     std::cout << dryruntext << "Now eliminating candidates based on "
               << it->second << ": " << std::flush;
+
+    if (o.showprogress) {
+      progress_callback = []() {
+        // format the total count only once, not each iteration.
+        std::ostringstream oss;
+        oss << "/" << filelist.size() << ")"
+            << "\033[u"; // Restore the cursor to the saved position;
+        return [suffix = oss.str()](std::size_t completed) {
+          std::cout
+            << "\033[s\033[K" // Save the cursor position & clear following text
+            << "(" << completed << suffix << std::flush;
+        };
+      }();
+    }
 
     // read bytes (destroys the sorting, for disk reading efficiency)
     gswd.fillwithbytes(
