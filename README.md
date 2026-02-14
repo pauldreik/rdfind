@@ -89,7 +89,7 @@ Rdfind uses the following algorithm. If N is the number of files to search throu
 8. Remove files from list that have the same size but different first bytes.
 9. Sort on device and inode(speeds up file reading). Read a few bytes from the end of each file (last bytes).
 10. Remove files from list that have the same size but different last bytes.
-11. Sort on device and inode(speeds up file reading). Perform a checksum calculation for each file.
+11. Sort on device and inode(speeds up file reading). Perform a checksum calculation for each file (unless disabled with -checksum none).
 12. Only keep files on the list with the same size and checksum. These are duplicates.
 13. Sort list on size, priority number, and depth. The first file for every set of duplicates is considered to be the original.
 14. If flag ”-makeresultsfile true”, then print results file (default).
