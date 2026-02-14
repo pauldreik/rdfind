@@ -66,6 +66,7 @@ set(testscripts
     testcases/verify_dryrun_option.sh
     testcases/verify_filesize_option.sh
     testcases/verify_maxfilesize_option.sh
+    testcases/verify_nochecksum.sh
     testcases/verify_ranking.sh
     testcases/verify_size_savings.sh)
 
