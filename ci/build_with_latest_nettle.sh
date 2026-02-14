@@ -14,6 +14,7 @@ me="$(basename "$0")"
 WD=$(mktemp -d rdfind.nettle.XXXXXXXXXX)
 cd "$WD"
 here=$(pwd)
+echo "*" >.gitignore
 
 nettleversion=4.0
 nettleinstall="$(pwd)/nettle-$nettleversion"
