@@ -1,3 +1,6 @@
+next
+optionally disable the checksum step by giving -checksum none
+optionally show progress
 1.7.0
 requires a C++17 capable compiler.
 new fast non-cryptographic hash xxh
