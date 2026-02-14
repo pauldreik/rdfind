@@ -64,7 +64,7 @@ usage()
     << " -followsymlinks    true |(false) follow symlinks\n"
     << " -removeidentinode (true)| false  ignore files with nonunique "
        "device and inode\n"
-    << " -checksum           md5 |(sha1)| sha256 | sha512 | xxh128\n"
+    << " -checksum          none | md5 |(sha1)| sha256 | sha512 | xxh128\n"
     << indent << "checksum type\n"
     << indent << "xxh128 is very fast, but is noncryptographic.\n"
     << " -buffersize N\n"
@@ -116,6 +116,7 @@ struct Options
   bool usesha256 = false;    // use sha256 checksum to check for similarity
   bool usesha512 = false;    // use sha512 checksum to check for similarity
   bool usexxh128 = false;    // use xxh128 checksum to check for similarity
+  bool nochecksum = false;   // skip using checksumming (unsafe!)
   bool deterministic = true; // be independent of filesystem order
   bool showprogress = false; // show progress while reading file contents
   std::size_t buffersize = 1 << 20; // chunksize to use when reading files
@@ -196,8 +197,12 @@ parseOptions(Parser& parser)
                      "reconfigure and rebuild '--with-xxhash'\n";
         std::exit(EXIT_FAILURE);
 #endif
+      } else if (parser.parsed_string_is("none")) {
+        std::cout
+          << "DANGER! -checksum none given, will skip the checksumming stage\n";
+        o.nochecksum = true;
       } else {
-        std::cerr << "expected md5/sha1/sha256/sha512/xxh128, not \""
+        std::cerr << "expected none/md5/sha1/sha256/sha512/xxh128, not \""
                   << parser.get_parsed_string() << "\"\n";
         std::exit(EXIT_FAILURE);
       }
@@ -273,8 +278,9 @@ parseOptions(Parser& parser)
 
   // done with parsing of options. remaining arguments are files and dirs.
 
-  // decide what checksum to use - if no checksum is set, force sha1!
-  if (!o.usemd5 && !o.usesha1 && !o.usesha256 && !o.usesha512 && !o.usexxh128) {
+  // decide what checksum to use, default to sha1
+  if (!o.usemd5 && !o.usesha1 && !o.usesha256 && !o.usesha512 && !o.usexxh128 &&
+      !o.nochecksum) {
     o.usesha1 = true;
   }
   return o;
