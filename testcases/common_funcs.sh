@@ -14,7 +14,7 @@ fi
 
 # shellcheck disable=SC3037
 /bin/echo -n "$me: checking for rdfind ..."
-rdfind=$PWD/rdfind
+rdfind=${RDFIND:-$PWD/rdfind}
 if [ ! -x "$rdfind" ]; then
   echo "could not find $rdfind"
   exit 1

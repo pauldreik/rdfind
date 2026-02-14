@@ -23,3 +23,5 @@ jobs:
         run: cmake -B build -S inofficial_cmake/ -DCMAKE_CXX_COMPILER=clang++-18
       - name: build
         run: cmake --build build
+      - name: test
+        run: ctest --test-dir build --output-on-failure
