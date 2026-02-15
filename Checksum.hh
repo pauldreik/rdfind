@@ -45,6 +45,9 @@ public:
   int update(std::size_t length, const unsigned char* buffer);
   int update(std::size_t length, const char* buffer);
 
+  /// makes the object behave as if it was newly constructed
+  void reset();
+
 #if 0
   /// prints the checksum on stdout
   int print();

@@ -20,31 +20,13 @@
 Checksum::Checksum(checksumtypes type)
   : m_checksumtype(type)
 {
-  switch (m_checksumtype) {
-    case checksumtypes::SHA1: {
-      sha1_init(&m_state.sha1);
-    } break;
-    case checksumtypes::SHA256: {
-      sha256_init(&m_state.sha256);
-    } break;
-    case checksumtypes::SHA512: {
-      sha512_init(&m_state.sha512);
-    } break;
-    case checksumtypes::MD5: {
-      md5_init(&m_state.md5);
-    } break;
 #ifdef HAVE_LIBXXHASH
-    case checksumtypes::XXH128: {
-      m_state.xxh128 = XXH3_createState();
-      assert(m_state.xxh128 != NULL && "Out of memory!");
-      [[maybe_unused]] const auto ret = XXH3_128bits_reset(m_state.xxh128);
-      assert(ret == XXH_OK);
-    } break;
-#endif
-    default:
-      // not allowed to have something that is not recognized.
-      throw std::runtime_error("wrong checksum type - programming error");
+  if (m_checksumtype == checksumtypes::XXH128) {
+    m_state.xxh128 = XXH3_createState();
+    assert(m_state.xxh128 != NULL && "Out of memory!");
   }
+#endif
+  reset();
 }
 
 Checksum::Checksum(Checksum&& other)
@@ -118,6 +100,34 @@ Checksum::update(std::size_t length, const char* buffer)
   return update(
     length,
     static_cast<const unsigned char*>(static_cast<const void*>(buffer)));
+}
+
+void
+Checksum::reset()
+{
+  switch (m_checksumtype) {
+    case checksumtypes::SHA1: {
+      sha1_init(&m_state.sha1);
+    } break;
+    case checksumtypes::SHA256: {
+      sha256_init(&m_state.sha256);
+    } break;
+    case checksumtypes::SHA512: {
+      sha512_init(&m_state.sha512);
+    } break;
+    case checksumtypes::MD5: {
+      md5_init(&m_state.md5);
+    } break;
+#ifdef HAVE_LIBXXHASH
+    case checksumtypes::XXH128: {
+      [[maybe_unused]] const auto ret = XXH3_128bits_reset(m_state.xxh128);
+      assert(ret == XXH_OK);
+    } break;
+#endif
+    default:
+      // not allowed to have something that is not recognized.
+      throw std::runtime_error("wrong checksum type - programming error");
+  }
 }
 
 #if 0

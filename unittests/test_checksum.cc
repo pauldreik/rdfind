@@ -94,3 +94,25 @@ TEST_CASE("copy from an rval is fine")
     REQUIRE(expected == finalize_checksum(movedto));
   }
 }
+
+TEST_CASE("resetting the state works as intended")
+{
+  static const char* content = "abcd";
+  for (auto type : types) {
+
+    Checksum ck1(type);
+    const auto v1 = finalize_checksum(ck1);
+
+    Checksum ck2(type);
+    REQUIRE(0 == ck2.update(std::strlen(content), content));
+    const auto v2 = finalize_checksum(ck2);
+    REQUIRE(v1 != v2);
+
+    // resetting should get the same checksum as an empty object.
+    Checksum ck3(type);
+    REQUIRE(0 == ck3.update(std::strlen(content), content));
+    ck3.reset();
+    const auto v3 = finalize_checksum(ck3);
+    REQUIRE(v1 == v3);
+  }
+}
