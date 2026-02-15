@@ -53,6 +53,8 @@ target_link_libraries(rdfind PUBLIC rdfindimpl)
 
 file(GENERATE OUTPUT .gitignore CONTENT "*")
 
+# apt install libcatch2-dev
+find_package(Catch2 3.7)
 
 enable_testing()
 
@@ -85,3 +87,12 @@ foreach(testscript ${testscripts})
   set_tests_properties(${testname} PROPERTIES ENVIRONMENT
                                               RDFIND=$<TARGET_FILE:rdfind>)
 endforeach()
+
+if(Catch2_FOUND)
+  set(unittests test_checksum)
+  foreach(unittest ${unittests})
+    add_executable(${unittest} ../unittests/test_checksum.cc)
+    target_compile_features(${unittest} PRIVATE cxx_std_20)
+    target_link_libraries(${unittest} PRIVATE rdfindimpl Catch2::Catch2WithMain)
+  endforeach()
+endif()
