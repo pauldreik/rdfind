@@ -15,6 +15,7 @@
 // os specific headers
 #include <sys/types.h> //for off_t and others.
 
+class Checksum;
 struct Options;
 
 /**
@@ -146,6 +147,7 @@ public:
   int fillwithbytes(enum readtobuffermode filltype,
                     enum readtobuffermode lasttype,
                     std::vector<char>& buffer,
+                    Checksum& cksum,
                     const Options& options);
 
   /// get a pointer to the bytes read from the file

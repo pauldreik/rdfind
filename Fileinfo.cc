@@ -27,21 +27,25 @@ int
 Fileinfo::fillwithbytes(enum readtobuffermode filltype,
                         enum readtobuffermode lasttype,
                         std::vector<char>& buffer,
+                        Checksum& chk,
                         const Options& options)
 {
-
-  // Decide if we are going to read from file or not.
-  // If file is short, first bytes might be ALL bytes!
-  if (lasttype != readtobuffermode::NOT_DEFINED) {
-    if (this->size() <= static_cast<filesizetype>(m_somebytes.size())) {
-      // pointless to read - all bytes in the file are in the field
-      // m_somebytes, or checksum is calculated!
+  const auto filesize = this->size();
+  const auto ufilesize = static_cast<std::uint64_t>(filesize);
+  // we might already have checksummed the entire file in the previous step, if
+  // it was smaller than the buffer.
+  if (chk.getType() == options.checksum_for_firstlast_bytes) {
+    if (lasttype == readtobuffermode::READ_FIRST_BYTES &&
+        options.first_bytes_size >= ufilesize) {
+      // already checksummed!
+      return 0;
+    }
+    if (lasttype == readtobuffermode::READ_LAST_BYTES &&
+        options.last_bytes_size >= ufilesize) {
+      // already checksummed!
       return 0;
     }
   }
-
-  // set memory to zero
-  m_somebytes.fill('\0');
 
   std::fstream f1;
   f1.open(m_filename, std::ios_base::in);
@@ -51,54 +55,48 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
     return -1;
   }
 
-  auto checksumtype = checksumtypes::NOTSET;
-  // read some bytes
-  switch (filltype) {
-    case readtobuffermode::READ_FIRST_BYTES:
-      // read at start of file
-      f1.read(m_somebytes.data(), SomeByteSize);
-      break;
-    case readtobuffermode::READ_LAST_BYTES:
-      // read at end of file
-      f1.seekg(-SomeByteSize, std::ios_base::end);
-      f1.read(m_somebytes.data(), SomeByteSize);
-      break;
-    case readtobuffermode::CREATE_MD5_CHECKSUM:
-      checksumtype = checksumtypes::MD5;
-      break;
-    case readtobuffermode::CREATE_SHA1_CHECKSUM:
-      checksumtype = checksumtypes::SHA1;
-      break;
-    case readtobuffermode::CREATE_SHA256_CHECKSUM:
-      checksumtype = checksumtypes::SHA256;
-      break;
-    case readtobuffermode::CREATE_SHA512_CHECKSUM:
-      checksumtype = checksumtypes::SHA512;
-      break;
-    case readtobuffermode::CREATE_XXH128_CHECKSUM:
-      checksumtype = checksumtypes::XXH128;
-      break;
-    default:
-      std::cerr << "does not know how to do that filltype:"
-                << static_cast<long>(filltype) << std::endl;
+  bool read_entire_file = true;
+  std::streamsize bytes_to_read{};
+  if (filltype == readtobuffermode::READ_FIRST_BYTES) {
+    bytes_to_read = static_cast<std::streamsize>(options.first_bytes_size);
+    if (filesize > bytes_to_read) {
+      read_entire_file = false;
+    }
+  } else if (filltype == readtobuffermode::READ_LAST_BYTES) {
+    bytes_to_read = static_cast<std::streamsize>(options.last_bytes_size);
+    if (filesize > bytes_to_read) {
+      read_entire_file = false;
+      f1.seekg(-options.last_bytes_size, std::ios_base::end);
+    }
   }
 
-  if (checksumtype != checksumtypes::NOTSET) {
-    Checksum chk(checksumtype);
+  // set memory to zero
+  m_somebytes.fill('\0');
 
+  // ensure the checksum object is in a good state
+  chk.reset();
+
+  if (read_entire_file) {
     while (f1) {
       f1.read(buffer.data(), static_cast<std::streamsize>(buffer.size()));
       // gcount is never negative, the cast is safe.
       chk.update(static_cast<std::size_t>(f1.gcount()), buffer.data());
     }
-
-    // store the result of the checksum calculation in somebytes
-    assert(chk.getDigestLength() > 0);
-    assert(static_cast<std::size_t>(chk.getDigestLength()) <=
-           m_somebytes.size());
-    if (chk.printToBuffer(m_somebytes.data(), m_somebytes.size())) {
-      std::cerr << "failed writing digest to buffer!!" << std::endl;
+  } else {
+    const auto bufsize = static_cast<std::streamsize>(buffer.size());
+    while (f1 && bytes_to_read > 0) {
+      f1.read(buffer.data(), std::min(bufsize, bytes_to_read));
+      // gcount is never negative, the cast is safe.
+      bytes_to_read -= f1.gcount();
+      chk.update(static_cast<std::size_t>(f1.gcount()), buffer.data());
     }
+  }
+
+  // store the result of the checksum calculation in somebytes
+  assert(chk.getDigestLength() > 0);
+  assert(static_cast<std::size_t>(chk.getDigestLength()) <= m_somebytes.size());
+  if (chk.printToBuffer(m_somebytes.data(), m_somebytes.size())) {
+    std::cerr << "failed writing digest to buffer!!" << std::endl;
   }
 
   return 0;
