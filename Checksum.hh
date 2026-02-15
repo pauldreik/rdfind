@@ -51,6 +51,8 @@ public:
   // returns negative if something is wrong.
   [[gnu::pure]] int getDigestLength() const;
 
+  checksumtypes getType() const noexcept { return m_checksumtype; }
+
 private:
   // to know what type of checksum we are doing
   const checksumtypes m_checksumtype = checksumtypes::NOTSET;
