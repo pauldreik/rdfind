@@ -32,6 +32,10 @@ struct Options
   std::size_t buffersize = 1 << 20; // chunksize to use when reading files
   long nsecsleep = 0; // number of nanoseconds to sleep between each file read.
   std::string resultsfile = "results.txt"; // results file name.
+  std::uint64_t first_bytes_size =
+    64; // how much to read during the "read first bytes" step
+  std::uint64_t last_bytes_size =
+    64; // how much to read during the "read last bytes" step
 };
 
 void
