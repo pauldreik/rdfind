@@ -51,7 +51,10 @@ add_executable(rdfind ../rdfind.cc)
 target_include_directories(rdfind PRIVATE ..)
 target_link_libraries(rdfind PUBLIC rdfindimpl)
 
-file(GENERATE OUTPUT .gitignore CONTENT "*")
+file(
+  GENERATE
+  OUTPUT .gitignore
+  CONTENT "*")
 
 # apt install libcatch2-dev
 find_package(Catch2 3.7)
