@@ -146,9 +146,15 @@ main(int narg, const char* argv[])
   // candidates. start looking at the contents.
   std::vector<std::pair<Fileinfo::readtobuffermode, const char*>> modes{
     { Fileinfo::readtobuffermode::NOT_DEFINED, "" },
-    { Fileinfo::readtobuffermode::READ_FIRST_BYTES, "first bytes" },
-    { Fileinfo::readtobuffermode::READ_LAST_BYTES, "last bytes" },
   };
+  if (o.first_bytes_size > 0) {
+    modes.emplace_back(Fileinfo::readtobuffermode::READ_FIRST_BYTES,
+                       "first bytes");
+  }
+  if (o.last_bytes_size > 0) {
+    modes.emplace_back(Fileinfo::readtobuffermode::READ_LAST_BYTES,
+                       "last bytes");
+  }
   if (o.usemd5) {
     modes.emplace_back(Fileinfo::readtobuffermode::CREATE_MD5_CHECKSUM,
                        "md5 checksum");

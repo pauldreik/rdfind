@@ -30,6 +30,12 @@ options are (default choice within parentheses)
 
  Processing options:
 
+ -firstbytessize N                sets the size in bytes when comparing the
+                                  beginning of files, prior to full checksumming.
+                                  default is 64 byte. Use 0 to disable the stage.
+ -lastbytessize N                 sets the size in bytes when comparing the
+                                  end of files, prior to full checksumming.
+                                  default is 64 byte. Use 0 to disable the stage.
  -checksum          none | md5 |(sha1)| sha256 | sha512 | xxh128
                                   checksum type
                                   xxh128 is very fast, but is noncryptographic.
@@ -128,6 +134,19 @@ parseOptions(Parser& parser)
       o.remove_identical_inode = parser.get_parsed_bool();
     } else if (parser.try_parse_bool("-deterministic")) {
       o.deterministic = parser.get_parsed_bool();
+    } else if (parser.try_parse_string("-firstbytessize")) {
+      const auto tmp = std::stoll(parser.get_parsed_string());
+      if (tmp < 0) {
+        throw std::runtime_error(
+          "negative value of firstbytessize not allowed");
+      }
+      o.first_bytes_size = tmp;
+    } else if (parser.try_parse_string("-lastbytessize")) {
+      const auto tmp = std::stoll(parser.get_parsed_string());
+      if (tmp < 0) {
+        throw std::runtime_error("negative value of lastbytessize not allowed");
+      }
+      o.last_bytes_size = tmp;
     } else if (parser.try_parse_string("-checksum")) {
       if (parser.parsed_string_is("md5")) {
         o.usemd5 = true;

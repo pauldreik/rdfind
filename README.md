@@ -86,9 +86,9 @@ Rdfind uses the following algorithm. If N is the number of files to search throu
 5. If flag -removeidentinode true: Remove items from the list which already are added, based on the combination of inode and device number. A group of files that are hardlinked to the same file are collapsed to one entry. Also see the comment on hardlinks under ”caveats below”!
 6. Sort files on size. Remove files from the list, which have unique sizes.
 7. Sort on device and inode(speeds up file reading). Read a few bytes from the beginning of each file (first bytes).
-8. Remove files from list that have the same size but different first bytes.
+8. Remove files from list that have the same size but different first bytes. (This step is possible to disable by using -firstbytessize 0).
 9. Sort on device and inode(speeds up file reading). Read a few bytes from the end of each file (last bytes).
-10. Remove files from list that have the same size but different last bytes.
+10. Remove files from list that have the same size but different last bytes. (This step is possible to disable by using -lastbytessize 0).
 11. Sort on device and inode(speeds up file reading). Perform a checksum calculation for each file (unless disabled with -checksum none).
 12. Only keep files on the list with the same size and checksum. These are duplicates.
 13. Sort list on size, priority number, and depth. The first file for every set of duplicates is considered to be the original.
