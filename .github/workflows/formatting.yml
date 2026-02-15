@@ -10,7 +10,7 @@ name: code formatting
 
 
 jobs:
-  build:
+  clang-format:
     name: Auto format with clang 18
     runs-on: ubuntu-24.04
 
@@ -40,4 +40,36 @@ jobs:
         with:
           name: clang-format.patch
           path: clang-format.patch
+          if-no-files-found: ignore
+
+  cmake-format:
+    name: Auto format with cmake-format
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: install packages
+        run: sudo apt install cmake-format
+      - name: run cmake format
+        run: |
+          ./do_cmake_format.sh
+      - name: check for differences
+        run: |
+          git diff >cmake-format.patch
+          if [ $(wc -c <cmake-format.patch) -ne 0 ] ; then
+             echo "there was a formatting issue."
+             cat /etc/os-release
+             echo "you may download the artifact and apply it with git apply"
+             cat cmake-format.patch
+             exit 1
+          else
+             rm cmake-format.patch
+          fi
+      - name: store patch as artifact if there is one
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cmake-format.patch
+          path: cmake-format.patch
           if-no-files-found: ignore
