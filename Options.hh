@@ -36,9 +36,9 @@ struct Options
   long nsecsleep = 0; // number of nanoseconds to sleep between each file read.
   std::string resultsfile = "results.txt"; // results file name.
   std::uint64_t first_bytes_size =
-    64; // how much to read during the "read first bytes" step
+    4096; // how much to read during the "read first bytes" step
   std::uint64_t last_bytes_size =
-    64; // how much to read during the "read last bytes" step
+    4096; // how much to read during the "read last bytes" step
   /// checksum used for first and last bytes
   checksumtypes checksum_for_firstlast_bytes =
 #ifdef HAVE_LIBXXHASH

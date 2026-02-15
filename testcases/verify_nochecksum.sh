@@ -24,14 +24,19 @@ makefiles() {
 reset_teststate
 makefiles
 
+# set small first/last to small sizes
+firstlastoptions="-firstbytessize 64 -lastbytessize 64"
+
 # with no checksum, we should falsely believe the files are equal
-$rdfind -checksum none a* b* \
+# shellcheck disable=SC2086
+$rdfind $firstlastoptions -checksum none a* b* \
   | grep "files that are not unique" >output.log
 
 verify [ "$(cat output.log)" = "It seems like you have 2 files that are not unique" ]
 
 # with checksumming (the default) the files should not be considered equal.
-$rdfind -checksum sha1 a* b* \
+# shellcheck disable=SC2086
+$rdfind $firstlastoptions -checksum sha1 a* b* \
   | grep "files that are not unique" >output.log
 
 verify [ "$(cat output.log)" = "It seems like you have 0 files that are not unique" ]
