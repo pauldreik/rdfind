@@ -81,7 +81,8 @@ set(testscripts
     testcases/verify_maxfilesize_option.sh
     testcases/verify_nochecksum.sh
     testcases/verify_ranking.sh
-    testcases/verify_size_savings.sh)
+    testcases/verify_size_savings.sh
+    testcases/verify_skipfirstbytes.sh)
 
 foreach(testscript ${testscripts})
   cmake_path(GET testscript STEM testname)

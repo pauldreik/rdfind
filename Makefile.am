@@ -9,19 +9,21 @@ rdfind_SOURCES = rdfind.cc Checksum.cc  Dirlist.cc  Fileinfo.cc  Rdutil.cc \
 LDADD = @LIBXXHASH@
 #these are the test scripts to execute - I do not know how to glob here,
 #feedback welcome.
-TESTS=testcases/largefilesupport.sh \
-      testcases/hardlink_fails.sh \
-      testcases/symlinking_action.sh \
-      testcases/verify_filesize_option.sh \
-      testcases/verify_maxfilesize_option.sh \
-      testcases/verify_dryrun_option.sh \
-      testcases/verify_ranking.sh \
-      testcases/verify_deterministic_operation.sh \
+TESTS=testcases/checksum_buffersize.sh \
       testcases/checksum_options.sh \
+      testcases/hardlink_fails.sh \
+      testcases/largefilesupport.sh \
       testcases/md5collisions.sh \
       testcases/sha1collisions.sh \
-      testcases/checksum_buffersize.sh \
-      testcases/verify_nochecksum.sh
+      testcases/symlinking_action.sh \
+      testcases/verify_deterministic_operation.sh \
+      testcases/verify_dryrun_option.sh \
+      testcases/verify_filesize_option.sh \
+      testcases/verify_maxfilesize_option.sh \
+      testcases/verify_nochecksum.sh \
+      testcases/verify_ranking.sh \
+      testcases/verify_size_savings.sh \
+      testcases/verify_skipfirstbytes.sh
 
 
 AUXFILES=testcases/common_funcs.sh \
