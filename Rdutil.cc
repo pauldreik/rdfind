@@ -20,6 +20,7 @@
 
 // project
 #include "Fileinfo.hh" //file container
+#include "Options.hh"
 #include "RdfindDebug.hh"
 
 // class declaration
@@ -542,16 +543,15 @@ Rdutil::saveablespace(std::ostream& out) const
 int
 Rdutil::fillwithbytes(enum Fileinfo::readtobuffermode type,
                       enum Fileinfo::readtobuffermode lasttype,
-                      const long nsecsleep,
-                      const std::size_t buffersize,
+                      const Options& options,
                       std::function<void(std::size_t)> progress_cb)
 {
   // first sort on inode (to read efficiently from the hard drive)
   sortOnDeviceAndInode();
 
-  const auto duration = std::chrono::nanoseconds{ nsecsleep };
+  const auto duration = std::chrono::nanoseconds{ options.nsecsleep };
 
-  std::vector<char> buffer(buffersize, '\0');
+  std::vector<char> buffer(options.buffersize, '\0');
   std::size_t progress_count = 0;
 
   for (auto& elem : m_list) {
@@ -559,8 +559,8 @@ Rdutil::fillwithbytes(enum Fileinfo::readtobuffermode type,
       ++progress_count;
       progress_cb(progress_count);
     }
-    elem.fillwithbytes(type, lasttype, buffer);
-    if (nsecsleep > 0) {
+    elem.fillwithbytes(type, lasttype, buffer, options);
+    if (options.nsecsleep > 0) {
       std::this_thread::sleep_for(duration);
     }
   }

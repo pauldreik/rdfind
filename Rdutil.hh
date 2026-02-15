@@ -14,6 +14,8 @@
 
 #include "Fileinfo.hh" //file container
 
+struct Options;
+
 class Rdutil
 {
 public:
@@ -90,8 +92,7 @@ public:
   // nanoseconds can be made between each file.
   int fillwithbytes(enum Fileinfo::readtobuffermode type,
                     enum Fileinfo::readtobuffermode lasttype,
-                    long nsecsleep,
-                    std::size_t buffersize,
+                    const Options& options,
                     std::function<void(std::size_t)> progress_cb);
 
   /// make symlinks of duplicates.

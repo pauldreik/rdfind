@@ -20,12 +20,14 @@
 // project
 #include "Checksum.hh" //checksum calculation
 #include "Fileinfo.hh"
+#include "Options.hh"
 #include "UndoableUnlink.hh"
 
 int
 Fileinfo::fillwithbytes(enum readtobuffermode filltype,
                         enum readtobuffermode lasttype,
-                        std::vector<char>& buffer)
+                        std::vector<char>& buffer,
+                        const Options& options)
 {
 
   // Decide if we are going to read from file or not.

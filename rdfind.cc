@@ -191,8 +191,7 @@ main(int narg, const char* argv[])
     }
 
     // read bytes (destroys the sorting, for disk reading efficiency)
-    gswd.fillwithbytes(
-      it[0].first, it[-1].first, o.nsecsleep, o.buffersize, progress_callback);
+    gswd.fillwithbytes(it[0].first, it[-1].first, o, progress_callback);
 
     // remove non-duplicates
     std::cout << "removed " << gswd.removeUniqSizeAndBuffer()
