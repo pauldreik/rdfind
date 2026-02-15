@@ -32,6 +32,8 @@ add_library(
   ../EasyRandom.hh
   ../Fileinfo.cc
   ../Fileinfo.hh
+  ../Options.cc
+  ../Options.hh
   ../RdfindDebug.hh
   ../Rdutil.cc
   ../Rdutil.hh
