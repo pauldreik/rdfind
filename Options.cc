@@ -6,64 +6,70 @@
 #include "CmdlineParser.hh"
 #include "Options.hh"
 
+namespace {
+constexpr auto usagetext = R"(
+Usage: rdfind [options] FILE ...
+
+Finds duplicate files recursively in the given FILEs (directories), and takes
+appropriate action (by default, nothing). Directories listed first are ranked
+higher, meaning that if a file is found on several places, the file found in
+the directory first encountered on the command line is kept, and the others are
+considered duplicate.
+
+options are (default choice within parentheses)
+
+ Searching options:
+
+ -ignoreempty      (true)| false  ignore empty files (true implies -minsize 1,
+                                  false implies -minsize 0)
+ -minsize N        (N=1)          ignores files with size less than N bytes
+ -maxsize N        (N=0)          ignores files with size N bytes and larger
+                                  (use 0 to disable this check).
+ -followsymlinks    true |(false) follow symlinks
+ -removeidentinode (true)| false  ignore files with nonunique device and inode
+
+ Processing options:
+
+ -checksum          none | md5 |(sha1)| sha256 | sha512 | xxh128
+                                  checksum type
+                                  xxh128 is very fast, but is noncryptographic.
+ -buffersize N                    chunksize in bytes when calculating the
+                                  checksum. The default is 1 MiB, can be up
+                                  to 128 MiB.
+ -deterministic    (true)| false  makes results independent of order
+                                  from listing the filesystem
+
+ Action options:
+
+ -makeresultsfile  (true)| false  makes a results file
+ -makesymlinks      true |(false) replace duplicate files with symbolic links
+ -makehardlinks     true |(false) replace duplicate files with hard links
+ -deleteduplicates  true |(false) delete duplicate files
+                                  Default is 0. Only a few values
+                                  are supported; 0, 1-5, 10, 25, 50, 100
+ -dryrun|-n         true |(false) print to stdout instead of changing anything
+
+ General options:
+
+ -outputname NAME                 sets the results file name to NAME,
+                                  default is results.txt
+ -sleep             Xms           sleep for X milliseconds between file reads.
+ -progress          true |(false) output progress information
+ -h|-help|--help                  show this help and exit
+ -v|--version                     display version number and exit
+
+If properly installed, a man page should be available as man rdfind.
+
+rdfind is written by Paul Dreik 2006 onwards.
+License: GPL v2 or later (at your option).
+)";
+
+}
+
 void
 usage()
 {
-  const auto indent = "                                  ";
-  std::cout
-    << "Usage: rdfind [options] FILE ...\n"
-    << '\n'
-    << "Finds duplicate files recursively in the given FILEs (directories),\n"
-    << "and takes appropriate action (by default, nothing).\n"
-    << "Directories listed first are ranked higher, meaning that if a\n"
-    << "file is found on several places, the file found in the directory "
-       "first\n"
-    << "encountered on the command line is kept, and the others are "
-       "considered duplicate.\n"
-    << '\n'
-    << "options are (default choice within parentheses)\n"
-    << '\n'
-    << " -ignoreempty      (true)| false  ignore empty files (true implies "
-       "-minsize 1,\n"
-    << "                                  false implies -minsize 0)\n"
-    << " -minsize N        (N=1)          ignores files with size less than N "
-       "bytes\n"
-    << " -maxsize N        (N=0)          ignores files with size N "
-       "bytes and larger (use 0 to disable this check).\n"
-    << " -followsymlinks    true |(false) follow symlinks\n"
-    << " -removeidentinode (true)| false  ignore files with nonunique "
-       "device and inode\n"
-    << " -checksum          none | md5 |(sha1)| sha256 | sha512 | xxh128\n"
-    << indent << "checksum type\n"
-    << indent << "xxh128 is very fast, but is noncryptographic.\n"
-    << " -buffersize N\n"
-    << indent << "chunksize in bytes when calculating the checksum.\n"
-    << indent << "The default is 1 MiB, can be up to 128 MiB.\n"
-    << " -deterministic    (true)| false  makes results independent of order\n"
-    << "                                  from listing the filesystem\n"
-    << " -makesymlinks      true |(false) replace duplicate files with "
-       "symbolic links\n"
-    << " -makehardlinks     true |(false) replace duplicate files with "
-       "hard links\n"
-    << " -makeresultsfile  (true)| false  makes a results file\n"
-    << " -outputname  name  sets the results file name to \"name\" "
-       "(default results.txt)\n"
-    << " -progress          true |(false) output progress information"
-    << " -deleteduplicates  true |(false) delete duplicate files\n"
-    << " -sleep             Xms          sleep for X milliseconds between "
-       "file reads.\n"
-    << "                                  Default is 0. Only a few values\n"
-    << "                                  are supported; 0,1-5,10,25,50,100\n"
-    << " -dryrun|-n         true |(false) print to stdout instead of "
-       "changing anything\n"
-    << " -h|-help|--help                  show this help and exit\n"
-    << " -v|--version                     display version number and exit\n"
-    << '\n'
-    << "If properly installed, a man page should be available as man rdfind.\n"
-    << '\n'
-    << "rdfind is written by Paul Dreik 2006 onwards. License: GPL v2 or "
-       "later (at your option).\n"
-    << "version is " << VERSION << '\n';
+  std::cout << usagetext + 1 << "version is " << VERSION << '\n';
 }
 
 Options
