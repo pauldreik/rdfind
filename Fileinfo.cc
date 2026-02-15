@@ -51,7 +51,7 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
     return -1;
   }
 
-  auto checksumtype = Checksum::checksumtypes::NOTSET;
+  auto checksumtype = checksumtypes::NOTSET;
   // read some bytes
   switch (filltype) {
     case readtobuffermode::READ_FIRST_BYTES:
@@ -64,26 +64,26 @@ Fileinfo::fillwithbytes(enum readtobuffermode filltype,
       f1.read(m_somebytes.data(), SomeByteSize);
       break;
     case readtobuffermode::CREATE_MD5_CHECKSUM:
-      checksumtype = Checksum::checksumtypes::MD5;
+      checksumtype = checksumtypes::MD5;
       break;
     case readtobuffermode::CREATE_SHA1_CHECKSUM:
-      checksumtype = Checksum::checksumtypes::SHA1;
+      checksumtype = checksumtypes::SHA1;
       break;
     case readtobuffermode::CREATE_SHA256_CHECKSUM:
-      checksumtype = Checksum::checksumtypes::SHA256;
+      checksumtype = checksumtypes::SHA256;
       break;
     case readtobuffermode::CREATE_SHA512_CHECKSUM:
-      checksumtype = Checksum::checksumtypes::SHA512;
+      checksumtype = checksumtypes::SHA512;
       break;
     case readtobuffermode::CREATE_XXH128_CHECKSUM:
-      checksumtype = Checksum::checksumtypes::XXH128;
+      checksumtype = checksumtypes::XXH128;
       break;
     default:
       std::cerr << "does not know how to do that filltype:"
                 << static_cast<long>(filltype) << std::endl;
   }
 
-  if (checksumtype != Checksum::checksumtypes::NOTSET) {
+  if (checksumtype != checksumtypes::NOTSET) {
     Checksum chk(checksumtype);
 
     while (f1) {

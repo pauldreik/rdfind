@@ -41,7 +41,7 @@ AUXFILES=testcases/common_funcs.sh \
 EXTRA_DIST = \
   Dirlist.hh Checksum.hh  Fileinfo.hh \
   Rdutil.hh bootstrap.sh RdfindDebug.hh EasyRandom.hh UndoableUnlink.hh \
-  CmdlineParser.hh Options.hh \
+  CmdlineParser.hh Options.hh ChecksumTypes.hh \
   $(TESTS) \
   $(AUXFILES) \
   rdfind.1 LICENSE \

@@ -4,7 +4,7 @@
 #include <set>
 
 namespace {
-using enum Checksum::checksumtypes;
+using enum checksumtypes;
 const auto types = { MD5,
                      SHA1,
                      SHA256,

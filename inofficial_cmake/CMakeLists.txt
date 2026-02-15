@@ -24,6 +24,7 @@ add_library(
   rdfindimpl OBJECT
   ../Checksum.cc
   ../Checksum.hh
+  ../ChecksumTypes.hh
   ../CmdlineParser.cc
   ../CmdlineParser.hh
   ../Dirlist.cc

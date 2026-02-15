@@ -20,23 +20,14 @@
 #include <xxhash.h>
 #endif
 
+#include "ChecksumTypes.hh"
+
 /**
  * class for checksum calculation
  */
 class Checksum
 {
 public:
-  // these are the checksums that can be calculated
-  enum class checksumtypes
-  {
-    NOTSET = 0,
-    MD5,
-    SHA1,
-    SHA256,
-    SHA512,
-    XXH128
-  };
-
   explicit Checksum(checksumtypes type);
   Checksum(const Checksum& other);
   Checksum(Checksum&& other);
