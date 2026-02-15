@@ -45,6 +45,15 @@ Checksum::Checksum(checksumtypes type)
   }
 }
 
+Checksum::~Checksum()
+{
+#ifdef HAVE_LIBXXHASH
+  if (m_checksumtype == checksumtypes::XXH128) {
+    XXH3_freeState(m_state.xxh128);
+  }
+#endif
+}
+
 int
 Checksum::update(std::size_t length, const unsigned char* buffer)
 {
@@ -208,7 +217,6 @@ Checksum::printToBuffer(void* buffer, std::size_t N)
         XXH128_hash_t result = XXH3_128bits_digest(m_state.xxh128);
         XXH128_canonicalFromHash(static_cast<XXH128_canonical_t*>(buffer),
                                  result);
-        XXH3_freeState(m_state.xxh128);
       } else {
         // bad size.
         return -1;

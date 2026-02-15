@@ -38,6 +38,7 @@ public:
   };
 
   explicit Checksum(checksumtypes type);
+  ~Checksum();
 
   int update(std::size_t length, const unsigned char* buffer);
   int update(std::size_t length, const char* buffer);
