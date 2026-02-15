@@ -1,8 +1,11 @@
 #pragma once
 
+#include "config.h"
+
 #include <cstddef>
 #include <string>
 
+#include "ChecksumTypes.hh"
 #include "Fileinfo.hh"
 
 class Parser;
@@ -36,6 +39,14 @@ struct Options
     64; // how much to read during the "read first bytes" step
   std::uint64_t last_bytes_size =
     64; // how much to read during the "read last bytes" step
+  /// checksum used for first and last bytes
+  checksumtypes checksum_for_firstlast_bytes =
+#ifdef HAVE_LIBXXHASH
+    checksumtypes::XXH128;
+#else
+    // the fastest one after xxh128 is sha1
+    checksumtypes::SHA1;
+#endif
 };
 
 void
