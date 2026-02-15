@@ -10,7 +10,8 @@ name: debian 13 trixie
 
 
 jobs:
-  container-test-job:
+  container-automake:
+    name: automake
     runs-on: ubuntu-latest
     container:
       image: debian:trixie-slim
@@ -36,8 +37,32 @@ jobs:
           ./configure
           make
           make check
-      - name: store the logs as an artifact
+      - name: store automake logs as artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           path: '**/*.log'
+          name: 'automake logs'
+
+  container-cmake:
+    name: cmake
+    runs-on: ubuntu-latest
+    container:
+      image: debian:trixie-slim
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: install packages
+        run: apt-get update && apt-get install cmake pkgconf build-essential nettle-dev libcap2-bin --yes
+      - name: configure
+        run: cmake -B build -S inofficial_cmake/
+      - name: build
+        run: cmake --build build
+      - name: test
+        run: ctest --test-dir build --output-on-failure
+      - name: store cmake logs as artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          path: '**/*.log'
+          name: 'cmake logs'
