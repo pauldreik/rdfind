@@ -59,3 +59,38 @@ TEST_CASE("creating and not using it is fine")
     Checksum ck(type);
   }
 }
+
+TEST_CASE("copying a checksum is fine")
+{
+  static const char* content = "abcd";
+  for (auto type : types) {
+    const auto expected = [type]() {
+      Checksum ck(type);
+      REQUIRE(0 == ck.update(std::strlen(content), content));
+      return finalize_checksum(ck);
+    }();
+    Checksum original(type);
+    REQUIRE(0 == original.update(std::strlen(content), content));
+    Checksum copy(original);
+    REQUIRE(expected == finalize_checksum(copy));
+    REQUIRE(expected == finalize_checksum(original));
+  }
+}
+
+TEST_CASE("copy from an rval is fine")
+{
+  static const char* content = "abcd";
+  for (auto type : types) {
+    const auto expected = [type]() {
+      Checksum ck(type);
+      REQUIRE(0 == ck.update(std::strlen(content), content));
+      return finalize_checksum(ck);
+    }();
+    Checksum original(type);
+    REQUIRE(0 == original.update(std::strlen(content), content));
+
+    // move copy should be ok
+    Checksum movedto(std::move(original));
+    REQUIRE(expected == finalize_checksum(movedto));
+  }
+}

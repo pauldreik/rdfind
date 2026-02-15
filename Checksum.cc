@@ -10,7 +10,9 @@
 #include <array>
 #include <cassert>
 #include <cstdio>
+#include <cstring>
 #include <stdexcept>
+#include <utility>
 
 // project
 #include "Checksum.hh"
@@ -42,6 +44,34 @@ Checksum::Checksum(checksumtypes type)
     default:
       // not allowed to have something that is not recognized.
       throw std::runtime_error("wrong checksum type - programming error");
+  }
+}
+
+Checksum::Checksum(Checksum&& other)
+  : m_checksumtype(other.m_checksumtype)
+{
+#ifdef HAVE_LIBXXHASH
+  if (m_checksumtype == checksumtypes::XXH128) {
+    m_state.xxh128 = std::exchange(other.m_state.xxh128, nullptr);
+  } else
+#endif
+  {
+    std::memcpy(&m_state, &other.m_state, sizeof(m_state));
+  }
+}
+
+Checksum::Checksum(const Checksum& other)
+  : m_checksumtype(other.m_checksumtype)
+{
+#ifdef HAVE_LIBXXHASH
+  if (m_checksumtype == checksumtypes::XXH128) {
+    m_state.xxh128 = XXH3_createState();
+    assert(m_state.xxh128 != NULL && "Out of memory!");
+    XXH3_copyState(m_state.xxh128, other.m_state.xxh128);
+  } else
+#endif
+  {
+    std::memcpy(&m_state, &other.m_state, sizeof(m_state));
   }
 }
 
