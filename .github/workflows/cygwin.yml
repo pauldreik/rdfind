@@ -1,0 +1,34 @@
+name: cygwin
+
+on: push
+
+jobs:
+  cygwin:
+    runs-on: windows-latest
+    env:
+      SHELLOPTS: igncr
+    defaults:
+      run:
+        shell: C:\tools\cygwin\bin\bash.exe --login '{0}'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: build on cygwin
+        uses: egor-tensin/setup-cygwin@v4
+        with:
+          packages: cmake gcc-g++ libnettle-devel autoconf automake make
+      - name: Run my action
+        run: |
+          cd ${GITHUB_WORKSPACE}
+          ls
+          aclocal --warnings=all
+          autoheader --warnings=all
+          automake --add-missing --warnings=all
+          autoconf --warnings=all
+          ./configure
+          make
+      - name: Upload windows executable
+        uses: actions/upload-artifact@v3
+        with:
+          name: executable
+          path: ${{ github.workspace }}/rdfind.exe
