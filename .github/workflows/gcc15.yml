@@ -17,8 +17,10 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: install packages
-        run: apt update && apt install -y build-essential nettle-dev time
+        run: apt update && apt install -y build-essential nettle-dev time              
       - name: bootstrap
         run: ./bootstrap.sh
       - name: configure
