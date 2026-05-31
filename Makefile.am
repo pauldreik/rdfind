@@ -7,8 +7,10 @@ rdfind_SOURCES = rdfind.cc Checksum.cc  Dirlist.cc  Fileinfo.cc  Rdutil.cc \
                  EasyRandom.cc UndoableUnlink.cc CmdlineParser.cc Options.cc
 
 LDADD = @LIBXXHASH@
-#these are the test scripts to execute - I do not know how to glob here,
-#feedback welcome.
+
+# these are the test scripts to execute.  it would be possible to glob
+# here, but there are some files that are benchmarks and common funcs,
+# so just list the tests in alphabetical order here.
 TESTS=testcases/checksum_buffersize.sh \
       testcases/checksum_options.sh \
       testcases/hardlink_fails.sh \
@@ -24,7 +26,6 @@ TESTS=testcases/checksum_buffersize.sh \
       testcases/verify_ranking.sh \
       testcases/verify_size_savings.sh \
       testcases/verify_skipfirstbytes.sh
-
 
 AUXFILES=testcases/common_funcs.sh \
          testcases/md5collisions/letter_of_rec.ps \
