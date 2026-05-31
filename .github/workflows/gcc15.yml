@@ -1,0 +1,36 @@
+---
+name: gcc 15
+
+"on":
+  push:
+    branches:
+      - main
+      - devel
+  pull_request:
+
+jobs:
+  build:
+    name: Compiles with gcc 15
+    runs-on: ubuntu-latest
+    container: gcc:15
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: install packages
+        run: apt update && apt install -y build-essential nettle-dev time
+      - name: bootstrap
+        run: ./bootstrap.sh
+      - name: configure
+        run: ./configure CXXFLAGS=-std=c++17
+      - name: build
+        run: make
+      - name: check
+        run: make check
+      - name: store the logs as an artifact
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          path: '**/*.log'
