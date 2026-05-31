@@ -12,7 +12,7 @@ jobs:
   build:
     name: Compiles with gcc 15
     runs-on: ubuntu-latest
-    container: gcc:16
+    container: gcc:15
 
     steps:
       - name: checkout
@@ -24,7 +24,7 @@ jobs:
       - name: bootstrap
         run: ./bootstrap.sh
       - name: configure
-        run: ./configure CXX=g++-16 CXXFLAGS=-std=c++17
+        run: ./configure CXX=g++-15 CXXFLAGS=-std=c++17
       - name: build
         run: make
       - name: check
