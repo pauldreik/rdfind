@@ -7,6 +7,7 @@
 #include "config.h"
 
 // std
+#include <algorithm>
 #include <cassert>
 #include <cerrno>   //for errno
 #include <cstring>  //for strerror
