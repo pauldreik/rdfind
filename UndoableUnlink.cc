@@ -11,7 +11,8 @@
 #include <stdexcept>
 
 // os
-#include <unistd.h> //for unlink etc.
+#include <stdio.h>  // for rename
+#include <unistd.h> // for unlink etc.
 
 // project
 #include "EasyRandom.hh"

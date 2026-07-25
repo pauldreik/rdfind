@@ -1,6 +1,7 @@
 #include "config.h" //header file from autoconf, must come first to make large file support work properly
 
 #include <algorithm>
+#include <cstdlib>
 #include <iostream>
 #include <limits>
 
